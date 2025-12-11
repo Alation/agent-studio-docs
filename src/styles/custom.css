@@ -1,0 +1,148 @@
+/* Dark mode colors. */
+:root {
+	--sl-color-accent-low: #391a06;
+	--sl-color-accent: #a44e00;
+	--sl-color-accent-high: #e8bfa7;
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #dff0ff;
+	--sl-color-gray-2: #afc5d7;
+	--sl-color-gray-3: #6691b3;
+	--sl-color-gray-4: #335c7c;
+	--sl-color-gray-5: #103c59;
+	--sl-color-gray-6: #002944;
+	--sl-color-black: #081a27;
+}
+
+/* Light mode colors. */
+:root[data-theme='light'] {
+	--sl-color-accent-low: #efcfbd;
+	--sl-color-accent: #a74f00;
+	--sl-color-accent-high: #522300;
+	--sl-color-white: #081a27;
+	--sl-color-gray-1: #002944;
+	--sl-color-gray-2: #103c59;
+	--sl-color-gray-3: #335c7c;
+	--sl-color-gray-4: #6691b3;
+	--sl-color-gray-5: #afc5d7;
+	--sl-color-gray-6: #dff0ff;
+	--sl-color-gray-7: #eff8ff;
+	--sl-color-black: #ffffff;
+}
+
+:root {
+	--highlight-hsl: 176, 58.8%, 68.6%;
+	--overlay-blur: hsla(var(--highlight-hsl), 0.2);
+	--sl-font-mono: "JetBrains Mono Variable", monospace;
+	--sl-font-system-mono: "JetBrains Mono Variable", monospace;
+}
+
+:root[data-theme='light'] {
+	--highlight-hsl: 203, 100.0%, 14.7%;
+	--overlay-blur: hsla(var(--highlight-hsl), 0.3);
+}
+
+[data-has-hero] .page {
+	background:
+		linear-gradient(215deg, var(--overlay-blur), transparent 40%),
+		radial-gradient(var(--overlay-blur), transparent 40%) no-repeat -60vw -40vh / 105vw 200vh,
+		radial-gradient(var(--overlay-blur), transparent 65%) no-repeat 50% calc(100% + 20rem) / 60rem 30rem;
+}
+
+[data-has-hero] header {
+	border-bottom: 1px solid transparent;
+	background-color: transparent;
+}
+
+[data-has-hero] .header-backdrop {
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	background: linear-gradient(to bottom,
+			var(--sl-color-gray-6),
+			transparent 50%);
+	height: 200%;
+	-webkit-mask-image: linear-gradient(to bottom,
+			black 0% 50%,
+			transparent 50% 100%);
+	mask-image: linear-gradient(to bottom,
+			black 0% 50%,
+			transparent 50% 100%);
+	z-index: -1;
+}
+
+[data-has-hero] .header-backdrop-edge {
+	height: 4px;
+}
+
+[data-has-hero] .hero>img {
+	filter: drop-shadow(0 0 3rem var(--overlay-blur));
+}
+
+.sl-markdown-content code:not(:where(.not-content *)) {
+	background-color: var(--sl-color-black);
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 5px;
+	padding: 0.175rem 0.35rem;
+	margin: 0 0.05rem;
+	font-size: var(--sl-text-code);
+}
+
+.sl-markdown-content table {
+	margin: 15px 0;
+	border-collapse: separate;
+	max-width: fit-content;
+	margin-inline: auto;
+	width: auto;
+	padding: 0;
+}
+
+.sl-markdown-content table :is(th:first-child, td:first-child) {
+	padding: 2px 4px;
+}
+
+.sl-markdown-content :is(th:last-child, td:last-child):not(:where(.not-content *)) {
+	padding: 2px 4px;
+}
+
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+	border-bottom: none;
+	vertical-align: baseline;
+}
+
+.sl-markdown-content table code {
+	background-color: inherit;
+	border: none;
+}
+
+.sl-markdown-content table> :is(thead, tbody)>tr> :is(th, td) {
+	padding: 3px 6px;
+}
+
+.sl-markdown-content table>thead>tr> :is(th, td) {
+	background-color: var(--sl-color-gray-5);
+	border-top: 2px solid var(--sl-color-gray-3);
+}
+
+.sl-markdown-content table>tbody>tr:last-child> :is(th, td) {
+	border-bottom: 2px solid var(--sl-color-gray-3);
+}
+
+.sl-markdown-content table tr {
+	background-color: var(--sl-color-gray-6);
+}
+
+.sl-markdown-content table tr:nth-child(2n) {
+	background-color: var(--sl-color-black);
+}
+
+.card {
+	border-radius: 0.5rem;
+}
+
+aside {
+	border-radius: 0.5rem;
+}
+
+starlight-image-zoom-zoomable img {
+	margin-left: auto;
+	margin-right: auto;
+}

@@ -1,0 +1,26 @@
+version: 2
+updates:
+  # CI
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 7
+    pull-request-branch-name:
+      separator: "-"
+    commit-message:
+      prefix: "build(deps/ci)"
+  # Docs
+  - package-ecosystem: "npm"
+    directory: "docs/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    cooldown:
+      default-days: 7
+    pull-request-branch-name:
+      separator: "-"
+    commit-message:
+      prefix: "build(deps/docs)"

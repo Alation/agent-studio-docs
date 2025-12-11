@@ -1,0 +1,25 @@
+{
+  "name": "alation-studio-docs",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.37.0",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "astro": "^5.16.4",
+    "sharp": "^0.34.5",
+    "starlight-image-zoom": "^0.13.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  }
+}
