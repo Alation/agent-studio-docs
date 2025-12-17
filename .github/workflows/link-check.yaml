@@ -1,64 +1,67 @@
 name: Link Checker
 
 on:
-  push:
+    merge_group:
+    pull_request:
+    push:
+        branches: [main]
 
 jobs:
-  check_links:
-    name: Link Checking
-    runs-on: ubuntu-latest
+    check_links:
+        name: Link Checking
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
 
-      - name: Install d2 with retry and exponential backoff
-        run: |
-          max_attempts=3
-          for attempt in $(seq 1 "$max_attempts"); do
-            echo "Attempt $attempt of $max_attempts: Installing d2..."
+            - name: Install d2 with retry and exponential backoff
+              run: |
+                  max_attempts=3
+                  for attempt in $(seq 1 "$max_attempts"); do
+                    echo "Attempt $attempt of $max_attempts: Installing d2..."
 
-            if curl -fsSL https://d2lang.com/install.sh | sh -s --; then
-              echo "✅ d2 installed successfully."
-              exit 0
-            fi
-            if [ "$attempt" -lt "$max_attempts" ]; then
-              sleep_time=$((attempt * 5))
-              echo "❌ Install failed. Retrying in ${sleep_time}s..."
-              sleep "$sleep_time"
-            else
-              echo "🔥 d2 installation failed after $max_attempts attempts."
-              exit 1
-            fi
-          done
+                    if curl -fsSL https://d2lang.com/install.sh | sh -s --; then
+                      echo "✅ d2 installed successfully."
+                      exit 0
+                    fi
+                    if [ "$attempt" -lt "$max_attempts" ]; then
+                      sleep_time=$((attempt * 5))
+                      echo "❌ Install failed. Retrying in ${sleep_time}s..."
+                      sleep "$sleep_time"
+                    else
+                      echo "🔥 d2 installation failed after $max_attempts attempts."
+                      exit 1
+                    fi
+                  done
 
-      - name: Install and build site
-        uses: withastro/action@v5
-        with:
-          path: .
+            - name: Install and build site
+              uses: withastro/action@v5
+              with:
+                  path: .
 
-      - name: Restore lychee cache
-        id: restore-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: .lycheecache
-          # `-N-` at the end of the prefix just useful for forcing a new cache
-          key: cache-lychee-0-${{ hashFiles('dist/**/*.html') }}
-          restore-keys: cache-lychee-0-
+            - name: Restore lychee cache
+              id: restore-cache
+              uses: actions/cache/restore@v4
+              with:
+                  path: .lycheecache
+                  # `-N-` at the end of the prefix just useful for forcing a new cache
+                  key: cache-lychee-0-${{ hashFiles('dist/**/*.html') }}
+                  restore-keys: cache-lychee-0-
 
-      - name: Run lychee
-        uses: lycheeverse/lychee-action@v2
-        with:
-          fail: true
-          args: --accept "100..=103,200..=299,403,418,429" --cache-exclude-status 401 --root-dir="${{ github.workspace }}/dist" --cache --max-cache-age 3d "dist/**/*.html"
-          jobSummary: true
-          format: markdown
-          workingDirectory: .
+            - name: Run lychee
+              uses: lycheeverse/lychee-action@v2
+              with:
+                  fail: true
+                  args: --accept "100..=103,200..=299,403,418,429" --cache-exclude-status 401 --root-dir="${{ github.workspace }}/dist" --cache --max-cache-age 3d "dist/**/*.html"
+                  jobSummary: true
+                  format: markdown
+                  workingDirectory: .
 
-      - name: Save lychee cache
-        uses: actions/cache/save@v4
-        if: success()
-        with:
-          path: .lycheecache
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+            - name: Save lychee cache
+              uses: actions/cache/save@v4
+              if: success()
+              with:
+                  path: .lycheecache
+                  key: ${{ steps.restore-cache.outputs.cache-primary-key }}
