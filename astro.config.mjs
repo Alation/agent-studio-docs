@@ -51,11 +51,11 @@ export default defineConfig({
                     label: "Reference",
                     items: [
                         {
-                            label: "API Reference",  
+                            label: "API Reference",
                             link: "https://developer.alation.com/dev/reference/alation-ai-api-overview"
                         },
                         {
-                            label: "Authentication",  
+                            label: "Authentication",
                             link: "reference/auth"
                         },
                         {
