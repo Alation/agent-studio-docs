@@ -1,0 +1,261 @@
+---
+title: Tools
+description: Tools Index
+---
+
+Tools are one of the main primitives for building agentic workflows & systems.
+Agents can choose to call tools as they see fit in order to learn about their environment, and to take actions to act upon this information. 
+Typically, tools will be accessed through an [MCP server](/agent-studio-docs/getting-started/key_concepts/#what-is-mcp).
+To learn more about tools, see [here](/agent-studio-docs/getting-started/tools/).
+
+## Alation Context
+
+:::danger
+This tool is deprecated in favor of the [Catalog Context Search Agent](../agents/catalog_context_search), and will be removed in February 2026! 
+:::
+
+This tool fetches catalog objects from Alation's Data Catalog based on natural language input. 
+Some examples of objects would include: Schema, Table, Column, Query, Glossary, Document, Article, Term, BI Folder, BI Report, and BI Field.
+A signature can be used to narrow down both the initial search space, as well as the output returned.
+For more information on signatures, see the [official Alation documentation](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature).
+
+### Example usage
+
+```json
+{
+  "question": "What brewery information is there in the catalog?",
+  "signature": {
+    "table": {
+      "fields_required": [
+        "name",
+        "title",
+        "description",
+        "url"
+      ],
+      "fields_optional": [
+        "columns"
+      ],
+      "child_objects": {
+        "columns": {
+          "fields": [
+            "name",
+            "title",
+            "data_type",
+            "description"
+          ]
+        }
+      },
+      "limit": 15
+    }
+  }
+}
+```
+
+### See also
+- https://developer.alation.com/dev/docs/guide-to-aggregated-context-api-beta
+
+
+## BI Report Search Tool
+
+This tool can be used to search the Alation Data Catalog for BI reports.
+Results can optionally be filtered using the `filters` and `limit` parameters.
+`filters` should only be used for custom fields, and should follow the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature.
+
+
+### Example usage
+
+```json
+{
+  "search_term": "Find me our analysis on PEBKAC errors.",
+  "filters": [
+    {
+      "filter_id": 0,
+      "filter_values": [
+        "foo",
+        "bar"
+      ]
+    }
+  ],
+  "limit": 20
+}
+```
+
+## Get Catalog Object Tool
+
+This tool can be used to fetch an object's information from the Alation Data Catalog.
+Supported object types are: `schema`, `table`, and `column`.
+
+### Example usage
+
+```json
+{
+  "object_type": "schema",
+  "object_id": 0
+}
+```
+
+### See also
+
+- [update_catalog_object_tool](#update_catalog_object_tool)
+
+## Get Data Product Spec Tool
+
+This tool can be used to fetch a raw data product spec in JSON format.
+The output is the same as what is expected by the `update_data_product` tool.
+
+### Example usage
+
+```jsonc
+{
+  "data_product_id": "my-data-product",
+  "data_product_version": "v1" // Optional
+}
+```
+
+### See also
+
+- [update_data_product_tool](#update_data_product_tool)
+- https://developer.alation.com/dev/reference/get_data_product
+- https://developer.alation.com/dev/reference/get_data_product_version
+
+## Get Data Schema Tool
+
+This tool fetches metadata and sample column values for all tables in a given data product.
+Agents can use this tool to gain a holistic understand of the data product before move on to more intensive tasks, such as running SQL queries.
+
+### Example usage
+
+```jsonc
+{
+  "data_product_id": "my-data-product",
+  "pre_exec_sql": "",  // Optional, SQL to execute before sampling tables. Useful for setting session-level context data in a DB.
+  "auth_id": "string",  // Optional
+  "query": "string"  // Optional, used to semantically search sample data for columns.
+}
+```
+
+## Get Data Sources Tool
+
+This tool fetches all available data sources from the Alation Data Catalog.
+
+### Example usage
+
+```jsonc
+{
+  "limit": 100
+}    
+```
+
+### See also
+
+- https://developer.alation.com/dev/reference/getdatasources-2
+
+## Get Search Filter Fields Tool
+
+This tool can be used to find all possible fields which can be used for searching the Alation Data Catalog.
+All possible filters will be searched, but only the ones which are the most semantically similar to the original search term will be returned.
+The amount of results can be controlled through a parameter.
+
+### Example usage
+
+```json
+{
+  "search_term": "compliance",
+  "limit": 10
+}
+```
+
+### See also
+
+- [get_search_filter_values_tool](#get_search_filter_values_tool)
+- [search_catalog_tool](#search_catalog_tool)
+
+## Get Search Filter Values Tool
+
+This tool can be used to find particular values for a given field, which can be used to filter results from searching the Alation Data Catalog.
+Use the search term to help narrow down results by semantically searching.
+To search for fields which can be used for filtering, use the `get_search_filter_fields` tool.
+
+### Example usage
+
+```json
+{
+  "field_id": 0,
+  "search_term": "governance",
+  "limit": 10
+}  
+```
+
+### See also
+
+- [get_search_filter_fields](#get_search_filter_fields_tool)
+- [search_catalog_tool](#search_catalog_tool)
+
+## List Data Products Tool
+
+This tool can be used to fetch multiple data products based on a natural language query.
+
+### Example usage
+
+```jsonc
+{
+  "search_term": "Human Resources",
+  "limit": 5,
+  "marketplace_id": "my-marketplace"  // Optional
+}
+   
+```
+
+### See also
+
+- https://developer.alation.com/dev/reference/data_product_marketplace_search
+
+## Search Catalog Tool
+
+This tool can be used to search for objects & assets within the Alation Data Catalog.
+Types of objects include: tables, schemas, columns, articles, and glossary terms.
+`filters` should only be used for custom fields, and should follow the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature.
+
+### Example usage
+
+```json
+{
+  "search_term": "Agriculture",
+  "object_types": [
+    "table"
+  ],
+  "filters": [
+    {
+      "filter_id": 0,
+      "filter_values": [
+        "foo",
+        "bar"
+      ]
+    }
+  ],
+  "limit": 20
+}
+```
+
+### See also
+
+- [get_search_filter_values_tool](#get_search_filter_values_tool)
+- [get_search_filter_fields_tool](#get_search_filter_fields_tool)
+
+## SQL Execution Tool
+
+This tool can be used to run queries against a data product.
+Note that mutating queries (`UPDATE`, `DELETE`, etc.) are not allowed.
+The data product must have a SQL compatible data source associated with it.
+
+### Example Usage
+
+```json
+{
+  "data_product_id": "my-data-product",
+  "sql": "SELECT 1;",  // Query to execute.
+  "result_table_name": "select_one",  // Name to describe the tabular results of the query.
+  "pre_exec_sql": "",  // Optional, SQL to execute before sampling tables. Useful for setting session-level context data in a DB.
+  "auth_id": "string",  // Optional
+}
+```
