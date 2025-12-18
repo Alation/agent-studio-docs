@@ -9,8 +9,8 @@ export default defineConfig({
         starlight({
             title: "Alation Agent Studio Documentation",
             logo: {
-                light: './src/assets/logo-light.svg',
-                dark: './src/assets/logo-dark.svg',
+                light: "./src/assets/logo-light.svg",
+                dark: "./src/assets/logo-dark.svg",
                 replacesTitle: true,
             },
             expressiveCode: {
@@ -44,7 +44,7 @@ export default defineConfig({
                     autogenerate: { directory: "guides" },
                 },
                 {
-                    label: 'Agent Studio SDK',
+                    label: "Agent Studio SDK",
                     autogenerate: { directory: "sdk" },
                 },
                 {
