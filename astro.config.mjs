@@ -44,7 +44,13 @@ export default defineConfig({
             sidebar: [
                 {
                     label: "Start Here",
-                    autogenerate: { directory: "getting-started" },
+                    items: [
+                        "getting-started/introduction",
+                        "getting-started/key_concepts",
+                        "getting-started/tools",
+                        "getting-started/agents",
+                        "getting-started/flows",
+                    ]
                 },
                 {
                     label: "Guides",
