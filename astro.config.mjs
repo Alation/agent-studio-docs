@@ -39,6 +39,10 @@ export default defineConfig({
                     autogenerate: { directory: "guides" },
                 },
                 {
+                    label: 'Agent Studio SDK',
+                    autogenerate: { directory: "sdk" },
+                },
+                {
                     label: "Reference",
                     autogenerate: { directory: "reference" },
                 },
