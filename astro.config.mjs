@@ -3,6 +3,8 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightImageZoom from "starlight-image-zoom";
 
+import d2 from "astro-d2";
+
 // https://astro.build/config
 export default defineConfig({
     integrations: [
@@ -51,12 +53,14 @@ export default defineConfig({
                         },
                         {
                             label: "MCP Client Setup",
-                            autogenerate: { directory: "guides/mcp_client_setup" },
+                            autogenerate: {
+                                directory: "guides/mcp_client_setup",
+                            },
                         },
                         {
                             slug: "guides/rest_api",
-                        }
-                    ]
+                        },
+                    ],
                 },
                 {
                     label: "Agent Studio SDK",
@@ -67,33 +71,43 @@ export default defineConfig({
                     items: [
                         {
                             label: "API Reference",
-                            link: "https://developer.alation.com/dev/reference/alation-ai-api-overview"
+                            link: "https://developer.alation.com/dev/reference/alation-ai-api-overview",
                         },
                         {
                             label: "API Role Requirements",
-                            link: "https://developer.alation.com/dev/docs/api-by-roles#ai-apis"
+                            link: "https://developer.alation.com/dev/docs/api-by-roles#ai-apis",
                         },
                         {
                             label: "Authentication",
-                            link: "reference/auth"
+                            link: "reference/auth",
                         },
                         {
-                          label: "Agents",
-                          autogenerate: { directory: "reference/agents" },
+                            label: "Agents",
+                            autogenerate: { directory: "reference/agents" },
                         },
                         {
-                          label: "Tools",
-                          autogenerate: { directory: "reference/tools" },
+                            label: "Tools",
+                            autogenerate: { directory: "reference/tools" },
                         },
                         {
-                          label: "Data Products",
-                          autogenerate: { directory: "reference/data_products" },
+                            label: "Data Products",
+                            autogenerate: {
+                                directory: "reference/data_products",
+                            },
                         },
-                  ],
+                        {
+                            label: "Evaluation",
+                            autogenerate: { directory: "reference/evaluation" },
+                        },
+                    ],
                 },
             ],
             lastUpdated: true,
             credits: true,
+        }),
+        d2({
+            pad: 10,
+            layout: "elk",
         }),
     ],
 });

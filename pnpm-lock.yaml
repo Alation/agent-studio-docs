@@ -17,6 +17,9 @@ importers:
       astro:
         specifier: ^5.16.6
         version: 5.16.6(@types/node@25.0.3)(rollup@4.53.5)(typescript@5.9.3)
+      astro-d2:
+        specifier: ^0.8.1
+        version: 0.8.1(astro@5.16.6(@types/node@25.0.3)(rollup@4.53.5)(typescript@5.9.3))
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -675,6 +678,12 @@ packages:
   astring@1.9.0:
     resolution: {integrity: sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==}
     hasBin: true
+
+  astro-d2@0.8.1:
+    resolution: {integrity: sha512-r2Y4KbRQ+hOFV+YR7i9dDBWbPFVh8hvz2aM4u+wc+uLwxQ03CvoC5VD6c2x+jKhMRYJH9KblKzydalaxXsgoBg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      astro: '>=5.0.0'
 
   astro-expressive-code@0.41.5:
     resolution: {integrity: sha512-6jfABbPO0fkRD1ROAPBQtJR2p7gjbmk/GjfblOpo5Z7F+gwhL7+s8bEhLz9GdW10yfbn+gJvwEf7f9Lu2clh2A==}
@@ -2421,6 +2430,13 @@ snapshots:
   array-iterate@2.0.1: {}
 
   astring@1.9.0: {}
+
+  astro-d2@0.8.1(astro@5.16.6(@types/node@25.0.3)(rollup@4.53.5)(typescript@5.9.3)):
+    dependencies:
+      astro: 5.16.6(@types/node@25.0.3)(rollup@4.53.5)(typescript@5.9.3)
+      hast-util-from-html: 2.0.3
+      hast-util-to-html: 9.0.5
+      unist-util-visit: 5.0.0
 
   astro-expressive-code@0.41.5(astro@5.16.6(@types/node@25.0.3)(rollup@4.53.5)(typescript@5.9.3)):
     dependencies:
