@@ -1,0 +1,207 @@
+---
+title: SQL Evaluations for Data Products
+description: How to create and run evaluation sets for Data Products and SQL Agents.
+---
+
+Evaluation is a helpful way of testing whether your Data Product or Agent behaves the way you expect it to.
+Evaluations can be used in 2 ways:
+
+1. **Development aid**: Helps in developing data product definitions by testing against expected user questions and refining agent responses
+2. **Regression testing**: Ensures new releases, prompt changes, or data product modifications don't break existing questions
+
+Alation AI supports two types of evaluations, depending on the type of object you are evaluating:
+
+- **SQL evaluation**: Tests data products by evaluating SQL query generation accuracy via executing SQL and comparing tables. (This article).
+- **Generic evaluation**: Tests agents using LLM-as-judge evaluation with custom rubrics. See [Agent Evaluations](/reference/evaluation/agent-evaluations).
+
+## SQL evaluation (for Data Products)
+
+SQL evaluation tests data products by providing natural language inputs(questions/tasks) and expected SQL queries, then generating new responses for the inputs and comparing the generated response to the saved queries.
+
+#### Principles for good evaluation cases
+
+Generally, the more specific a question, the less variance there is in generated SQL, and the more effective it is as an evaluation question.
+If a question is meant to be generic and open-ended, consider adding multiple expected SQLs to allow for various interpretations of the question.
+However, high variance in generated SQL may be a sign of ambiguity or confusing definitions in the Data Product itself, so review each case carefully.
+
+Aim for as much "coherence" between the question and the expected SQL as possible. An example of a question with low coherence is:
+```json
+{
+  "question": "How many vendors do I have in Idaho?",
+  "sql": "SELECT VendorName, VendorAddress, VendorCity, VendorState FROM Vendors WHERE VendorState = 'Idaho'"
+}
+```
+While the cardinality of the result set answers the question (and our LLM Judge may mark this SQL as correct), the SQL is answering a fundamentally different question.
+To make the case more coherent, change it to:
+```json
+{
+  "question": "How many vendors do I have in Idaho?",
+  "sql": "SELECT COUNT(DISTINCT VendorName) FROM Vendors WHERE VendorState = 'Idaho'"
+}
+```
+This SQL is directly, and minimally, answering the question.
+
+### Creating SQL evaluation cases
+
+#### Manual creation
+
+When viewing a data product, you can click on the "3 dot" dropdown on the upper right-hand of the screen and click the "Evaluation" tab in the list of options.
+You may need to add the feature flag `?enableChatEvaluation` to the URL to see this option.
+You can also add `/evaluation` to the data product URL (with no marketplace, e.g. `/app/data-product/{data_product_id}/evaluation`) to navigate to the same page, 
+
+There, you can see a list of past evaluation Runs, as well as the Question-SQL pairs (cases) which create the evaluation set for this data product.
+Only valid SQL is accepted, and the SQL is sanitized and executed upon creation to ensure that it returns a valid result and does not hit any syntax or runtime errors.
+If multiple answers are acceptable for a given question, you may enter multiple SQL statements separated by ";" (e.g. `"SELECT COUNT(*) FROM TABLE;SELECT COUNT(USER_ID) FROM TABLE"`).
+Matching any of the reference SQLs exactly, or upon review from an LLM Judge, is a passing result.
+
+You can also create evaluation cases directly via API:
+
+```bash
+# Create evaluation cases for a data product
+curl -X POST "<tenant_url>/ai/api/v1/sql_evaluation_set/{data_product_id}" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "question": "What are the top 5 customers by revenue?",
+      "sql": "SELECT customer_id, SUM(revenue) as total_revenue FROM sales GROUP BY customer_id ORDER BY total_revenue DESC LIMIT 5"
+    },
+    {
+      "question": "How many orders were placed last month?",
+      "sql": "SELECT COUNT(*) FROM orders WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')"
+    }
+  ]'
+```
+
+#### CSV upload
+
+You may also upload evaluation cases from a CSV file with `question` and `sql` columns in the UI via the "Upload CSV" button, or via API.
+
+```bash
+# Upload CSV with evaluation cases
+curl -X POST "<tenant_url>/ai/api/v1/sql_evaluation_set/{data_product_id}/csv" \
+  -F "csv_file=@eval_cases.csv"
+```
+
+CSV format:
+```csv
+question,sql
+"What are the top 5 customers by revenue?","SELECT customer_id, SUM(revenue) as total_revenue FROM sales GROUP BY customer_id ORDER BY total_revenue DESC LIMIT 5"
+"How many orders were placed last month?","SELECT COUNT(*) FROM orders WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')"
+```
+
+### Running SQL evaluations
+
+
+You can click the "Run" button on the upper righthand side to trigger an evaluation run, which will create chats for each of the questions, and run them against the selected agent configuration.
+The selected agent should be a query agent.
+Execute the evaluation against your data product (and the default query agent) via API.
+
+```bash
+# Start SQL evaluation run
+curl -X POST "<tenant_url>/ai/api/v1/run_sql_evaluation/{data_product_id}?default_agent_ref=sql_query_agent"
+```
+
+The evaluation runs in the background and tests whether the generated response executes SQL which is equivalent to the expected SQL(s).
+If there is an exact match, both "Execution Accuracy" and "LLM Judge" will have a score of 1.
+If not, "LLM Judge" will be 1 if our LLM Judge determines the generated response is equivalent to any of the expected SQL(s).
+The judge's result may not always be correct, but generally has very high agreement with a human reviewer.
+
+:::note
+You can only run a single evaluation run per data product at a time.
+:::
+
+### Reviewing SQL evaluation results
+
+Results can be viewed on the "Runs" tab.
+Versioning of the data product and evaluation set is available through hashes -- the same content for a data product and/or evaluation set will result in the same hash.
+For example, if during iterating on a data product, you change the description between eval runs, the hash for the data product will change, but the hash for the evaluation set will stay the same.
+This will allow you to make comparisons between runs.
+If the evaluation hashes don't match, that means the runs are not directly comparable, since the questions and/or sqls have changed.
+This may be intentional, however, during evaluation set creation and refinement.
+
+:::tip
+You can download a CSV of more detailed results for a run by clicking the download button on the rightmost of an evaluation run's row.
+:::
+
+#### API SQL evaluation result access
+
+```bash
+# Get recent evaluation results
+curl "<tenant_url>/ai/api/v1/sql_evaluation_results/{data_product_id}?limit=10"
+```
+
+Response includes metadata:
+```json
+{
+  "data": [
+    {
+      "id": "3a56d029-297b-4b8c-a8e8-22a3e84fc570",
+      "data_product_id": "my-product",
+      "data_product": "My Data Product\nThis includes data about various things...",
+      "data_product_hash": "3982ba1ba49af5f59029132a43c664862132dfe272b1acbf25b77916b8ceb78e",
+      "eval_set_hash": "026e8af6bd31838e4e552e5677c6cea82170c47fcb53f77f7aa9b2900f64adda",
+      "agent_config_id": "f3cc0206-219f-4165-b356-54d1f5b0fc98",
+      "agent_config_hash": "d1d0a85d8814b2ddc01d6bb42266f19da46bacda1ff2a8bde4311a15e73bdba6",
+      "created_at": "2024-01-15T10:30:00Z",
+      "num_cases": 25,
+      "run_status": "COMPLETED",
+      "llm_name": "gpt-4",
+      "eval_score": {
+        "execution_accuracy": 0.92,
+        "case_count": 25
+      }
+    }
+  ],
+  "total": 15
+}
+```
+
+
+```bash
+# Get detailed evaluation report JSON
+curl "<tenant_url>/ai/api/v1/sql_evaluation_results/{data_product_id}/{eval_result_id}"
+# Download results as CSV
+curl "<tenant_url>/ai/api/v1/sql_evaluation_results/{data_product_id}/{eval_result_id}/csv"
+```
+
+## Understanding evaluation results
+
+You can review individual examples for generic evaluations in the UI, to see the inputs, expected output, and generated response, along with the case's score and reasoning from the LLM Judge.
+Further, you may download a CSV report of the run in the UI or via API, or a more detailed JSON report via API.
+
+### SQL rvaluation metrics
+
+- **Number of valid cases**: The number of cases where the reference SQL can be executed successfully.
+- **Execution accuracy**: Percentage of generated SQL queries that execute successfully.
+- **LLM judge**: Percentage of generated SQL queries which are equivalent to the reference SQL.
+- **Execution time**: The average time from question asked to the agent completing the request.
+
+### Result status
+
+- **RUNNING**: Evaluation is currently in progress
+- **COMPLETED**: Evaluation finished successfully
+- **ERROR**: Evaluation failed due to an error
+
+Beyond these high-level metrics, it's important to review individual examples.
+LLM Judge reasoning is provided for each case, which is helpful to understand why the example passed or failed.
+
+## Best practices
+
+1. **Start small**: Begin with 10-20 representative questions covering key use cases
+2. **Test edge cases**: Include questions that test complex joins, aggregations, and filtering
+3. **Create a clear rubric**: Write specific, measurable evaluation criteria in your rubrics, and test it on real examples of inputs/outputs to ensure there is agreement between you and the LLM Judge.
+4. **Iteratively improveme**: Use evaluation results to identify Data Product/Agent weaknesses, and update the sets with real user questions to ensure good coverage.
+5. **Analyze errors**: Don't just look at scores - analyze individual failures to understand the issues and fix them by updating a Data Product and/or Agent.
+
+## Troubleshooting
+
+**Low evaluation scores**
+- Review individual case failures in the detailed report
+- Consider if your rubric or expected outputs are realistic and coherent
+- Check if your agent configuration needs adjustment
+- Review eval chats via the links in the CSV or JSON output, or review the JSON report to see the LLM's generated responses.
+- There is an [Error Analysis Tool](https://github.com/Alation/alation-ai/tree/main/contrib/error_analysis_tool) in Alation AI which helps visualize the JSON reports.
+
+**CSV epload failures**
+- Ensure CSV has `question` and `sql` columns (for SQL evaluation)
+- Check for proper CSV formatting and encoding
