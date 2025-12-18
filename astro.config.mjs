@@ -8,6 +8,11 @@ export default defineConfig({
     integrations: [
         starlight({
             title: "Alation Agent Studio Documentation",
+            logo: {
+                light: './src/assets/logo-light.svg',
+                dark: './src/assets/logo-dark.svg',
+                replacesTitle: true,
+            },
             expressiveCode: {
                 themes: ["catppuccin-mocha", "catppuccin-latte"],
                 styleOverrides: { borderRadius: "0.5rem" },
