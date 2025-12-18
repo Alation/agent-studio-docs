@@ -1,0 +1,455 @@
+---
+title: Agent Evaluations
+description: How to create and run evaluation sets for Agents.
+---
+
+Evaluation is a helpful way of testing whether your Data Product or Agent behaves the way you expect it to across a range of controlled inputs.
+Evaluations can be used in 2 ways:
+
+1. **Development aid**: Helps in developing data product definitions by testing against expected user questions and refining agent responses.
+2. **Regression testing**: Ensures new releases, prompt changes, or data product modifications don't break existing questions
+
+Alation AI supports two types of evaluations, depending on the type of object you are evaluating:
+
+- **Generic evaluation**: Tests agents using LLM-as-judge evaluation with custom rubrics. (This article).
+- **SQL evaluation**: Tests data products by evaluating SQL query generation accuracy via executing SQL and comparing tables. See [SQL Evaluations for Data Products](/reference/evaluation/data-product-evaluations).
+
+
+## Generic evaluation (for agents)
+
+Generic evaluation tests agents using custom input/output pairs and LLM-as-judge scoring based on rubrics you define.
+Additionally, we support tool-specific evaluations (SQL, Charting, Search, etc.), which can be configured by using a reserved keyword in the expected output.
+The APIs support arbitrary JSON schemas for evaluation cases in an evaluation set (inputs and expected_output), but default to strings.
+
+### How we evaluate agents
+
+Agents are evaluated using LLM-as-a-Judge by default, and optionally can have tool-specific scorers enabled.
+For example, a SQL Agent may want to use our execution accuracy scorer to compare a predicted table to a reference table, but also grade the final text response from the agent.
+See the chart below for how to configure the expected output for each case to enable various scorers for each example.
+
+First we'll go over the basics of how to create an eval set and eval cases, then look at an example.
+
+
+### Creating generic evaluation sets
+
+An Agent may have more than 1 evaluation set, but for simplicity the UI shows the first eval set by creation time.
+Typically a single evaluation set is sufficient per agent.
+The inputs and expected outputs for each case should match the input and expected output schemas of the agent.
+
+An evaluation set comes with a `rubric`, which is the way that all its evaluation cases should be graded, and may be edited via API or UI.
+The rubric should direct the LLM Judge to output a score in some int/float range (`1` or `0` (pass/fail), `[0.0, 1.0]` (float score)).
+The LLM Judge submits a reason for its score, so the rubric should focus on how to assign a score based on the Inputs, Expert Response (Expected Output), and Actual Response (Generated Output).
+To aggregate scores, we simply take the average across all cases.
+
+Since the evaluation set may change over time, we compute a "hash" based on the content of the cases and rubric, which helps identify differences between eval set versions across runs.
+Similarly, we compute a "hash" based on the content of the Agent Config, which helps identify differences between agent versions across runs.
+
+```bash
+# Create a generic evaluation set via API
+curl -X POST "<tenant_url>/ai/api/v1/evaluation_sets" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Customer Support Agent Evaluation",
+    "description": "Tests customer support agent responses",
+    "agent_config_id": "agent-config-uuid",
+    "rubric": "Evaluate the response on helpfulness, accuracy, and tone. Provide a total score in the range [0, 1] and explain your reasoning."
+  }'
+```
+
+### Adding evaluation cases
+
+Cases are defined by inputs and expected output.
+A Case's input depends on the input schema defined by the Agent Config, it should match exactly.
+Its expected output may take 1 of 3 forms listed below.
+
+1. a `string`: An LLM Judge will compare the final text response from the agent to this string, based on the Eval Set's rubric.
+2. any json object matching the output schema of the Agent Config: If the Agent Config has an output schema, one can provide an expected output object that matches the schema. An LLM Judge will compare the generated object to the expected object, based on the Eval Set's rubric.
+3. a `dict` with the keys `eval_tool_calls` and/or `eval_text`: Tool-specific Scorers will grade each generated tool call/response with the expected one, using a built-in rubric, and an LLM Judge will compare the final text responses from the agent to the string in `eval_text`, based on the Eval Set's rubric.
+
+For more details on the expected output format, see the [example](#example-weather-agent) below.
+
+
+On an Agent's evaluation page, you can create new cases on the "Cases" tab, by adding inputs and expected output manually.
+Additionally, you may upload a JSON file with a list of case definitions.
+
+```bash
+# Add evaluation cases to a set via API for a SQL Query Agent.
+
+# Note: Hard-coding text answers for SQL-based questions is not recommended,
+#   since they may become stale.
+# Note: Cases 2 and 3 use different methods to specify a text-only expected output,
+#   which will be scored by an LLM Judge according to the eval set rubric.
+curl -X POST "<tenant_url>/ai/api/v1/evaluation_sets/{eval_set_id}/cases" \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "inputs": {
+        "message": "How many users are in my account?",
+        "data_product_id": "my_dp_id"
+      },
+      "expected_output": {
+        "eval_text": "You have 10 users in your account.",
+        "eval_tool_calls": [
+          {
+            "tool_name": "execute_query",
+            "args": {
+              "sql": "SELECT COUNT(*) FROM users",
+              "result_table_name": "users_count"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "inputs": {
+        "message": "How are you?",
+        "data_product_id": "my_dp_id"
+      },
+      "expected_output": {
+        "eval_text": "I'm fine, how can I help you analyze your data today?"
+      }
+    },
+    {
+      "inputs": {
+        "message": "What color is the sky?",
+        "data_product_id": "my_dp_id"
+      },
+      "expected_output": "The sky is blue. How can I help you analyze your data today?"
+    }
+  ]'
+```
+
+### Running generic evaluations
+
+Kick off an evaluation run by clicking "Run Evaluation".
+Only a single evaluation per Agent can run at a time.
+You may review the results in the "Runs" tab.
+
+```bash
+# Start generic evaluation run via API
+curl -X POST "<tenant_url>/ai/api/v1/evaluation_sets/{eval_set_id}/run"
+```
+
+The system will:
+1. Run a chat with each agent through the specified agent
+2. Score generated responses based on the expected output provided, using tool-specific scorers and/or LLM Judge
+3. Generate a detailed report with scores and explanations for each case
+
+
+#### API generic eval result access
+
+```bash
+# Get recent evaluation results
+curl "<tenant_url>/ai/api/v1/evaluation_sets/{evaluation_set_id}/results?limit=10"
+```
+
+Response includes metadata:
+```json
+{
+  "data": [
+    {
+      "id": "3a56d029-297b-4b8c-a8e8-22a3e84fc570",
+      "eval_set_id": "5374057c-598f-470f-bc80-8a3b6ba87294",
+      "eval_set_name": "Customer Support Agent Evaluation",
+      "eval_set_hash": "224fd6b9818e3e1dc722c2a1de13818ebd9e4886ea1129a19d73a78f59f49b6b",
+      "agent_config_id": "8b4bf8cd-9143-4fa7-9580-3a3da6c66c28",
+      "agent_config_hash": "1dd882a8f01c28829d443790c345bd5cc6bf948186046dcb6b7719ba5f89e291",
+      "created_at": "2024-01-15T10:30:00Z",
+      "num_cases": 25,
+      "run_status": "COMPLETED",
+      "llm_name": "gpt-4",
+      "scores": {
+        "llm_judge": 0.92
+      }
+    }
+  ],
+  "total": 15
+}
+```
+
+```bash
+# Get detailed evaluation report JSON
+curl "<tenant_url>/ai/api/v1/evaluation_results/{eval_result_id}"
+# Download results as CSV
+curl "<tenant_url>/ai/api/v1/evaluation_results/{eval_result_id}/csv"
+```
+
+## Example: weather agent
+
+Consider creating an evaluation for a weather agent.
+It has access to 2 tools: `get_location` and `get_forecast`, which must be called sequentially.
+We'll look at the following (crude) representation of a chat, including text and tool calls.
+
+```d2
+chat_box1: {
+  shape: rectangle
+  label: "How's the weather?"
+  style.border-radius: 10
+  near: top-right
+}
+
+chat_box2: {
+  data: |json
+    [
+      {
+        "type": "tool-call",
+        "name": "get_location",
+        "args": {}
+      },
+      {
+        "type": "tool-return",
+        "name": "get_location",
+        "content": "SF Bay"
+      },
+      {
+        "type": "tool-call",
+        "name": "get_forecast",
+        "args": {"location": "SF Bay"}
+      },
+      {
+        "type": "tool-return",
+        "name": "get_forecast",
+        "content": "78 degrees, no chance of rain"
+      }
+    ]
+  |
+
+  shape: rectangle
+  label: "Visualized Tool Calls"
+  style.border-radius: 10
+  near: center-left
+}
+
+chat_box3: {
+  shape: rectangle
+  label: "It's sunny and warm today."
+  style.border-radius: 10
+  near: bottom-left
+}
+```
+
+Let's create an evaluation for it.
+In each case, the *Case Inputs* will be the simple JSON below:
+```json
+{"message": "How's the weather?"}
+```
+First, for text-only evaluation, we can simply judge the response based on the final response.
+The expected output is just the string `"Warm and sunny"`.
+
+The inputs, expected output, and generated outputs are all fed into the Text LLM Judge, which gives the score.
+
+```d2
+direction: right
+
+outside: Text-Only Evaluation {
+  style.bold: true
+  expected_output: Expected Output {
+    data: |json
+      "It's sunny and warm today."
+    |
+    data.style.font-size: 18
+  }
+
+  llm_judge_scorer: LLM Judge Scorer {
+    style.bold: true
+    data: |md
+      Score the final text response from the Agent
+      
+      according to the `rubric` provided based
+
+      on the `inputs`, `expected_output`, and
+
+      `generated_output`.
+    |
+    data.style.font-size: 24
+  }
+
+  score: "Score" {
+    text_score: |json
+      {
+        "text_llm_judge": 1.0,
+        "overall": 1.0
+      }
+    |
+    text_score.style.font-size: 24
+  }
+
+  expected_output -> llm_judge_scorer -> score
+}
+```
+
+For tool-based evaluation, we compare the _generated tool calls/responses_ with the _expected tool calls/responses_.
+
+```d2
+direction: right
+outside: Tool-Based Evaluation {
+  style.bold: true
+  expected_output: Expected Output {
+    data: |json
+      {
+        "eval_tool_calls": [
+          {
+            "tool_name": "get_location",
+            "tool_args": {}
+          },
+          {
+            "tool_name": "get_forecast",
+            "tool_args": {
+              "location": "SF Bay"
+            }
+          }
+        ]
+      }
+    |
+    data.style.font-size: 18
+  }
+
+  tool_scorer: Tool-Based Scorer {
+    data: |md
+      Compare tool returns with tool-specific logic.
+
+      First re-execute an expected tool call with saved
+
+      `arguments`, then review the chat history for matching
+
+      tool calls and try to find one with an equivalent result.
+
+      Each tool call gets its own score.
+    |
+    data.style.font-size: 24
+    style.bold: true
+  }
+
+  score: Score {
+    data: |json
+      {
+        "get_location_llm_judge": 1.0,
+        "get_forecast_llm_judge": 1.0,
+        "overall": 1.0
+      }
+    |
+    data.style.font-size: 18
+  }
+
+  expected_output -> tool_scorer -> score
+}
+```
+
+And finally, to evaluate *both* tool calls, and text, we can, of course, run all the scorers and combine the scores.
+
+```d2
+direction: right
+
+hybrid_case: "Hybrid Evaluation" {
+  style.bold: true
+  expected_output: Expected Output {
+    data: |json
+      {
+        "eval_tool_calls": [
+          {
+            "tool_name": "get_location",
+            "tool_args": {}
+          },
+          {
+            "tool_name": "get_forecast",
+            "tool_args": {
+              "location": "SF Bay"
+            }
+          }
+        ],
+        "eval_text": "It's sunny and warm today."
+      }
+    |
+    data.style.font-size: 18
+  }
+
+  hybrid_scorer: "Text and Tool Scorer" {
+    style.bold: true
+    data: |md
+      Score both the Agent's final text response
+
+      and each tool-based scorer.
+    |
+    data.style.font-size: 24
+  }
+
+  hybrid_score: Hybrid Score {
+    style.bold: true
+    score: Score {
+      data: |json
+        {
+          "text_llm_judge": 1.0,
+          "get_location_llm_judge": 1.0,
+          "get_forecast_llm_judge": 1.0,
+          "overall": 1.0
+        }
+      |
+      data.style.font-size: 18
+    }
+  }
+
+  expected_output -> hybrid_scorer -> hybrid_score
+}
+```
+
+So, one can view the following 2 expected outputs as equivalent:
+```json
+"It's sunny and warm today."
+```
+```json
+{"eval_text": "It's sunny and warm today."}
+```
+
+Both use the same, text-only LLM Judge scorer.
+
+## Tool scorers
+
+The table below shows the specific scorer available for each tool.
+Custom tools can select any existing scorer.
+All other tools will use the LLM Judge Scorer, which is nearly identical to the text LLM Judge, except it operates on the outputs of tools, which allows for fine-grained scoring of tool outputs in addition to final responses.
+
+| Tool Function Name | Scorer | Scorer Method |
+| ------ | ------ | ------ |
+| `generate_chart_from_sql` | ChartToolScorer | An LLM compares the charts visually |
+| `execute_query` | SQLToolScorer | Execution Accuracy + LLM Judge if data match fails |
+| `search_catalog` | SearchCatalogToolScorer | We compute recall based on the returned objects |
+| * | LLMJudgeToolScorer | An LLM compares the generated tool return to the expected tool return |
+
+Any tool which is not listed above (*) will use the default LLM Judge Scorer.
+Custom tools, when supported, will be able to select any of the above scorers, while the default value will be the LLM Judge Scorer.
+
+## Understanding evaluation results
+
+You can review individual examples for generic evaluations in the UI, to see the inputs, expected output, and generated response, along with the case's score and reasoning from the LLM Judge.
+Further, you may download a CSV report of the run in the UI or via API, or a more detailed JSON report via API.
+
+#### Generic evaluation metrics
+
+- **LLM judge**: Scores based on your custom rubric (integers or float scores are supported)
+- **Tool scores**: If tool-based scoring is enabled, the tool-specific scores determined by built-in scorers.
+- **Execution time**: The average time from question asked to the agent completing the request.
+
+#### Result status
+
+- **RUNNING**: Evaluation is currently in progress
+- **COMPLETED**: Evaluation finished successfully
+- **ERROR**: Evaluation failed due to an error
+
+Beyond these high-level metrics, it's important to review individual examples.
+LLM Judge reasoning is provided for each case, which is helpful to understand why the example passed or failed.
+
+## Best practices
+
+1. **Start small**: Begin with 10-20 representative questions covering key use cases
+2. **Test edge cases**: Include questions that test complex joins, aggregations, and filtering
+3. **Create a clear rubric**: Write specific, measurable evaluation criteria in your rubrics, and test it on real examples of inputs/outputs to ensure there is agreement between you and the LLM Judge.
+4. **Iteratively improveme**: Use evaluation results to identify Data Product/Agent weaknesses, and update the sets with real user questions to ensure good coverage.
+5. **Analyze errors**: Don't just look at scores - analyze individual failures to understand the issues and fix them by updating a Data Product and/or Agent.
+
+## Troubleshooting
+
+**Low evaluation scores**
+- Review individual case failures in the detailed report
+- Consider if your rubric or expected outputs are realistic and coherent
+- Check if your agent configuration needs adjustment
+- Review eval chats via the links in the CSV or JSON output, or review the JSON report to see the LLM's generated responses.
