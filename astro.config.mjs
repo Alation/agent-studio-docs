@@ -93,10 +93,7 @@ export default defineConfig({
                             label: "Agents",
                             autogenerate: { directory: "reference/agents" },
                         },
-                        {
-                            label: "Tools",
-                            autogenerate: { directory: "reference/tools" },
-                        },
+                        { slug: "reference/tools" },
                         {
                             label: "Data Products",
                             autogenerate: {
