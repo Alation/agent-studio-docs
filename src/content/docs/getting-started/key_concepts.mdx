@@ -1,14 +1,90 @@
 ---
 title: Key Concepts
-description: This is a place where we explain what are agents, tools
-owner: Ines, Vishal
+description: "Learn the core building blocks of Agent Studio—LLMs (foundation models), tools (actions), agents, and the Alation Knowledge Layer—and how they work together."
 ---
 
-## Overview
-This is a place where we explain what are agents, Actions (Tools), LLMs
+The key concepts you’ll see throughout Agent Studio are as follows:
 
-## What is a Tool or an Action in Alation ? 
+- **LLMs (Foundation Models / FMs)**: the reasoning engine that interprets instructions and generates outputs
+- **Actions (Tools)**: the capabilities an agent can use to take actions and retrieve or apply context
+- **Agents**: the orchestrator that combines an LLM with instructions and tools to complete tasks reliably
+- **The Alation Knowledge Layer**: the trusted, governed context that grounds agents in enterprise reality
 
+Understanding how these concepts fit together will help you design agents that are reliable, grounded in trusted Alation context, and ready for enterprise workflows.
 
-## What is an Agent ? 
-Agent = LLM + Prompt + Tools
+## What is an LLM?
+
+An **LLM (Large Language Model)** is the model an agent uses to understand natural language, reason about a task, and generate outputs. You may also hear LLMs referred to as **Foundation Models (FMs)**—these terms are often used interchangeably.
+
+In Agent Studio, the LLM is responsible for:
+- Interpreting user intent (what someone is trying to do)
+- Following instructions defined in prompts
+- Deciding when to use an action (tool) to retrieve or validate information
+- Producing the final response or output
+
+An LLM can be very capable, but without the right context it may produce incomplete, inconsistent, or outdated answers. That’s why tools and trusted knowledge matter.
+
+### What LLMs can I use?
+
+Agent Studio supports both **OpenAI** and **Anthropic** models. We also support bringing your own enterprise LLM (**coming soon**).
+
+## What is a Tool or an Action in Alation?
+
+A **Tool** (also referred to as an **Action**) is a callable capability that an agent can use to **take actions**.
+
+Tools are what let an agent move beyond “just generating text” and instead:
+- Retrieve trusted context from Alation
+- Interact with enterprise metadata and governed entities
+- Connect to other systems (for example, your **database** or other enterprise platforms) to carry out tasks
+- Support workflows that rely on accurate, structured information
+
+In practice, tools are the mechanism that lets an agent *do something*—fetch data, validate information, trigger a workflow, or interact with systems—rather than only respond conversationally.
+
+### Tool calls and usage metering
+
+A **tool call** represents an **action** taken by an agent.
+
+Customers are **metered on actions**, and tool calls are what count toward usage. In other words, **each underlying tool call is counted, metered, and applied against the customer’s usage**.
+
+## What is an Agent?
+
+An **agent** is a system that can take a goal and work toward completing it—often by combining reasoning with tool usage.
+
+In Agent Studio, you can think of an agent as:
+
+**Agent = LLM + Prompt + Tools**
+
+- **LLM (FM)**: interprets the request and generates outputs  
+- **Prompt**: the instructions, behavior guidelines, and task framing that shape how the agent operates  
+- **Tools**: the actions the agent can call to retrieve trusted context and execute tasks  
+
+Agents are most effective when they are grounded in trusted knowledge and have clear, governed ways to access that knowledge.
+
+## What is the Alation Knowledge Layer?
+
+The foundation for Agent Studio is the **Alation Knowledge Layer**.
+
+Agent Studio is powered by an underlying knowledge layer built from the trusted metadata you already use and deploy inside Alation. It turns the context you already maintain into something AI agents can reliably consume.
+
+This trusted metadata is composed of:
+- **Catalog data** you already have in Alation  
+- **Data products** that extend and operationalize that context  
+
+Because agents are only as good as the knowledge you give them, enterprise AI initiatives need a source of information that’s not only comprehensive—but also **trusted, governed, and up to date**.
+
+The Alation Knowledge Layer unites the **Data Catalog** and **Data Products** to provide structured business context in one place (including definitions, policies, lineage, and governance). It is **continuously refreshed and reconciled across systems** so the context stays accurate, trusted, and ready for Agent Studio to consume.
+
+### What is a data product?
+
+TODO
+
+## Putting it all together in Agent Studio
+
+Agent Studio ties these concepts together into a single system for building enterprise-ready agents:
+
+- **The Alation Knowledge Layer** provides the trusted, governed context.
+- **Tools** sit on top of the knowledge layer (and can also connect to other systems like your database) to take actions and retrieve information.
+- **Agents** sit on top of tools, using them to complete tasks and workflows.
+- **LLMs (FMs)** power the agents—interpreting intent, reasoning through steps, and deciding when and how to use tools.
+
+This layered approach is what enables agents to move beyond prototypes: they stay grounded in trusted enterprise context, can take meaningful actions through tools, and remain adaptable through LLM-powered reasoning.

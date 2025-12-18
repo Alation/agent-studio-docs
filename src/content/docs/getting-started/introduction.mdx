@@ -1,27 +1,137 @@
 ---
-title: Introduction
-description: "This is a place where you learn about agent studio, which includes a low code builder and an SDK. Common Use cases why would people build agents."
+title: What is Agent Studio?
+description: "Agent Studio is an AI platform that empowers users to rapidly create AI agents using the trusted context already available in Alation."
 ---
 
-Welcome to Alation Studio documentation.
+Agent Studio is an AI platform that empowers users to rapidly create AI agents using the trusted context already available in Alation.
 
-## Overview
-This is a place where you learn about agent studio : which incudes a low code builder and an SDK.
+### We’re here to supercharge your AI agents with Alation’s trusted metadata
 
-## Usecases
+AI agents often fail in the enterprise for a simple reason: they don’t have the right context. That gap typically shows up in three ways:
+
+- **Fragmented knowledge** across systems and teams  
+- **Conflicting or outdated context** that leads to inconsistent outputs  
+- **Unsustainable manual effort** to keep agents accurate and useful  
+
+Agent Studio is built to solve these problems by grounding agents in a trusted, continuously maintained knowledge foundation—built on top of the context already available in Alation.
+
+## Tools are the foundation of Agent Studio
+
+In Agent Studio, **tools are the foundation for everything you build and deploy**.
+
+Our out-of-the-box tools are built on top of the trusted context you already have—your **Alation catalog**, **data products**, and even **your databases**—so agents can take real actions using reliable enterprise knowledge. Because tools can be accessed both inside and outside of Alation, they make it easy to build agents in a variety of ways depending on where you want those agents to run.
+
+## What Agent Studio provides
+
+Agent Studio provides a seamless way for customers to unlock trusted context in Alation and put it to work in AI agents. Depending on how you want to build and deploy, we support a few paths:
+
+1. **Tools (the building blocks)**  
+   We provide tools that can be accessed via **MCP** servers. You can use these tools to build agents in whatever platform you like—inside Alation or outside of it.
+
+2. **Out-of-the-box agents**  
+   We provide pre-built agents that solve common tasks on top of the Alation catalog. These agents can be used as-is or serve as starting points for further agent customization. They can be accessed externally via **MCP** or **REST APIs**.
+
+3. **Custom agent building and evaluation**  
+   We provide the ability to build custom enterprise agents on top of our tools. You can build from scratch, or customize and edit one of our out-of-the-box agents to your match your enterprise’s needs.
+
+   To ensure high quality agents, Agent Studio provides a **custom evaluation interface** that enables you to create, monitor, and track evaluation sets for each agent you build—so you can ensure your agent keeps performing well for your enterprise over time.
+
+   Lke out-of-the-box agents, these agents can be accessed externally via **MCP** or **REST APIs**.
+
+No matter which approach you choose, Agent Studio makes it easy to move agents from prototype to production and bring them to wherever your AI already runs today. Our philosophy is simple: **Get what you need from Alation, then deliver value where the work happens.**
+
+## Where you can build and run agents
+
+Agent Studio supports both **building in Alation** and **building outside Alation**, while still using the same underlying tools and trusted context.
+
+### Build inside Alation (Web UI)
+
+In the Agent Studio **Web UI**, you can:
+- Use **default (out-of-the-box) agents** to solve common catalog tasks
+- Build **custom agents** on top of Agent Studio tools
+- Evaluate and iterate using the built-in evaluation interface
+
+When you’re ready, you can **publish** your agents so they can be used outside of Alation via **MCP** or **REST APIs**.
+
+### Build outside Alation (your agent platform)
+
+If you prefer to build and run agents in your own environment, you can still leverage Agent Studio:
+
+- Use Agent Studio **tools directly via MCP**
+- Use the **Agent Studio SDK** to access tools and agents from Python
+
+This approach lets you bring Alation context into the workflows you already run—without forcing you to move your entire agent stack into Alation.
+
+## When should I use Agent Studio?
+
+Use Agent Studio when you want to build agents on top of the metadata and context inside the Alation catalog—especially when you need customization beyond “one-size-fits-all” catalog experiences.
+
+Common reasons include:
+- You need a **custom agent** built on Alation metadata and context
+- You want to **bring Alation catalog context outside of Alation** to power other agents or workflows
+
+Here are some example use cases:
 
 ### Data Insight Agents
-As a business analyst
---> I want to
---> I want to
+
+Data insight agents help teams answer business questions using structured data—faster, more consistently, and with less back-and-forth between analysts and stakeholders.
+
+As a data analyst, I need to provide a platform for business analysts to ask questions in natural language over structured data and/or use that to power downstream workflows.
+
+- I want to enable business analysts to answer questions directly over data (without needing to know where the data lives or how it’s modeled)
+- I want to automate repetitive tasks (for example, a weekly supply chain workflow that checks inventory)
+
+Why this matters:
+- Reduces time spent translating business questions into SQL or dashboards
+- Improves trust by grounding answers in governed definitions, lineage, and approved data products
+- Enables operational workflows that depend on structured data, not one-off analysis
 
 ### Metadata Insight Agents
-As a business analyst
---> I want to generate a semantic layer ?
---> I want to generate DQ rules ?
---> I want to understand how D70 in Media Table was computed ? [Lineage]
+
+Metadata insight agents help users *understand* data—what it means, where it comes from, and how it should be used—by using the trusted context stored in Alation.
+
+As a data analyst:
+- I want to generate or augment a semantic layer using my context in Alation
+- I want to pull Alation context into other tools (for example, Claude or ChatGPT) so answers are grounded in our enterprise definitions, policies, and governance
+
+Why this matters:
+- Makes “enterprise-safe” AI possible by grounding responses in trusted metadata rather than guesswork
+- Reduces ambiguity by standardizing definitions and business context across teams
+- Helps external agent experiences (like Claude or ChatGPT) stay aligned with what the catalog says, even when users interact outside of Alation
 
 ### Curation Agents
-As a business analyst
---> I want to
---> I want to
+
+Curation agents automate and scale the work required to keep your catalog accurate, complete, and useful—especially when you need custom enrichment logic.
+
+As a data analyst:
+- I want to build a custom curation agent to enrich data in my catalog, and I can’t use Alation’s curation automation tool to do this
+
+Why this matters:
+- Keeps the catalog continuously improved without relying on manual updates
+- Helps enforce organization-specific standards for documentation, classification, and governance
+- Enables enrichment workflows tailored to your enterprise (instead of generic curation rules)
+
+## Who uses Agent Studio?
+
+Agent Studio provides different entry points depending on how much you want to build, but we believe strongly that with AI, everyone is a builder.
+
+Agent Studio is designed for:
+- **Business analysts**, who primarily use the **UI** to run and customize agents for common workflows.
+- **Data analysts**, who use the **UI** and/or **MCP servers** to build, iterate, and operationalize agents on top of structured data.
+- **Data stewards**, who use the **UI** and/or **Python SDK** to apply governed context and ensure agents stay aligned with trusted definitions and policies.
+- **AI developers**, who use **MCP servers**, **REST APIs**, and/or the **Python SDK** to build and deploy agents into existing AI workflows and platforms.
+
+All of these users are looking to build or use agents on top of structured data and the Alation catalog.
+
+## How do I use Agent Studio?
+
+You can access Agent Studio through:
+- The **Web UI**
+- **Hosted MCP servers**
+- The **Python SDK**
+
+Each entry point gives you access to the tools and agents available in Agent Studio, but each is optimized for a different workflow:
+
+- **Web UI**: The easiest way to get started inside Alation. Create and customize agents in a UI, test quickly, and build evaluation sets. When you are ready, publish agents for use outside of Alation.
+- **Hosted MCP servers**: Best for building agents outside of Alation, or for directly using existing tools and out-of-the-box agents when you do not need to customize and publish a new agent.
+- **Python SDK**: Best for developers who want to use Agent Studio tools and agents from a Python development environment.
