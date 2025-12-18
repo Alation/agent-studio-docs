@@ -5,10 +5,11 @@ description: "Learn the core building blocks of Agent Studio—LLMs (foundation 
 
 The key concepts you’ll see throughout Agent Studio are as follows:
 
-- **LLMs (Foundation Models / FMs)**: the reasoning engine that interprets instructions and generates outputs
-- **Actions (Tools)**: the capabilities an agent can use to take actions and retrieve or apply context
-- **Agents**: the orchestrator that combines an LLM with instructions and tools to complete tasks reliably
-- **The Alation Knowledge Layer**: the trusted, governed context that grounds agents in enterprise reality
+- **[LLMs (Foundation Models / FMs)](#what-is-an-llm)**: the reasoning engine that interprets instructions and generates outputs
+- **[Tools](#what-is-a-tool)**: the capabilities an agent can use to take actions and retrieve or apply context
+- **[MCP](#what-is-mcp)**: a standard way to expose tools so external agent frameworks can discover and use them
+- **[Agents](#what-is-an-agent)**: the orchestrator that combines an LLM with instructions and tools to complete tasks reliably
+- **[The Alation Knowledge Layer](#what-is-the-alation-knowledge-layer)**: the trusted, governed context that grounds agents in enterprise reality
 
 Understanding how these concepts fit together will help you design agents that are reliable, grounded in trusted Alation context, and ready for enterprise workflows.
 
@@ -28,7 +29,7 @@ An LLM can be very capable, but without the right context it may produce incompl
 
 Agent Studio supports both **OpenAI** and **Anthropic** models. We also support bringing your own enterprise LLM (**coming soon**).
 
-## What is a Tool or an Action in Alation?
+## What is a Tool?
 
 A **Tool** (also referred to as an **Action**) is a callable capability that an agent can use to **take actions**.
 
@@ -40,11 +41,26 @@ Tools are what let an agent move beyond “just generating text” and instead:
 
 In practice, tools are the mechanism that lets an agent *do something*—fetch data, validate information, trigger a workflow, or interact with systems—rather than only respond conversationally.
 
-### Tool calls and usage metering
+### Tool calls, actions, and usage metering
 
 A **tool call** represents an **action** taken by an agent.
 
-Customers are **metered on actions**, and tool calls are what count toward usage. In other words, **each underlying tool call is counted, metered, and applied against the customer’s usage**.
+Customers are metered on actions, and an action is counted each time an Alation tool is called. In other words, every underlying call to an Alation-provided tool counts toward the customer’s usage.
+
+Metering applies only to Alation’s built-in (base) tools. If a customer imports an external tool, or exposes a custom-built agent as a tool, usage is still measured only by the Alation-provided tool calls that happen underneath. A complete list of these Alation-provided tools that are metered is available [here](/reference/tools/index).
+
+The number of tool calls an agent makes per request is not fixed and depends on the users request. In practice, most agents make 2 to 3 tool calls per request, and the highest we have seen is 10 tool calls for a single request.
+
+## What is MCP?
+
+**[MCP](https://modelcontextprotocol.io/docs/getting-started/intro)** is a way to make tools available to agents in a standardized, interoperable way.
+
+In Agent Studio, MCP is how tools (and out-of-the-box agents) can be exposed so external AI development environments can:
+- Discover what tools are available
+- Call those tools in a consistent way
+- Use Alation-powered actions inside workflows running outside of Alation
+
+Practically, **MCP servers** are one of the main entry points for using Agent Studio outside the Alation UI. They let you connect your existing agent framework to Agent Studio’s tools and agents without needing to rebuild those capabilities yourself.
 
 ## What is an Agent?
 
@@ -60,9 +76,11 @@ In Agent Studio, you can think of an agent as:
 
 Agents are most effective when they are grounded in trusted knowledge and have clear, governed ways to access that knowledge.
 
+*An agent can be exposed as a tool via an MCP server. This means agents can be composed hierarchically, where one agent can call another agent as a tool.*
+
 ## What is the Alation Knowledge Layer?
 
-The foundation for Agent Studio is the **Alation Knowledge Layer**.
+The foundation for Agent Studio is the **[Alation Knowledge Layer](https://www.alation.com/glossary/agentic-knowledge-layer/)**.
 
 Agent Studio is powered by an underlying knowledge layer built from the trusted metadata you already use and deploy inside Alation. It turns the context you already maintain into something AI agents can reliably consume.
 
@@ -76,7 +94,7 @@ The Alation Knowledge Layer unites the **Data Catalog** and **Data Products** to
 
 ### What is a data product?
 
-TODO
+Data products are published, trusted assets built from the data catalog for a specific business purpose. They package the underlying data with the business meaning required to use it correctly, including metrics, definitions, and other semantic context, so teams can consistently discover, understand, and operationalize the data.
 
 ## Putting it all together in Agent Studio
 
@@ -84,6 +102,7 @@ Agent Studio ties these concepts together into a single system for building ente
 
 - **The Alation Knowledge Layer** provides the trusted, governed context.
 - **Tools** sit on top of the knowledge layer (and can also connect to other systems like your database) to take actions and retrieve information.
+- **MCP** makes those tools accessible outside of Alation so they can plug into the AI workflows you already run.
 - **Agents** sit on top of tools, using them to complete tasks and workflows.
 - **LLMs (FMs)** power the agents—interpreting intent, reasoning through steps, and deciding when and how to use tools.
 
