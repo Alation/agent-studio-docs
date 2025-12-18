@@ -1,0 +1,16 @@
+on: [push]
+name: Cocogitto
+
+jobs:
+  cog_check_job:
+    runs-on: ubuntu-latest
+    name: check conventional commit compliance
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Conventional commits check
+        uses: cocogitto/cocogitto-action@v4
+        with:
+          command: check
