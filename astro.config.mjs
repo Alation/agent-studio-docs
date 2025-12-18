@@ -55,6 +55,10 @@ export default defineConfig({
                             link: "https://developer.alation.com/dev/reference/alation-ai-api-overview"
                         },
                         {
+                            label: "API Role Requirements",
+                            link: "https://developer.alation.com/dev/docs/api-by-roles#ai-apis"
+                        },
+                        {
                             label: "Authentication",
                             link: "reference/auth"
                         },
