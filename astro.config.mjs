@@ -49,6 +49,9 @@ export default defineConfig({
                         {
                             label: "MCP Client Setup",
                             autogenerate: { directory: "guides/mcp_client_setup" },
+                        },
+                        {
+                            slug: "guides/rest_api",
                         }
                     ]
                 },

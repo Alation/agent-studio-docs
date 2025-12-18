@@ -1,0 +1,114 @@
+---
+title: REST API
+description: Learn how to authenticate and call the REST APIs using OAuth 2.0 Client Credentials Grant.
+---
+
+Agent Studio REST APIs support OAuth 2.0 Client Credentials Grant for authentication.
+This guide explains how to obtain an access token to authenticate your API requests.
+To view the full list of REST API endpoints, see the [API Reference](https://developer.alation.com/dev/reference/alation-ai-api-overview).
+
+## Prerequisites
+
+### Create an OAuth 2.0 Client
+
+:::note
+You need to have a Server Admin role to create an OAuth 2.0 Client.
+:::
+{/* TODO: replace with the correct link */}
+Follow the [Authentication Guide](/guides/mcp_auth/create_oauth_client) to create an OAuth 2.0 Client in your Alation instance.
+Make sure to note down the `client_id` and `client_secret` as you will need them to obtain an access token.
+
+## REST API authentication
+
+To authenticate with the REST API using OAuth 2.0 Client Credentials Grant, you need to obtain an access token by making a POST request to the token endpoint.
+
+### Curl
+
+For a one-time request or testing purposes, you can use `curl` to obtain an access token.
+The access token expires after a certain period and you will need to automate the token refresh process.
+
+```bash
+curl --location '<base_url>/oauth/v2/token/' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'grant_type=client_credentials' \
+--data-urlencode 'client_id=<client_id>' \
+--data-urlencode 'client_secret=<client_secret>'
+```
+
+Once the access token is obtained, include it in the `Authorization` header of your API requests as follows:
+
+```bash
+curl --location '<base_url>/ai/api/v1/chats/agent/default/catalog_search_agent/stream' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer <access_token>' \
+--data '{
+    "message": "Find me sales related tables"
+}'
+```
+
+### Python
+
+{/* TODO: replace with the correct link */}
+We recommend using the [Agent Studio SDK](/getting-started/sdks/python-sdk) for interacting with the REST API.
+The SDK handles the authentication process for you, including obtaining and refreshing access tokens.
+
+```python
+from alation_ai_agent_sdk import (
+    AlationAIAgentSDK,
+    ServiceAccountAuthParams,
+)
+
+BASE_URL = '<base_url>'
+CLIENT_ID = '<client_id>'
+CLIENT_SECRET = '<client_secret>'
+
+sdk = AlationAIAgentSDK(
+    base_url=BASE_URL,
+    auth_method="service_account",
+    auth_params=ServiceAccountAuthParams(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+    )
+)
+
+# Agents and tools can be called through the SDK
+response = sdk.catalog_context_search_agent("Find me sales related tables")
+# Or can be called through the API client
+streamed_response = sdk.api.catalog_context_search_agent_stream("Find me sales related tables")
+```
+
+Without the SDK, you can use the `requests` library to obtain an access token and use it to call the API.
+
+```python
+import requests
+
+BASE_URL = '<base_url>'
+CLIENT_ID = '<client_id>'
+CLIENT_SECRET = '<client_secret>'
+
+url = f'{BASE_URL}/oauth/v2/token/'
+payload = {
+  'grant_type': 'client_credentials',
+  'client_id': CLIENT_ID,
+  'client_secret': CLIENT_SECRET
+}
+response = requests.post(url, data=payload)
+access_token = response.json().get('access_token')
+print(access_token)
+
+headers = {
+    "Accept": "text/event-stream",
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {access_token}"
+}
+
+with requests.post(
+    f'{BASE_URL}/ai/api/v1/chats/agent/default/catalog_search_agent/stream',
+    headers=headers,
+    json={"message": "Find me sales related tables"},
+    stream=True
+) as response:
+    for line in response.iter_lines():
+        if line:
+            print(line.decode('utf-8'))
+```
