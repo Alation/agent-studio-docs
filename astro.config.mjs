@@ -41,7 +41,16 @@ export default defineConfig({
                 },
                 {
                     label: "Guides",
-                    autogenerate: { directory: "guides" },
+                    items: [
+                        {
+                            label: "MCP Authentication",
+                            autogenerate: { directory: "guides/mcp_auth" },
+                        },
+                        {
+                            label: "MCP Client Setup",
+                            autogenerate: { directory: "guides/mcp_client_setup" },
+                        }
+                    ]
                 },
                 {
                     label: "Agent Studio SDK",
