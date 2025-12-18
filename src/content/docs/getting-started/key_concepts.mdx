@@ -68,6 +68,38 @@ In Agent Studio, MCP is how tools (and out-of-the-box agents) can be exposed so 
 Practically, **MCP servers** are one of the main entry points for using Agent Studio outside the Alation UI. 
 They let you connect your existing agent framework to Agent Studio’s tools and agents without needing to rebuild those capabilities yourself.
 
+### Hosted vs. local MCP servers
+
+Agent Studio supports two ways to use MCP servers: **hosted MCP servers** and **local MCP servers**. Both expose Agent Studio capabilities over MCP, but they differ in where the server runs and what it can access.
+
+#### Hosted MCP servers
+
+Most customers use **hosted MCP servers** by default. In this mode, the MCP servers are **hosted by Alation in our cloud**.
+
+Hosted MCP servers can expose:
+- **Base tools**
+- **Base (out-of-the-box) agents**
+- **Custom agents you build** in Agent Studio (including those created in the UI)
+
+This is the best option when you want the full Agent Studio experience and the ability to build, publish, and use custom agents outside of Alation.
+
+### Local MCP servers
+
+:::caution
+We do not recommend starting with a local MCP server as the hosted option is easier.
+:::
+
+If you are using the **Python SDK**, you can also run a **local MCP server**, meaning you host the MCP server on your own machine using the SDK.
+
+By default, local MCP servers provide access to:
+- **Base tools**
+- **Base (out-of-the-box) agents**
+
+Local MCP does **not** support hosting custom agents created in the Agent Studio UI. In other words, you **cannot** build an agent in the Agent Studio UI and then host that agent on a local MCP server.
+
+Setup instructions for running a local MCP server are available [here](https://github.com/Alation/alation-ai-agent-sdk/tree/main/python/dist-mcp/).
+
+
 ## What is an Agent?
 
 An **agent** is a system that can take a goal and work toward completing it—often by combining reasoning with tool usage.
