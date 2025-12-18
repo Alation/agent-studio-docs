@@ -49,7 +49,28 @@ export default defineConfig({
                 },
                 {
                     label: "Reference",
-                    autogenerate: { directory: "reference" },
+                    items: [
+                        {
+                            label: "API Reference",  
+                            link: "https://developer.alation.com/dev/reference/alation-ai-api-overview"
+                        },
+                        {
+                            label: "Authentication",  
+                            link: "reference/auth"
+                        },
+                        {
+                          label: "Agents",
+                          autogenerate: { directory: "reference/agents" },
+                        },
+                        {
+                          label: "Tools",
+                          autogenerate: { directory: "reference/tools" },
+                        },
+                        {
+                          label: "Data Products",
+                          autogenerate: { directory: "reference/data_products" },
+                        },
+                  ],
                 },
             ],
             lastUpdated: true,
