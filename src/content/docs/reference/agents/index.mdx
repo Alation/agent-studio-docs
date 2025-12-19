@@ -1,0 +1,28 @@
+---
+title: List of Default Agents
+description: A list of out-of-the-box agents available in Agent Studio.
+---
+
+import { getCollection } from 'astro:content';
+
+export async function getAgentsList() {
+  const agents = await getCollection('docs', (entry) => {
+    if (!entry.id) return false;
+    return entry.id.startsWith('reference/agents/default')
+  });
+  
+  return agents.sort((a, b) => a.data.title.localeCompare(b.data.title));
+}
+
+export const agents = await getAgentsList();
+
+The following agents are available out-of-the-box in Agent Studio:
+
+<ul>
+{agents.map(agent => (
+  <li>
+    <a href={`/agent-studio-docs/${agent.id}/`}>{agent.data.title}</a>
+    {agent.data.description && ` - ${agent.data.description}`}
+  </li>
+))}
+</ul>

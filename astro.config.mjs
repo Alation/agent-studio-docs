@@ -91,7 +91,25 @@ export default defineConfig({
                         },
                         {
                             label: "Agents",
-                            autogenerate: { directory: "reference/agents" },
+                            items: [
+                                {
+                                    slug: "reference/agents/introduction",
+                                },
+
+                                {
+                                    slug: "reference/agents",
+                                },
+                                {
+                                    label: "Default Agent Details",
+                                    autogenerate: {
+                                        directory: "reference/agents/default",
+                                    },
+                                },
+                                {
+                                    label: "Custom Agents",
+                                    slug: "reference/agents/custom-agents",
+                                },
+                            ],
                         },
                         {
                             label: "Tools",
