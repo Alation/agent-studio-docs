@@ -1,0 +1,70 @@
+---
+title: Dashboard Search
+description: An agent for querying BI reports.
+---
+
+The dashboard search agent retrieves relevant dashboards from the catalog.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Receives a natural language question from the user
+2. Extracts search terms and identifies filter fields and values to search with
+3. Executes the search to obtain dashboards
+4. Summarizes the search results and includes relevant dashboards to the user's request in the final answer
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language question or request to send to the agent
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a json object with these parameters:
+
+- `message` (string): The final answer to the user's request
+- `relevant_objects` (array): A list of BIReportObject, each containing:
+  - `url` (string): The URL to access the dashboard
+  - `title` (string): The name of the dashboard
+  - `description` (string): The description of the dashboard
+  - `breadcrumbs` (array): The list of folder names leading to the dashboard in the catalog
+  - `type` (object): The dashboard type.
+
+## Available tools
+
+The agent is configured with 3 tools:
+
+### BI report search
+
+Searches for dashboards in the catalog relevant to the user's question.
+
+**Key parameters:**
+- `search_term`: The main search term extracted from the user's question
+- `filters`: Optional filters extracted from the user's question to narrow down the search (e.g., folder names, tags)
+- `limit`: The maximum number of dashboards to return
+
+### Search filter fields
+
+Identifies relevant fields which are available in the system to refine the dashboard search.
+
+**Key parameters:**
+
+- `search_term`: The filter field search term extracted from the user's question
+- `limit`: The maximum number of filter fields to return
+
+### Search filter fields
+
+Search over values of a specific field to identify relevant values to refine the dashboard search.
+
+**Key parameters:**
+
+- `field_id`: The ID of the field to search values in
+- `search_term`: The filter value search term extracted from the user's question
+- `limit`: The maximum number of filter values to return
+
+## Behavior notes
+
+- The agent returns a structured object as its final response, including both the final message and relevant objects

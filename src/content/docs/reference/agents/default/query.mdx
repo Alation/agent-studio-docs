@@ -18,20 +18,21 @@ The agent follows this workflow:
 
 ## Input parameters
 
-### Required
+Required:
 
-- **message** (string): The natural language question or request to send to the agent
-- **data_product_id** (string): The ID of the data product to query
+- `message` (string): The natural language question or request to send to the agent
+- `data_product_id` (string): The ID of the data product to query
 
 ## Output format
 
-- **message** (string): The final response containing query results
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` which addresses the user's request.
 
 ## Available tools
 
 The agent has access to two tools:
 
-### Get Data Schema
+### Get data schema
 
 Retrieves the schema for tables in the data product.
 Optionally supports semantic search of sample values.
@@ -41,7 +42,7 @@ Optionally supports semantic search of sample values.
 - `data_product_id`: The data product to get schema for
 - `query`: Optional semantic search query for sample values
 
-### SQL Execution
+### SQL execution
 
 Executes SQL queries against the data product's database.
 The tool automatically handles result serialization and may limit rows/columns for very large results.

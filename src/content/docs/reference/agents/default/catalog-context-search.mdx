@@ -1,0 +1,75 @@
+---
+title: Catalog Context Search
+description: Answers complex questions about the Alation data catalog by analyzing the query and forming a multi-step search plan.
+---
+
+The catalog context search agent is designed to answer questions about the Alation data catalog.
+This includes finding relevant objects, understanding relationships between objects, answering questions about the objects, and more.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Receives a natural language request from the user
+2. Analyzes the question to determine the best search strategy
+3. Searches for relevant custom fields, datasources, and filters to narrow down the search
+4. Defines a search signature to specify which objects and fields of the objects to retrieve
+5. Performs a preliminary search for relevant catalog objects using the search signature
+6. Retrieves relevant object details from the preliminary search results
+7. Addresses the user request using the retrieved object details
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language question or request to send to the agent
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` which addresses the user's request.
+
+## Available tools
+
+The agent is configured with 6 tools:
+
+### Analyze catalog question
+
+Analyzes the user's question and determines a search strategy to address the request.
+
+**Key parameters:**
+- `message`: The user's natural language question
+
+### Get datasources
+
+Retrieves all datasources (paginated) in the Alation catalog.
+
+### Get custom fields definition
+
+Retrieves all custom fields defined in the Alation catalog, including information on how to use them.
+
+### Get signature creation instructions
+
+Lists instructions for generating a good search signature.
+
+### Get catalog context by IDs & signature
+
+Searches for catalog objects using a search signature containing object types, fields, and search phrases.
+
+**Key parameters:**
+- `search_signature`: The search signature defining object types, fields, and search phrases
+
+### Bulk retrieval
+
+Final search tool that retrieves detailed information about catalog objects by their IDs and a specified set of fields.
+
+
+**Key parameters:**
+
+- `search_signature`: The search signature defining object types and ids, and fields to retrieve
+
+## Behavior notes
+
+- The agent will answer the question provided as text, not just provide a list of search results.
+- The agent may use multiple search steps to refine results before answering the question.
+- If you know which object types are relevant to your request, including that in the request can help improve results.
