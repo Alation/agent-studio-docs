@@ -1,0 +1,74 @@
+---
+title: Machine-to-Machine OAuth Clients
+description: How to create and use machine-to-machine OAuth clients in Alation AI Studio.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import m2mOAuthImage from '../../../../assets/img/guides/authentication/m2m-oauth-client-application.png';
+
+:::caution[ Before you begin ]
+Only users with the **Server Admin** role can create machine-to-machine OAuth clients in Alation
+:::
+
+## Generating Client ID and Client Secret
+<Steps>
+1. Navigate to ```https://your-alation-instance.alationcloud.com/admin/auth/```
+2. Scroll down until you find **OAuth Client Applications**
+3. Click on **Add**
+4. Give it a **Name**, set the **Access Token Duration** (in seconds, min 5 mins, max 72 hours)
+5. Select a **System User Role** - this will determine the permissions the OAuth client will have when accessing Alation resources. Always follow the principle of least privilege and only assign the minimum role necessary for the client to perform its tasks.
+6. On clicking save, the **Client ID** and **Client Secret** will be generated. Make sure to copy and securely store the **Client Secret** as it will not be shown again.
+</Steps>
+<Image src={m2mOAuthImage} alt="OAuth Client Creation Screenshot" style="max-width: 80%; height: auto;" />
+
+:::caution[ Security Note ]
+The `client_secret` is a sensitive credential, they do not expire automatically and need to be rotated periodically based on your organization's security policies.
+Ensure it is stored securely and not exposed in client-side code or public repositories.
+:::
+## Generating JWT Access Tokens
+
+Once you have the `client_id` and `client_secret`, you can generate the JWT access token using the following steps:
+
+```bash
+curl --request POST \
+     --url https://your-alation-instance.alationcloud.com/oauth/v2/token/ \
+     --header 'accept: application/json' \
+     --header 'content-type: application/x-www-form-urlencoded' \
+     --data grant_type=client_credentials \
+     --data client_id=<client-id from above step> \
+     --data client_secret=<client-secret from above step>
+```
+
+The response will contain a JWT token that's valid for the duration you specified when creating the OAuth client.
+This can be used to access the REST APIs or the MCP server.
+
+## Usage in Production Systems
+
+```d2
+start: Start {
+  shape: circle
+}
+
+get_token: Get Access Token {
+  shape: rectangle
+  description: "POST /oauth/v2/token/\nwith client_id & client_secret"
+}
+
+api_call: Call Secure API {
+  shape: rectangle
+  description: "Use JWT token in\nAuthorization header"
+}
+
+start -> get_token
+get_token -> api_call
+```
+
+To ensure unattended flows work seamlessly in production systems, implement a step/node that will fetch a new Access Token using the above curl command before making any API calls.
+
+This ensures that your system always has a valid token and can handle token expiration gracefully.
+
+:::caution[Token Revocation]
+Generating a new Access Token automatically invalidates the previous token.
+Ensure that your application logic accounts for this to avoid using stale tokens.
+:::

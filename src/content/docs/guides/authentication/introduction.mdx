@@ -1,0 +1,43 @@
+---
+title: Introduction
+description: Explains the two modes of authentication available in Alation Agent Studio.
+---
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Resources (MCP server, REST APIs) in Alation AI Studio support two modes of OAuth 2.0 authentication: user-initiated and machine-to-machine.
+
+## User-initiated flow
+:::note[Synonymously known as]
+3-legged OAuth, Authorization Code flow, Interactive flow
+:::
+:::tip[When to use]
+Use this when the integration requires access on behalf of a specific user, reflecting their individual permissions and roles.
+:::
+For **interactive** use cases where an end-user is present to authorize access, Alation supports OAuth 2.0 authorization code-based user-initiated authentication. 
+
+This approach allows users to securely grant access to their resources without sharing their credentials.
+
+<LinkCard
+  title="Create User-Initiated OAuth Clients"
+  description="Instructions to create OAuth clients for user-initiated authentication"
+  href="../user_initiated_auth/">
+</LinkCard>
+
+## Machine-to-machine flow
+:::note[Synonymously known as]
+2-legged OAuth, Client Credentials flow, Machine-to-machine (M2M) authentication, service account flow
+:::
+:::tip[When to use]
+Use this when the integration needs to operate independently of user context, typically for automated and scheduled flows.
+:::
+For **non-interactive**, **programmatic integrations**, Alation supports OAuth 2.0 client_credentials-based machine-to-machine authentication using JWTs. 
+
+This approach provides secure **server-to-server** communication without requiring end-user interaction. 
+
+In this mode, the **ROLE** and **permissions** associated with the OAuth client app are applied to the requests made to Alation AI Studio resources.
+
+<LinkCard
+  title="Create Machine-to-Machine OAuth Clients"
+  description="Instructions to create OAuth clients for machine-to-machine authentication"
+  href="../machine_to_machine/">
+</LinkCard>

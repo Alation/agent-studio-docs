@@ -1,0 +1,147 @@
+---
+title: User-Initiated OAuth Clients
+description: Learn how to implement user-initiated OAuth authorization flows with Alation's 3-Legged Authorization Grant.
+---
+
+import { Badge } from '@astrojs/starlight/components';
+
+:::caution[Before you begin]
+Only users with the **Server Admin** role can create OAuth clients in Alation.
+:::
+
+User (delegated) authorization refers to an OAuth flow where users grant third-party applications access to their protected resources.
+In this case, the grant is to Alation.
+When this occurs, the third-party application may act on behalf of the user within Alation.
+
+Delegated authorization requires several systems interacting in concert and follows the **3-Legged Authorization Grant** flow.
+
+:::tip[Learn more about OAuth flows]
+- [OAuth 2.0 Concepts & OAuth Flows](https://iamblockc.medium.com/oauth-2-0-concepts-oauth-flows-8debed7a9abc) — Overview of different OAuth flows
+- [IETF: OAuth Delegated Authorization](https://www.ietf.org/archive/id/draft-li-oauth-delegated-authorization-00.html) — Detailed specification
+:::
+
+For delegated authorization to work, configurations are required within Alation and within the third-party application. 
+Unfortunately, there is a chicken and egg problem as both configurations depend on each other.
+
+### Third-Party Application Configuration
+
+Each application or platform is slightly different, but any that support OAuth 2.0 needs to support these items: `Authorization URL`, `Token URL`, `Client ID`, and `Client Secret`.
+
+:::note
+Different platforms may refer to these values with slightly different labels.
+:::
+
+At a conceptual level, the **Authorization URL** accepts the pair of `Client ID` and `Client Secret` as well as the `Redirect URI` and returns a refresh token. 
+The **Token URL** accepts the refresh token and returns an access token, which is what's required to access resources.
+
+To configure your third-party application, you need the following values:
+
+**Authorization URL:**
+```
+https://your-alation-instance.alationcloud.com/oauth/v1/authorize/
+```
+
+**Token URL:**
+```
+https://your-alation-instance.alationcloud.com/oauth/v1/token/
+```
+
+:::caution
+Replace `your-alation-instance` with your specific Alation instance.
+:::
+
+You'll also need to specify the `Client ID` and `Client Secret`, which you can obtain from Alation through:
+- **The Alation User Interface** <Badge text="Coming Soon" variant="caution" size="small" />
+- **OpenAPI documentation** <Badge text="Available from 2025.3.3" variant="success" size="small" /> at:
+  ```
+  https://your-alation-instance.alationcloud.com/openapi/oauth2/
+  ```
+
+  Navigate to **OAuth Client Administration** → **POST /oauth/v1/register/** to register a new client. 
+  You can test the API directly from the documentation page by clicking "Try it out" and providing the required configuration parameters.
+
+  **Example payload for a confidential client:**
+  ```json
+  {
+    "name": "My Application",
+    "redirect_uris": ["https://your-app.com/oauth/callback"],
+    "grant_type": "confidential",
+    "refresh_token_lifetime": 2592000,
+    "access_token_lifetime": 3600,
+    "pkce_enabled": true
+  }
+  ```
+
+- **Alation Support**
+
+### Alation Configuration
+
+To generate the `Client ID` and `Client Secret`, you'll need to provide information about how you intend to use them.
+
+#### Platform-Specific Considerations
+
+Different platforms have different requirements and capabilities.
+
+:::tip[Platform-specific setup guides]
+For detailed step-by-step instructions for each platform, refer to their individual documentation pages in the [MCP Client Setup guides](../../mcp_client_setup/introduction/).
+:::
+
+:::caution[PKCE Support]
+ChatGPT and MS Copilot Studio do not yet support **Proof of Key Exchange Code (PKCE)**. 
+This option should **not** be selected in the Alation configuration when using those platforms.
+:::
+
+**Known Redirect URLs:**
+
+- **VSCode:**
+  ```
+  https://vscode.dev/redirect
+  ```
+
+- **Claude Desktop:**
+  ```
+  https://claude.com/api/mcp/auth_callback
+  ```
+  ```
+  https://claude.ai/api/mcp/auth_callback
+  ```
+
+- **ChatGPT Connectors:**
+  ```
+  https://chatgpt.com/connector_platform_oauth_redirect
+  ```
+
+#### Required configuration values
+
+You'll need the **Redirect URL** (sometimes labeled **Callback URL**) from the third-party application you're building. 
+This is the location where Alation will pass the user session details to the third-party application.
+
+:::tip[MS Copilot Studio configuration]
+If you're creating a configuration for MS Copilot Studio, you'll need to:
+1. Create the `Client ID` and `Client Secret` without the `Redirect URL` first
+2. Configure those credentials within Copilot Studio
+3. Obtain the `Redirect URL` that Copilot Studio generates
+4. Add that `Redirect URL` to the Alation configuration
+
+This value must be persisted within Alation for the auth flow to work.
+:::
+
+#### Grant types
+
+**Grant Type** — Alation supports `public` and `confidential` grants:
+- **Confidential** (recommended): Use this for most MCP server integrations where credentials can be kept secure
+- **Public**: Intended for Single Page Applications or mobile apps where credentials cannot be secured
+
+#### Token expiry settings
+
+All tokens have an expiry and can only be used while they are fresh. You can adjust these expiry times within the allowed ranges:
+
+| Token Type | Minimum | Maximum |
+|------------|---------|---------|
+| **Refresh Token Expiry** | 3 days | 180 days |
+| **Access Token Expiry** | 1 hour | 3 days |
+
+#### PKCE (Proof of Key Exchange Code)
+
+PKCE is an additional security measure added to OAuth 2.0.
+Not all platforms support it (see above), but if you're in doubt, it's best to leave it enabled as a starting point.
