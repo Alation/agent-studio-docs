@@ -1,0 +1,97 @@
+---
+title: Revise Data Product
+description: Improves data product semantic layers by analyzing SQL evaluation results and iteratively refining specifications
+---
+
+The Revise Data Product agent improves data product semantic layers through iterative refinement.
+It analyzes SQL evaluation results, identifies failures, updates data product specifications, and verifies improvements through re-evaluation.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Runs SQL evaluation on the data product's evaluation set and analyzes results
+2. Provides a summary of evaluation results, identifying patterns in failed cases
+3. Fetches the current data product specification (critical step to preserve all fields)
+4. Modifies only the specific fields that need changes while preserving all other fields
+5. Updates the data product with the complete modified specification
+6. Re-runs evaluation to verify improvements and compares with previous results
+7. Iterates the process if needed based on user feedback
+
+## Input parameters
+
+### Required
+
+- **message** (string): Instructions or questions about the data product evaluation
+- **data_product_id** (string): The ID of the data product to evaluate and improve
+
+## Output format
+
+- **message** (string): The final response with evaluation results and improvement summary
+
+## Available tools
+
+The agent has access to three tools:
+
+### Run SQL Evaluation
+
+Runs SQL evaluation on the data product's evaluation set.
+Returns cached results if the data product specification hasn't changed, otherwise triggers a fresh evaluation run.
+
+**Returns:**
+
+- Overall execution accuracy
+- Passed cases (successful question/SQL pairs)
+- Failed cases with detailed reasoning
+
+### Get Data Product Raw Specification
+
+Retrieves the complete raw data product specification in the exact format expected by the update API.
+This differs from the schema tool by providing the raw JSON specification without sample values or simplification.
+
+**Key fields in specification:**
+
+- `product.en.description`: Natural language description
+- `product.deliverySystems`: Database connection information
+- `product.recordSets`: Table definitions
+- `x-metrics`: Custom metric definitions
+- `x-derivedColumns`: Computed column definitions
+- `relationships`: Join relationship definitions
+
+### Update an Existing Data Product
+
+Updates the data product specification with modifications.
+Requires the complete specification with all fields preserved.
+
+**Critical requirements:**
+
+- Must include the complete specification (missing fields will be removed)
+- Must preserve exact field names and structure from the original spec
+- Never construct specifications from scratch
+
+## Behavior notes
+
+- **Always fetch before update**: The agent must call Get Data Product Raw Specification before calling Update Data Product
+- **Complete specifications required**: Updates must include the complete specification; missing fields will be removed
+- **Preserve structure**: Field names and structure from the original spec must be maintained exactly
+- **Verify improvements**: Changes are only kept if they improve evaluation scores
+- **Iterative approach**: The agent can make multiple rounds of refinements based on evaluation feedback
+- **Cached results**: If the data product hasn't changed, evaluation returns cached results for efficiency
+
+## Common use cases
+
+### Improving descriptions
+
+Updates `product.en.description` or table/column descriptions to better capture domain terminology and improve semantic understanding.
+
+### Refining metrics
+
+Modifies `x-metrics` definitions to accurately represent business calculations and aggregations.
+
+### Defining relationships
+
+Updates `relationships` to correctly specify join conditions between tables.
+
+### Adding derived columns
+
+Creates or modifies `x-derivedColumns` to expose computed fields for natural language queries.

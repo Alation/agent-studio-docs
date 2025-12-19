@@ -1,0 +1,77 @@
+---
+title: Data Product Query
+description: An agent for querying databases associated with data products and generating charts
+---
+
+The Data Product Query agent enables natural language querying of databases associated with data products.
+It can execute SQL queries, retrieve schemas, and generate visualizations using charts.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Receives a natural language question from the user
+2. Uses the Get Data Schema tool to understand available tables and columns
+3. Generates and executes SQL queries using the SQL Execution tool
+4. Analyzes results and may refine queries as needed
+5. If visualization is requested, generates a chart using the Chart Generation tool
+6. Returns the final consolidated results
+
+## Input parameters
+
+### Required
+
+- **message** (string): The natural language question or request to send to the agent
+- **data_product_id** (string): The ID of the data product to query
+
+### Optional
+
+- **auth_id** (string): The ID of the authentication credentials to use for the query
+
+## Output format
+
+- **message** (string): The final response containing query results and analysis
+
+## Available tools
+
+The agent has access to three tools:
+
+### SQL Execution
+
+Executes SQL queries against the data product's database.
+The tool automatically handles result serialization and may limit rows/columns for very large results.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to query
+- `sql`: The SQL query to execute
+- `result_table_name`: A semantic name for the result table
+
+### Get Data Schema
+
+Retrieves the schema for tables in the data product.
+Optionally supports semantic search of sample values.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to get schema for
+- `query`: Optional semantic search query for sample values
+
+### Chart Generation
+
+Generates visualizations using Altair and Python.
+Takes a SQL query and Python code snippet to create interactive charts.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to query
+- `sql`: SQL query to generate data for the chart
+- `chart_code_snippet`: Python function using Altair to create the chart
+- `image_title`: Title for the chart
+
+## Behavior notes
+
+- The agent always uses result tables from executed queries to answer questions (never synthesizes data)
+- For complex questions, it executes a final consolidated query to return all results in a single table
+- When generating charts, it returns the first reasonable visualization without excessive iteration
+- Charts are generated using Altair and returned as JSON representations

@@ -1,0 +1,61 @@
+---
+title: Data Product Question Manager
+description: An agent for managing SQL evaluation questions - creating new questions and auditing existing ones
+---
+
+The Data Product Question Manager agent helps you build and maintain high-quality SQL evaluation sets for your data products.
+It can generate new question/SQL pairs and audit existing ones for quality and correctness.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Reviews existing evaluation questions to avoid duplicates and understand terminology
+2. Explores data schemas and sample values to understand business context
+3. Generates diverse questions across five complexity categories (complex filters, joins, column transformations, business jargon, complex operators)
+4. Validates each SQL query by executing it against the data product
+5. Saves the evaluation set as a CSV and presents it for review
+6. Uploads the evaluation set after receiving user confirmation
+7. For auditing tasks, reviews existing questions for SQL correctness, clarity, coverage, and duplicates
+
+## Input parameters
+
+### Required
+
+- **message** (string): The request to send to the agent (e.g., "Generate 10 new evaluation questions" or "Audit existing questions")
+- **data_product_id** (string): The ID of the data product to manage evaluation questions for
+
+## Output format
+
+- **message** (string): The final response with evaluation set details and upload confirmation
+
+## Available tools
+
+The agent has access to ten tools organized into three categories:
+
+### Evaluation management
+
+- **Get SQL Evaluation Set**: Retrieve existing question/SQL pairs to avoid duplicates and understand current coverage
+- **Get SQL Evaluation Case**: Retrieve details of a specific evaluation case by ID
+- **Update SQL Evaluation Case**: Modify the question or SQL of an existing evaluation case
+- **Delete SQL Evaluation Case**: Remove an evaluation case from the set
+- **Upload SQL Evaluation Set**: Upload a completed evaluation set to the data product
+
+### Data exploration
+
+- **Get Data Schema**: Retrieve schema information to understand available tables and columns
+- **SQL Execution**: Execute and validate SQL queries against the data product
+
+### Asset management
+
+- **Save Asset**: Save evaluation sets as CSV files for review and upload
+- **Retrieve Asset**: Retrieve previously saved evaluation sets
+- **List Assets**: Discover available saved assets
+
+## Behavior notes
+
+- Questions must represent realistic business inquiries, not trivial queries like "how many rows in my data"
+- The agent generates no more than 20 questions at a time
+- Questions should be concise and sound natural, as if asked by a business user
+- All updates and deletions require user confirmation
+- Evaluation sets are saved in CSV format with columns: `question`, `sql`, `notes`
