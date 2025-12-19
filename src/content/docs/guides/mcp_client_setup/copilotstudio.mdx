@@ -14,16 +14,20 @@ import createConnectionImage from '../../../../assets/img/guides/mcp_client_setu
 import successImage from '../../../../assets/img/guides/mcp_client_setup/ms_copilot_studio/copilot-successfully-connected-screen.png';
 import finalVerification from '../../../../assets/img/guides/mcp_client_setup/ms_copilot_studio/copilot-final-verification.png';
 
-:::caution[ Before you begin ]
-This setup requires:
-- **Server Admin** access to your Alation instance to create OAuth clients
-- Access to Microsoft Copilot Studio
+Connect your Alation catalog to Microsoft Copilot Studio using the Remote MCP server with OAuth 2.0 authentication.
 
+:::note
+This guide covers **Remote MCP** setup for Microsoft Copilot Studio.
 Due to a chicken-and-egg situation with redirect URIs, you'll need to complete the setup in three phases:
 1. Create an OAuth client with a placeholder redirect URI
 2. Configure Copilot Studio to generate the actual redirect URI
 3. Update the OAuth client with the Copilot Studio redirect URI
 :::
+
+## Prerequisites
+
+- **Server Admin** access to your Alation instance to create OAuth clients
+- Access to Microsoft Copilot Studio
 
 ## Creating the OAuth client
 
