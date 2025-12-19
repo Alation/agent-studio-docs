@@ -5,8 +5,73 @@ description: "How and when to use the Alation Agent Studio SDK."
 
 import { LinkCard } from '@astrojs/starlight/components';
 
+The Alation AI Agent SDK enables AI agents to access and leverage metadata from the Alation Data Catalog.
+This SDK empowers developers to build sophisticated AI agents that can search, retrieve, and reason about your data catalog.
+
+## When to use the SDK
+
+The SDK is primarily for **local mode** integrations where you want to:
+
+- Build custom agents in Python using frameworks like LangChain
+- Run a local MCP server with full control over configuration
+- Integrate Alation directly into your Python applications
+- Customize and extend the SDK's functionality
+
+If you're using **remote MCP** (covered in our MCP Client Setup guides), you don't need to install the SDK.
+The remote MCP server at `https://<YOUR_INSTANCE>.alationcloud.com/ai/mcp/` handles everything for you.
+
+## Components
+
+The SDK consists of three main packages:
+
+### Core SDK (alation-ai-agent-sdk)
+The foundation that handles authentication, API calls, and provides core tools for interacting with the Alation catalog.
+
+### LangChain integration (alation-ai-agent-langchain)
+Adapters for building sophisticated multi-agent workflows using the LangChain framework.
+
+### MCP integration (alation-ai-agent-mcp)
+A local MCP server implementation that exposes Alation capabilities to any MCP client.
+
+## Quick start
+
+```bash
+pip install uv
+
+# Install the core SDK
+uv pip install alation-ai-agent-sdk==1.0.0rc2
+
+# Install LangChain integration (optional)
+uv pip install alation-ai-agent-langchain==1.0.0rc2
+
+# Install the MCP integration (optional)
+uv pip install alation-ai-agent-mcp==1.0.0rc2
+```
+
+### Basic usage
+
+```python
+from alation_ai_agent_sdk import AlationAPI, ServiceAccountAuthParams
+
+# Initialize with service account authentication
+auth_params = ServiceAccountAuthParams(
+    client_id="your_client_id",
+    client_secret="your_client_secret"
+)
+
+alation_api = AlationAPI(
+    base_url="https://your-instance.alationcloud.com",
+    auth_method="service_account",
+    auth_params=auth_params
+)
+```
+
+## Learn more
+
+For comprehensive documentation, examples, and guides:
+
 <LinkCard
-  title="Agent Studio SDK"
-  href="https://github.com/Alation/alation-ai-agent-sdk/blob/main/README.md"
-  description="The official Alation Agent Studio SDK Repository."
+  title="Alation AI Agent SDK"
+  href="https://github.com/Alation/alation-ai-agent-sdk"
+  description="Complete SDK documentation, guides, and examples on GitHub."
 />
