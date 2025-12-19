@@ -1,12 +1,27 @@
-# Contributing to Alation AI Agent SDK
+# Contributing to Alation AI Agent Studio Documentation
 
 Thanks for taking the time to contribute!
 
 This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
-By participating, you are expected to uphold this code. Please report unacceptable behavior to ai_agent_sdk@alation.com.
+By participating, you are expected to uphold this code.
+Please report unacceptable behavior to ai_agent_sdk@alation.com.
 
-The following is a set of guidelines for contributing to the Alation AI Agent SDK.
+The following is a set of guidelines for contributing to the Alation AI Agent Studio Documentation.
 These are just guidelines, not rules, use your best judgment and feel free to propose changes to this document in a pull request.
+
+## Style
+
+Here are style guidelines for the content that we strive to follow.
+
+- 1 sentence per line (it might look funny in an editor, but it makes future diffs very easy to read).
+- Title-case titles.
+  Sentence-case headings.
+  This is purely subjective, but consistency is nice.
+- Prefer defining diagrams with text using `d2` over adding image blobs (if possible).
+  This makes updates easy to see because they are text-based diffs.
+  It also makes the visual style consistent.
+
+In general, we follow the ideas of [Diátaxis](https://diataxis.fr/).
 
 ## Issues
 
@@ -33,11 +48,13 @@ Pull Requests are the way concrete changes are made to the code, documentation, 
   - Choose the base branch (`main`) of the original repository and your branch as the head branch.
   - Provide a clear title and description for your pull request.
   - Reference any related issues or bug reports.
-- **Review and Merge:** The project maintainers will review your pull request. You may need to make changes based on feedback. Once approved, they'll merge your changes into the main repository. 
+- **Review and Merge:** The project maintainers will review your pull request.
+  You may need to make changes based on feedback.
+  Once approved, they'll merge your changes into the main repository.
 
 ### Dependencies Upgrades Policy
 
 Dependencies for the Agent Studio Docs repository should only be altered by maintainers.
 For security reasons, we will not accept PRs that alter dependencies.
 We invite contributors to make requests updating these files in our issue tracker.
-If the change is significantly complicated, draft PRs are welcome, with the understanding that these PRs will be closed in favor of a duplicate PR submitted by an Alation AI Agent SDK maintainer.
+If the change is significantly complicated, draft PRs are welcome, with the understanding that these PRs will be closed in favor of a duplicate PR submitted by an Alation AI Agent Studio Documentation maintainer.
