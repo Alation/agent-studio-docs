@@ -35,4 +35,4 @@ preview:
 [group('lint')]
 link-check *FLAGS:
     pnpm build
-    -lychee --root-dir={{ justfile_directory() }}/dist --insecure --accept '100..=103,200..=299,403,418,429' --cache --cache-exclude-status='401' --max-cache-age 7d -E {{FLAGS}} 'dist/**/*.html'
+    -lychee --remap '/dist/agent-studio-docs /dist' --root-dir={{ justfile_directory() }}/dist --insecure --accept '100..=103,200..=299,403,418,429' --cache --cache-exclude-status='401' --max-cache-age 7d -E {{FLAGS}} 'dist/**/*.html'
