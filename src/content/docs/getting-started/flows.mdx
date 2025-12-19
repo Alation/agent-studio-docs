@@ -22,8 +22,6 @@ Agent Flows extend this capability by enabling agents and tools to run autonomou
 
 <Badge text="Key Benefit" variant="success" /> Transform repeatable questions and workflows into automated processes that deliver insights, summaries, or actions exactly when needed.
 
----
-
 ## What are agent flows?
 
 Agent Flows allow you to orchestrate a **sequence of agent and tool steps** into a single, reusable workflow.
@@ -46,8 +44,6 @@ Instead of logging into a chatbot and asking the same questions each week, they 
 4. **Receive a concise summary** directly in Slack or email
 
 **Result:** Less manual work, faster insights, and consistent reporting.
-
----
 
 ## Key capabilities
 
@@ -79,13 +75,9 @@ Instead of logging into a chatbot and asking the same questions each week, they 
 - Complete observability and audit trails
 - Performance monitoring and debugging capabilities
 
----
-
 ## Creating an agent flow
 
 To create an Agent Flow, navigate to the **Flow** tab in Agent Studio and follow the steps below.
-
----
 
 ### Step 1: create a new flow
 
@@ -93,8 +85,6 @@ Click **Create New Flow** to open the flow builder.
 Each flow starts with a **Start** node, which defines how the flow is invoked.
 
 ![Start step configuration](../../../assets/img/getting-started/flows/start-step.png)
-
----
 
 ### Step 2: define input parameters (optional)
 
@@ -111,8 +101,6 @@ Inputs are available throughout the flow and can be referenced by downstream ste
 Input parameters are optional.
 If your flow always runs with the same values, you can omit this step.
 :::
-
----
 
 ### Step 3: build the flow sequence
 
@@ -136,8 +124,6 @@ Tool steps execute deterministic actions and are best suited for:
 
 You can mix agent and tool steps freely to create end-to-end workflows.
 
----
-
 ### Step 4: reference outputs between steps
 
 Flows become powerful when steps build on one another.
@@ -155,8 +141,6 @@ For example:
 
 The flow builder automatically validates these references before execution.
 
----
-
 ### Step 5: validate the flow
 
 A flow can only be executed when:
@@ -166,13 +150,9 @@ A flow can only be executed when:
 
 Validation errors are surfaced directly in the builder to help you resolve issues quickly.
 
----
-
 ## Running an agent flow
 
 Agent Flows support both **manual execution** and **scheduled runs**.
-
----
 
 ### Manual (dry) runs
 
@@ -183,8 +163,6 @@ For testing or one-off execution:
 
 This is the recommended approach while developing and refining a flow.
 
----
-
 ### Scheduled runs
 
 Once you are satisfied with the flow:
@@ -194,16 +172,12 @@ Once you are satisfied with the flow:
 
 Each schedule acts as an independent trigger, enabling the same flow to serve multiple use cases.
 
----
-
 ### API runs
 
 Just like agents, agent flows can also be invoked programmatically via API.
 For advanced users that want to build custom schedules or trigger, the API route provide more flexibility for automation.
 
 Each schedule acts as an independent trigger, enabling the same flow to serve multiple use cases.
-
----
 
 ## Monitoring and run history
 
@@ -215,8 +189,6 @@ The **Run History** tab provides visibility into all executions of a flow, inclu
 ![Flow run history](../../../assets/img/getting-started/flows/run-history.png)
 
 This makes it easy to audit past runs, troubleshoot failures, and confirm successful execution over time.
-
----
 
 ## Summary
 

@@ -19,8 +19,6 @@ While the model is responsible for reasoning and decision-making, tools are resp
 
 <Badge text="Key Benefit" variant="tip" /> Connect data agents to internal and external software systems.
 
----
-
 ### What is a tool?
 
 A tool is a structured, callable interface that an agent can invoke to perform a specific operation.
@@ -52,12 +50,8 @@ Clear and precise instructions significantly improve an agent's ability to choos
 
 Together, instructions, inputs, and outputs form a **tool contract** (sometimes referred to as a "tool card") that agents use to reason about tool selection and execution.
 
----
-
 ![Tool definition showing instructions, inputs, and outputs](../../../assets/img/getting-started/tools/tool-list.png)
 *A tool definition in Agent Studio, including instructions, input parameters, and outputs.*
-
----
 
 ### Deterministic vs. non-deterministic tools
 
@@ -68,8 +62,6 @@ Some tools can be **non-deterministic**, such as tools that invoke another agent
 In these cases, outputs may vary depending on context, prior conversation state, or reasoning paths.
 
 Understanding this distinction is important when designing agents that depend on consistent or repeatable behavior.
-
----
 
 ## Default tools
 
@@ -90,8 +82,6 @@ Default tools support a wide range of catalog operations, including:
 - Executing SQL queries
 
 For a complete list of default tools and their detailed schemas, see the **Default Tools Reference** section.
-
----
 
 ## Creating custom tools
 
@@ -128,8 +118,6 @@ When creating API-based tools, you must explicitly define:
 API-based tools require explicit definition of HTTP methods, authentication, and parameters since metadata cannot be inferred automatically.
 Careful and precise definitions are essential for reliable tool usage by agents.
 </Aside>
-
----
 
 ## Tool testing and validation
 
