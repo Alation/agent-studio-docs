@@ -56,8 +56,8 @@ export default defineConfig({
                     label: "Guides",
                     items: [
                         {
-                            label: "MCP Authentication",
-                            autogenerate: { directory: "guides/mcp_auth" },
+                            label: "Authentication",
+                            autogenerate: { directory: "guides/authentication" },
                         },
                         {
                             label: "MCP Client Setup",
@@ -84,10 +84,6 @@ export default defineConfig({
                         {
                             label: "API Role Requirements",
                             link: "https://developer.alation.com/dev/docs/api-by-roles#ai-apis",
-                        },
-                        {
-                            label: "Authentication",
-                            autogenerate: { directory: "reference/auth" },
                         },
                         {
                             label: "Agents",

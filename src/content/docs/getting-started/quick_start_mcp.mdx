@@ -1,12 +1,75 @@
 ---
 title: MCP
-description: This is a place where we tell people how to get started using MCP
+description: Getting started with Model Context Protocol (MCP) in Alation AI Studio.
 owner: Jags
 ---
 
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
 ## Overview
-This is a place where we tell people how to get started using MCP using user deligated flow.
-We can point them to a list of Guides to follow in sequence
+MCP (Model Context Protocol) is a standardized way to connect LLMs to tools that give it the ability to interact with external systems.
+
+## Core concepts
+### MCP server
+Service that exposes tools through standardized protocol interfaces.
+A server can contain multiple tools.
+### Tool
+Functions that your LLM can actively call, and decides when to use them based on user requests.
+Tools can write to databases, call external APIs, modify files, or trigger other logic.
+### MCP client
+Instantiated by host application like Claude Desktop, VS Code, Azure Copilot studio to communicate with particular MCP servers.
+A Client can connect to multiple MCP servers.
 
 
-## One Agent, One tool, ...
+## Types of MCP server
+:::tip[Choosing the Right Type]
+Unless you have specific security requirements or customization needs, we recommend starting with the Alation-hosted MCP server for a hassle-free experience.
+:::
+
+Alation provides two types of MCP server:
+
+1. **Alation-hosted MCP Server (Remote)**: A fully managed MCP server hosted by Alation, isolated per tenant.
+This is the easiest way to get started with MCP.
+2. **Self-Hosted MCP server (Local)**: You can also choose to host the Alation MCP server on your machine or on infrastructure.
+This option provides more control and customization but requires you to manage the server setup and maintenance.
+
+
+## Getting started with Alation-hosted MCP server
+
+:::caution[Availability]
+The Alation-hosted MCP server is only available to Alation Cloud customers
+:::
+
+The MCP server is hosted and available at `https://company-name.alationcloud.com/ai/mcp`, where `company-name` is your Alation tenant name.
+
+To connect to it, discover and use the tools, you need a MCP-compliant client like **ChatGPT Web**, **Claude Desktop**, **VS Code**, or **Azure Copilot Studio**.
+
+Instructions on how to set these up are provided in their respective documentation.
+
+<CardGrid>
+<LinkCard
+  title="Setup ChatGPT Web"
+  description="Instructions to connect Alation MCP server with ChatGPT Web"
+  href="../guides/mcp_client_setup/chatgpt/">
+</LinkCard>
+<LinkCard
+  title="Setup Claude Desktop"
+  description="Instructions to connect Alation MCP server with Claude Desktop"
+  href="../guides/mcp_client_setup/claude/">
+</LinkCard>
+<LinkCard
+  title="Setup VS Code"
+  description="Instructions to connect Alation MCP server with VS Code"
+  href="../guides/mcp_client_setup/vscode/">
+</LinkCard>
+<LinkCard
+  title="Setup Azure Copilot Studio"
+  description="Instructions to connect Alation MCP server with Azure Copilot Studio"
+  href="../guides/mcp_client_setup/copilotstudio/">
+</LinkCard>
+<LinkCard
+  title="Setup n8n workflow automation"
+  description="Instructions to connect Alation MCP server with n8n workflow automation"
+  href="../guides/mcp_client_setup/n8n/">
+</LinkCard>
+</CardGrid>
