@@ -81,7 +81,7 @@ export default defineConfig({
                         },
                         {
                             label: "Authentication",
-                            link: "reference/auth",
+                            autogenerate: { directory: "reference/auth" },
                         },
                         {
                             label: "Agents",
