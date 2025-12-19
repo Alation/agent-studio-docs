@@ -9,6 +9,7 @@ This repository serves as documentation for Agent Studio.
 To work with this repository, we recommend using
 - [`just`](https://just.systems/man/en/introduction.html): our command runner
 - [`mise`](https://mise.jdx.dev/installing-mise.html) (optional): to manage `pnpm`/`node` versions
+- [`lychee`](https://lychee.cli.rs/) (optional): used by `just link-check` to check for broken links
 
 Once you have at least `just` and `pnpm`, you can run the following.
 
