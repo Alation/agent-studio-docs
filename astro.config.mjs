@@ -50,7 +50,8 @@ export default defineConfig({
                         "getting-started/tools",
                         "getting-started/agents",
                         "getting-started/flows",
-                    ],
+                        "getting-started/quick_start_mcp"
+                    ]
                 },
                 {
                     label: "Guides",
