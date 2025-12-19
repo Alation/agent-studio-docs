@@ -1,0 +1,66 @@
+---
+title: Deep Research
+description: An analytics assistant that decomposes and solves complex research requests
+---
+
+The Deep Research agent is an expert analytics assistant designed to tackle complex, multi-faceted questions.
+It breaks down complex requests into systematic research plans, executes them step-by-step, and delivers comprehensive, data-driven summaries.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Analyzes and decomposes the user's research request
+2. Discovers relevant data products if none are specified
+3. Retrieves schemas to understand available data and relationships
+4. Creates a structured research plan with business-friendly language (or uses a provided plan)
+5. Executes each research step independently, running SQL queries to extract data
+6. Documents findings in plain language as it progresses
+7. Synthesizes all findings into a comprehensive final summary with actionable insights and specific metrics
+
+## Input parameters
+
+### Required
+
+- **message** (string): The complex question or research request
+
+## Output format
+
+- **message** (object): The final output containing the research results
+
+The message object contains:
+
+- **summary** (string): A comprehensive final summary addressing the original question
+- **plan** (object): The research plan used (saveable for future use)
+  - **plan_title** (string): The title of the research plan
+  - **plan_steps** (array): List of research steps, each containing:
+    - **section_header** (string): The main goal for this research step
+    - **instructions** (array of strings): The list of analytics questions for the step
+  - **plan_goal** (string, optional): The main research goal
+
+## Available tools
+
+The agent has access to three tools:
+
+### List Available Data Products
+
+Discovers relevant data products based on the user's question.
+Returns up to 5 data products by default using semantic search.
+
+### Get Data Schema
+
+Retrieves schema information for data products.
+Supports optional semantic search of sample values.
+
+### SQL Execution
+
+Executes SQL queries against data products to extract insights and data.
+
+## Behavior notes
+
+- **No clarification questions**: The agent uses best judgment to interpret vague requests and provides complete answers
+- **Data-driven focus**: Prioritizes calculations, aggregations, trends, and specific metrics over metadata
+- **Business-friendly language**: Avoids SQL, tool names, and technical identifiers in user-facing text
+- **Concurrent execution**: Invokes multiple independent tools simultaneously for efficiency
+- **Critical thinking**: Carefully analyzes tool results to ensure high-quality, accurate answers
+- **Comprehensive results**: Always aims to fully address the request, even if information is incomplete

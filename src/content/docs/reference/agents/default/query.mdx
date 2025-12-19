@@ -1,0 +1,70 @@
+---
+title: Query
+description: An agent for querying SQL databases
+---
+
+The Query agent is a streamlined SQL assistant for querying databases associated with data products.
+It translates natural language questions into SQL queries and returns data-driven answers.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Receives a natural language question from the user
+2. Uses the Get Data Schema tool to understand available tables and columns
+3. Generates and executes SQL queries using the SQL Execution tool
+4. Analyzes results and may refine queries as needed
+5. Returns the final consolidated results in a single table
+
+## Input parameters
+
+### Required
+
+- **message** (string): The natural language question or request to send to the agent
+- **data_product_id** (string): The ID of the data product to query
+
+## Output format
+
+- **message** (string): The final response containing query results
+
+## Available tools
+
+The agent has access to two tools:
+
+### Get Data Schema
+
+Retrieves the schema for tables in the data product.
+Optionally supports semantic search of sample values.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to get schema for
+- `query`: Optional semantic search query for sample values
+
+### SQL Execution
+
+Executes SQL queries against the data product's database.
+The tool automatically handles result serialization and may limit rows/columns for very large results.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to query
+- `sql`: The SQL query to execute
+- `result_table_name`: A semantic name for the result table
+
+## Behavior notes
+
+- The agent always uses result tables from executed queries to answer questions (never synthesizes data)
+- For complex questions, it executes a final consolidated query to return all results in a single table
+- Results are returned as tables, not markdown formatted text
+- This agent is optimized for query execution without visualization capabilities
+
+## Comparison with Data Product Query
+
+The Query agent is similar to the Data Product Query agent but:
+
+- **Does not** include chart generation capabilities
+- Focuses purely on SQL execution and data retrieval
+- Lighter weight for straightforward querying tasks
+
+For visualization needs, use the Data Product Query agent instead.
