@@ -66,7 +66,10 @@ export default defineConfig({
                             },
                         },
                         {
-                            slug: "guides/rest_api",
+                            label: "Rest API",
+                            autogenerate: {
+                                directory: "guides/rest_api",
+                            },
                         },
                     ],
                 },
