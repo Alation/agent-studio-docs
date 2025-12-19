@@ -20,14 +20,15 @@ The agent follows this workflow:
 
 ## Input parameters
 
-### Required
+Required:
 
-- **message** (string): The request to send to the agent (e.g., "Generate 10 new evaluation questions" or "Audit existing questions")
-- **data_product_id** (string): The ID of the data product to manage evaluation questions for
+- `message` (string): The request to send to the agent (e.g., "Generate 10 new evaluation questions" or "Audit existing questions")
+- `data_product_id` (string): The ID of the data product to manage evaluation questions for
 
 ## Output format
 
-- **message** (string): The final response with evaluation set details and upload confirmation
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` with evaluation set details and upload confirmation.
 
 ## Available tools
 

@@ -1,10 +1,9 @@
 ---
-title: Data Product Query
-description: An agent for querying databases associated with data products and generating charts
+title: Analytics Agent
+description: An agent that handles data product search, querying, and charting in an end-to-end flow.
 ---
 
-The Data Product Query agent enables natural language querying of databases associated with data products.
-It can execute SQL queries, retrieve schemas, and generate visualizations using charts.
+The Analytics Agent is designed to handle data analytics tasks by searching for a data product, constructing and executing a query, and/or generating a chart to address a user's request.
 
 ## How it works
 
@@ -22,20 +21,34 @@ The agent follows this workflow:
 Required:
 
 - `message` (string): The natural language question or request to send to the agent
-- `data_product_id` (string): The ID of the data product to query
-
-Optional:
-
-- `auth_id` (string): The ID of the authentication credentials to use for the query
+- `marketplace_id` (string): The ID of the marketplace to search for data products
 
 ## Output format
 
 The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
 The final message, assuming no errors, is a `string` which addresses the user's request.
+The chart(s) generated are available as html and json vega configs with successful charting tool return blocks.
 
 ## Available tools
 
-The agent has access to three tools:
+The agent is configured with 4 tools:
+
+### List available data products
+
+Searches for data products in the specified marketplace relevant to the user's question.
+
+**Key parameters:**
+- `marketplace_id`: The marketplace to search, which is passed to the tool based from the input parameters.
+
+### Get data schema
+
+Retrieves the schema for tables in the data product.
+Optionally supports semantic search of sample values.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to get schema for
+- `query`: Optional semantic search query for sample values
 
 ### SQL execution
 
@@ -47,16 +60,6 @@ The tool automatically handles result serialization and may limit rows/columns f
 - `data_product_id`: The data product to query
 - `sql`: The SQL query to execute
 - `result_table_name`: A semantic name for the result table
-
-### Get data schema
-
-Retrieves the schema for tables in the data product.
-Optionally supports semantic search of sample values.
-
-**Key parameters:**
-
-- `data_product_id`: The data product to get schema for
-- `query`: Optional semantic search query for sample values
 
 ### Chart generation
 
@@ -73,6 +76,6 @@ Takes a SQL query and Python code snippet to create interactive charts.
 ## Behavior notes
 
 - The agent always uses result tables from executed queries to answer questions (never synthesizes data)
-- For complex questions, it executes a final consolidated query to return all results in a single table
+- For complex questions, the agent may execute multiple queries to explore the dataset or obtain intermediate results
 - When generating charts, it returns the first reasonable visualization without excessive iteration
 - Charts are generated using Altair and returned as JSON representations

@@ -20,20 +20,21 @@ The agent follows this workflow:
 
 ## Input parameters
 
-### Required
+Required:
 
-- **message** (string): Instructions or questions about the data product evaluation
-- **data_product_id** (string): The ID of the data product to evaluate and improve
+- `message` (string): Instructions or questions about the data product evaluation
+- `data_product_id` (string): The ID of the data product to evaluate and improve
 
 ## Output format
 
-- **message** (string): The final response with evaluation results and improvement summary
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` with evaluation results and improvement summary.
 
 ## Available tools
 
 The agent has access to three tools:
 
-### Run SQL Evaluation
+### Run SQL evaluation
 
 Runs SQL evaluation on the data product's evaluation set.
 Returns cached results if the data product specification hasn't changed, otherwise triggers a fresh evaluation run.
@@ -44,7 +45,7 @@ Returns cached results if the data product specification hasn't changed, otherwi
 - Passed cases (successful question/SQL pairs)
 - Failed cases with detailed reasoning
 
-### Get Data Product Raw Specification
+### Get data product raw specification
 
 Retrieves the complete raw data product specification in the exact format expected by the update API.
 This differs from the schema tool by providing the raw JSON specification without sample values or simplification.
@@ -58,7 +59,7 @@ This differs from the schema tool by providing the raw JSON specification withou
 - `x-derivedColumns`: Computed column definitions
 - `relationships`: Join relationship definitions
 
-### Update an Existing Data Product
+### Update an existing data product
 
 Updates the data product specification with modifications.
 Requires the complete specification with all fields preserved.

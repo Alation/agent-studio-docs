@@ -1,0 +1,102 @@
+---
+title: Curation
+description: An agent for curating catalog objects.
+---
+
+The curation agent updates catalog objects based on user requests. The agent searches for relevant objects, analyzes their current state, and updates them according to the user's intent.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Receives a natural language question from the user
+2. Searches for relevant catalog objects to update based on the user's request
+3. Gets custom field definition details to apply accurate updates
+4. Updates objects individually, modifying titles, descriptions, and custom fields as specified
+
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language request to send to the agent
+
+Optional:
+
+- `asset_ids` (list of strings): A list of asset_ids, obtained from uploading PDFs or text files containing context for the agent to use when curating catalog objects.
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string`.
+
+## Available tools
+
+The agent is configured with 6 tools:
+
+### Run the catalog context search agent
+
+Executes the Catalog Context Search agent to find relevant catalog objects based on the user's request.
+
+**Key parameters:**
+
+- `message`: A search query derived from the user's request
+
+
+### Get custom fields definition
+
+Retrieves all custom fields defined in the Alation catalog, including information on how to use them.
+
+### Get users
+
+Search for Alation users by name or email.
+Results are paginated, and include user IDs, names, and emails for use with curation actions.
+
+**Key parameters:**
+
+- `limit`: Maximum number of users to return
+- `skip`: Number of users to skip for pagination
+- `order_by`: Field to order results by ("id" by default)
+- `display_name__icontains`: Filter users whose display name contains this string
+- `email__icontains`: Filter users whose email contains this string
+
+### Get groups
+
+Search for groups in Alation by name or email.
+Results are paginated, and include group IDs and names for use with curation actions.
+
+**Key parameters:**
+
+- `limit`: Maximum number of groups to return
+- `skip`: Number of groups to skip for pagination
+- `order_by`: Field to order results by ("id" by default)
+- `display_name__icontains`: Filter groups whose display name contains this string
+- `email__icontains`: Filter groups whose email contains this string
+
+
+### Get catalog object
+
+Retrieves detailed information about catalog objects by their IDs and a specified set of fields.
+
+**Key parameters:**
+- `object_type`: The type of catalog object ("schema", "table", and "column" are allowed)
+- `object_id`: The ID of the catalog object to retrieve
+
+### Update catalog object
+
+Updates catalog objects by ID, modifying their titles, descriptions, and custom field values as specified.
+
+**Key parameters:**
+- `object_type`: The type of catalog object ("schema", "table", and "column" are allowed)
+- `object_id`: The ID of the catalog object to update
+- `title`: An updated title for the object
+- `description`: An updated description for the object
+- `custom_fields`: Updates to custom field values on the object
+
+
+## Behavior notes
+
+- The agent searches for relevant objects based on the user's request
+- Currently the agent supports curating schemas, tables, and columns
+- The agent may update titles, descriptions, and custom fields on catalog objects
+- The agent may not exhaustively update all relevant objects in a single run, and is intended for small, interactive updates. Alation's bulk [Curation Automation](https://docs.alation.com/en/latest/steward/CurationAutomation/index.html#curation-automation) tool is recommended for bulk updates.

@@ -50,14 +50,16 @@ export default defineConfig({
                         "getting-started/tools",
                         "getting-started/agents",
                         "getting-started/flows",
-                    ]
+                    ],
                 },
                 {
                     label: "Guides",
                     items: [
                         {
                             label: "Authentication",
-                            autogenerate: { directory: "guides/authentication" },
+                            autogenerate: {
+                                directory: "guides/authentication",
+                            },
                         },
                         {
                             label: "MCP Client Setup",
@@ -100,10 +102,6 @@ export default defineConfig({
                                     autogenerate: {
                                         directory: "reference/agents/default",
                                     },
-                                },
-                                {
-                                    label: "Custom Agents",
-                                    slug: "reference/agents/custom-agents",
                                 },
                             ],
                         },

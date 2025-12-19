@@ -1,0 +1,73 @@
+---
+title: Chart Generation
+description: Chart generation agent using structured configuration approach with custom code fallback for complex visualizations.
+---
+
+The chart generation agent creates custom data visualizations based on user requests.
+
+## How it works
+
+The agent uses this workflow:
+
+1. Receives a natural language request from the user
+2. Executes queries to obtain relevant data for the visualization
+3. Generates the requested chart(s)
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language question or request to send to the agent
+- `data_product_id` (string): The data product to query
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string`.
+The chart(s) generated are available as html and json vega configs with successful charting tool return blocks.
+
+## Available tools
+
+The agent is configured with 3 tools:
+
+
+### Get data schema
+
+Retrieves the schema for tables in the data product.
+Optionally supports semantic search of sample values.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to get schema for
+- `query`: Optional semantic search query for sample values
+
+### SQL execution
+
+Executes SQL queries against the data product's database.
+The tool automatically handles result serialization and may limit rows/columns for very large results.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to query
+- `sql`: The SQL query to execute
+- `result_table_name`: A semantic name for the result table
+
+### Chart generation from asset
+
+Generates visualizations using Altair and Python.
+Takes an asset ID from a generated CSV to create interactive charts.
+
+**Key parameters:**
+
+- `data_product_id`: The data product to query
+- `sql`: SQL query to generate data for the chart
+- `chart_code_snippet`: Python function using Altair to create the chart
+- `image_title`: Title for the chart
+
+
+## Behavior notes
+
+- The agent always uses result tables from executed queries to answer questions (never synthesizes data)
+- For complex questions, the agent may execute multiple queries to explore the dataset or obtain intermediate results
+- When generating charts, it returns the first reasonable visualization without excessive iteration
+- Charts are generated using Altair and returned as JSON representations

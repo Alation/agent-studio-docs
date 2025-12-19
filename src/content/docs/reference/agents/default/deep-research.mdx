@@ -20,39 +20,38 @@ The agent follows this workflow:
 
 ## Input parameters
 
-### Required
+Required:
 
-- **message** (string): The complex question or research request
+- `message` (string): The complex question or research request
 
 ## Output format
 
-- **message** (object): The final output containing the research results
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a json object containing:
 
-The message object contains:
-
-- **summary** (string): A comprehensive final summary addressing the original question
-- **plan** (object): The research plan used (saveable for future use)
-  - **plan_title** (string): The title of the research plan
-  - **plan_steps** (array): List of research steps, each containing:
-    - **section_header** (string): The main goal for this research step
-    - **instructions** (array of strings): The list of analytics questions for the step
-  - **plan_goal** (string, optional): The main research goal
+- `summary` (string): A comprehensive final summary addressing the original question
+- `plan` (object): The research plan used (saveable for future use)
+  - `plan_title` (string): The title of the research plan
+  - `plan_steps` (array): List of research steps, each containing:
+    - `section_header` (string): The main goal for this research step
+    - `instructions` (array of strings): The list of analytics questions for the step
+  - `plan_goal` (string, optional): The main research goal
 
 ## Available tools
 
 The agent has access to three tools:
 
-### List Available Data Products
+### List available data products
 
 Discovers relevant data products based on the user's question.
 Returns up to 5 data products by default using semantic search.
 
-### Get Data Schema
+### Get data schema
 
 Retrieves schema information for data products.
 Supports optional semantic search of sample values.
 
-### SQL Execution
+### SQL execution
 
 Executes SQL queries against data products to extract insights and data.
 
