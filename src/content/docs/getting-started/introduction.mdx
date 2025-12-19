@@ -23,7 +23,6 @@ This page covers:
 - [Common usecases](#when-should-i-use-agent-studio)
 - [Who uses Agent Studio?](#who-uses-agent-studio)
 - [How do I use Agent Studio?](#how-do-i-use-agent-studio)
-- [What LLMs can I use?](#what-llms-can-i-use)
 
 ## Tools are the foundation of Agent Studio
 
@@ -89,16 +88,16 @@ Common reasons include:
 - You need a **custom agent** built on Alation metadata and context
 - You want to **bring Alation catalog context outside of Alation** to power other agents or workflows
 
-Here are some example use cases:
+Next, we’ll walk through a few common use cases.
 
 ### Data Insight Agents
 
 Data insight agents help teams answer business questions using structured data—faster, more consistently, and with less back-and-forth between analysts and stakeholders.
 
-As a data analyst, I need to provide a platform for business analysts to ask questions in natural language over structured data and/or use that to power downstream workflows.
+As a data analyst:
 
-- I want to enable business analysts to answer questions directly over data (without needing to know where the data lives or how it’s modeled)
-- I want to automate repetitive tasks (for example, a weekly supply chain workflow that checks inventory)
+- I want to enable business analysts to answer questions in natural language directly against data, without needing to know where it lives or how it’s modeled.
+- I want to automate repetitive tasks or routines (for example, a weekly supply chain workflow that checks inventory)
 
 Why this matters:
 - Reduces time spent translating business questions into SQL or dashboards
@@ -109,7 +108,7 @@ Why this matters:
 
 Metadata insight agents help users *understand* data—what it means, where it comes from, and how it should be used—by using the trusted context stored in Alation.
 
-As a data analyst:
+As a data analyst or data app developer:
 - I want to generate or augment a semantic layer using my context in Alation
 - I want to pull Alation context into other tools (for example, Claude or ChatGPT) so answers are grounded in our enterprise definitions, policies, and governance
 
@@ -122,7 +121,7 @@ Why this matters:
 
 Curation agents automate and scale the work required to keep your catalog accurate, complete, and useful—especially when you need custom enrichment logic.
 
-As a data analyst:
+As a data steward:
 - I want to build a custom curation agent to enrich data in my catalog, and I can’t use Alation’s curation automation tool to do this
 
 Why this matters:
