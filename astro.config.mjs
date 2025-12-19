@@ -7,6 +7,8 @@ import d2 from "astro-d2";
 
 // https://astro.build/config
 export default defineConfig({
+    site: "https://alation.github.io",
+    base: "/agent-studio-docs",
     integrations: [
         starlight({
             title: "Alation Agent Studio Documentation",
@@ -20,7 +22,7 @@ export default defineConfig({
                 styleOverrides: { borderRadius: "0.5rem" },
             },
             components: {
-                Header: './src/components/Header.astro',
+                Header: "./src/components/Header.astro",
             },
             customCss: [
                 "./src/styles/custom.css",
