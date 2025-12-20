@@ -1,0 +1,30 @@
+---
+title: BI Report Search Tool
+description: Search BI reports in the catalog.
+---
+
+# BI Report Search Tool
+
+This tool can be used to search the Alation Data Catalog for BI reports.
+Results can optionally be filtered using the `filters` and `limit` parameters.
+`filters` should only be used for custom fields, and should follow the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature.
+
+
+## Example usage
+
+```json
+{
+  "search_term": "Find me our analysis on PEBKAC errors.",
+  "filters": [
+    {
+      "filter_id": 0,
+      "filter_values": [
+        "foo",
+        "bar"
+      ]
+    }
+  ],
+  "limit": 20
+}
+```
+

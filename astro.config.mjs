@@ -109,7 +109,10 @@ export default defineConfig({
                                 },
                             ],
                         },
-                        { slug: "reference/tools" },
+                        {
+                            label: "Tools",
+                            autogenerate: { directory: "reference/tools" },
+                        },
                         {
                             label: "Data Products",
                             autogenerate: {
