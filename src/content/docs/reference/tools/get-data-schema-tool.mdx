@@ -1,0 +1,20 @@
+---
+title: Get Data Schema Tool
+description: TODO
+---
+
+# Get Data Schema Tool
+
+This tool fetches metadata and sample column values for all tables in a given data product.
+Agents can use this tool to gain a holistic understand of the data product before move on to more intensive tasks, such as running SQL queries.
+
+## Example usage
+
+```jsonc
+{
+  "data_product_id": "my-data-product",
+  "pre_exec_sql": "",  // Optional, SQL to execute before sampling tables. Useful for setting session-level context data in a DB.
+  "auth_id": "string",  // Optional
+  "query": "string"  // Optional, used to semantically search sample data for columns.
+}
+```

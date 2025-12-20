@@ -1,0 +1,22 @@
+---
+title: SQL Execution Tool
+description: Execute SQL against a data warehouse using a data product..
+---
+
+# SQL Execution Tool
+
+This tool can be used to run queries against a data product.
+Note that mutating queries (`UPDATE`, `DELETE`, etc.) are not allowed.
+The data product must have a SQL compatible data source associated with it.
+
+## Example Usage
+
+```json
+{
+  "data_product_id": "my-data-product",
+  "sql": "SELECT 1;",  // Query to execute.
+  "result_table_name": "select_one",  // Name to describe the tabular results of the query.
+  "pre_exec_sql": "",  // Optional, SQL to execute before sampling tables. Useful for setting session-level context data in a DB.
+  "auth_id": "string",  // Optional
+}
+```

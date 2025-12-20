@@ -1,0 +1,36 @@
+---
+title: Search Catalog Tool
+description: Search the catalog.
+---
+
+## Search Catalog Tool
+
+This tool can be used to search for objects & assets within the Alation Data Catalog.
+Types of objects include: tables, schemas, columns, articles, and glossary terms.
+`filters` should only be used for custom fields, and should follow the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature.
+
+### Example usage
+
+```json
+{
+  "search_term": "Agriculture",
+  "object_types": [
+    "table"
+  ],
+  "filters": [
+    {
+      "filter_id": 0,
+      "filter_values": [
+        "foo",
+        "bar"
+      ]
+    }
+  ],
+  "limit": 20
+}
+```
+
+### See also
+
+- [Get Search Filter Values Tool](/agent-studio-docs/reference/tools/get-search-filter-values-tool)
+- [Get Search Filter Fields Tool](/agent-studio-docs/reference/tools/get-search-filter-fields-tool)

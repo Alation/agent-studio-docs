@@ -1,0 +1,24 @@
+---
+title: Get Search Filter Fields Tool
+description: Get fields to use for filtering catalog search results.
+---
+
+# Get Search Filter Fields Tool
+
+This tool can be used to find all possible fields which can be used for searching the Alation Data Catalog.
+All possible filters will be searched, but only the ones which are the most semantically similar to the original search term will be returned.
+The amount of results can be controlled through a parameter.
+
+## Example usage
+
+```json
+{
+  "search_term": "compliance",
+  "limit": 10
+}
+```
+
+## See also
+
+- [Get Search Filter Values Tool](/agent-studio-docs/reference/tools/get-search-filter-values-tool)
+- [Search Catalog Tool](/agent-studio-docs/reference/tools/search-catalog-tool)
