@@ -20,7 +20,7 @@ Delegated authorization requires several systems interacting in concert and foll
 - [IETF: OAuth Delegated Authorization](https://www.ietf.org/archive/id/draft-li-oauth-delegated-authorization-00.html) — Detailed specification
 :::
 
-For delegated authorization to work, configurations are required within Alation and within the third-party application. 
+For delegated authorization to work, configurations are required within Alation and within the third-party application.
 Unfortunately, there is a chicken and egg problem as both configurations depend on each other.
 
 ### Third-Party Application Configuration
@@ -31,18 +31,18 @@ Each application or platform is slightly different, but any that support OAuth 2
 Different platforms may refer to these values with slightly different labels.
 :::
 
-At a conceptual level, the **Authorization URL** accepts the pair of `Client ID` and `Client Secret` as well as the `Redirect URI` and returns a refresh token. 
+At a conceptual level, the **Authorization URL** accepts the pair of `Client ID` and `Client Secret` as well as the `Redirect URI` and returns a refresh token.
 The **Token URL** accepts the refresh token and returns an access token, which is what's required to access resources.
 
 To configure your third-party application, you need the following values:
 
 **Authorization URL:**
-```
+```txt "your-alation-instance"
 https://your-alation-instance.alationcloud.com/oauth/v1/authorize/
 ```
 
 **Token URL:**
-```
+```txt "your-alation-instance"
 https://your-alation-instance.alationcloud.com/oauth/v1/token/
 ```
 
@@ -53,11 +53,11 @@ Replace `your-alation-instance` with your specific Alation instance.
 You'll also need to specify the `Client ID` and `Client Secret`, which you can obtain from Alation through:
 - **The Alation User Interface** <Badge text="Coming Soon" variant="caution" size="small" />
 - **OpenAPI documentation** <Badge text="Available from 2025.3.3" variant="success" size="small" /> at:
-  ```
+  ```txt "your-alation-instance"
   https://your-alation-instance.alationcloud.com/openapi/oauth2/
   ```
 
-  Navigate to **OAuth Client Administration** → **POST /oauth/v1/register/** to register a new client. 
+  Navigate to **OAuth Client Administration** → **POST /oauth/v1/register/** to register a new client.
   You can test the API directly from the documentation page by clicking "Try it out" and providing the required configuration parameters.
 
   **Example payload for a confidential client:**
@@ -87,7 +87,7 @@ For detailed step-by-step instructions for each platform, refer to their individ
 :::
 
 :::caution[PKCE Support]
-ChatGPT and MS Copilot Studio do not yet support **Proof of Key Exchange Code (PKCE)**. 
+ChatGPT and MS Copilot Studio do not yet support **Proof of Key Exchange Code (PKCE)**.
 This option should **not** be selected in the Alation configuration when using those platforms.
 :::
 
@@ -113,7 +113,7 @@ This option should **not** be selected in the Alation configuration when using t
 
 #### Required configuration values
 
-You'll need the **Redirect URL** (sometimes labeled **Callback URL**) from the third-party application you're building. 
+You'll need the **Redirect URL** (sometimes labeled **Callback URL**) from the third-party application you're building.
 This is the location where Alation will pass the user session details to the third-party application.
 
 :::tip[MS Copilot Studio configuration]
