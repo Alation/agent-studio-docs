@@ -1,79 +1,110 @@
 ---
 title: n8n MCP Client
-description: How to connect Alation MCP server with n8n MCP Client Tool nodes.
+description: Connect Alation to n8n via Remote MCP Server
 ---
 
 import { Steps } from "@astrojs/starlight/components";
 
-This guide shows you how to set up n8n's MCP Client Tool node to connect to your hosted Alation MCP server.
-Local Alation MCP server integration is not covered in this guide.
+Connect your Alation catalog to n8n using the Remote MCP server with OAuth authentication.
 
 ## Prerequisites
 
-- n8n instance with built-in [MCP Client Tool node](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.toolmcp/) support.
-- OAuth Client credentials from your Alation instance or a Server Admin role to create one.
+- **OAuth Client credentials** from your Alation instance or a Server Admin role to create one.
+- **n8n instance** with built-in [MCP Client Tool node](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.toolmcp/) support
 
-## Step 1. Add an MCP Client Node in n8n
-
-Search for MCP Client Tool node.
-In the screenshot below, you can see two types of MCP Client Tool nodes: first one is the built-in MCP Client node, and the second one is from the community package.
-This guide will pick the built-in one which supports the OAuth 2.0 authentication method.
-
-![Add MCP Client Tool Node](../../../../assets/img/guides/mcp_client_setup/n8n/add-node.png)
-
-## Step 2. Configure authentication
+## Add an MCP Client Node in n8n
 
 <Steps>
-1. Choose `HTTP Streamable` as Server Transport.
-2. Enter `https://<your-instance>.alationcloud.com/ai/mcp` as the MCP Endpoint URL.
-3. Alation hosted MCP Server supports Bearer Auth and MCP OAuth2.
-   - MCP OAuth2: recommended for user delegated access.
-   - Bearer Auth: used for service account style access. Note that the token needs to be manually refreshed when it expires.
+
+1. **Search for MCP Client Tool**
+
+   In the n8n editor, search for "MCP" in the node panel. Select **MCP Client Tool** under "Model Context Protocol" (the built-in node, not the community package).
+
+   ![Add MCP Client Tool Node](../../../../assets/img/guides/mcp_client_setup/n8n/add-node.png)
+
+2. **Configure server transport**
+
+   Set the following parameters:
+
+   | Field | Value |
+   |-------|-------|
+   | Server Transport | `HTTP Streamable` |
+   | MCP Endpoint URL | `https://<YOUR_INSTANCE>.alationcloud.com/ai/mcp` |
+
+   ![MCP Client Tool parameters](../../../../assets/img/guides/mcp_client_setup/n8n/node-parameters.png)
+
 </Steps>
+
+## Connecting (Authentication)
+
+Alation supports two authentication methods:
+
+| Method | Use Case |
+|--------|----------|
+| **MCP OAuth2** | Recommended for user-delegated access |
+| **Bearer Auth** | Service account style access (requires manual token refresh) |
+
 ![Authentication Methods](../../../../assets/img/guides/mcp_client_setup/n8n/auth-methods.png)
 
-### MCP OAuth2 setup
+### MCP OAuth2 Setup
 
 <Steps>
 
-1. Create an OAuth Client
+1. **Select MCP OAuth2 authentication**
 
-   Refer to the [OAuth 2.0 User Initiated Authentication Guide](/agent-studio-docs/guides/authentication/user_initiated_auth) to create an OAuth Client in your Alation instance.
-   The following fields are required when creating an OAuth Client for n8n.
+   In the Authentication dropdown, select **MCP OAuth2**, then click the credential dropdown and select **Create New Credential**.
 
-   | Field                | Value                                                                                                      |
-   | -------------------- | ---------------------------------------------------------------------------------------------------------- |
-   | name                 | Any name to identify the client.<br/> e.g. `"n8n-mcp-client"`                                              |
-   | client_type          | `"confidential"`                                                                                           |
-   | redirect_uris        | Taken from the n8n oauth setup page.<br/> e.g. `["http://localhost:5678/rest/oauth2-credential/callback"]` |
-   | refresh_token_expiry | Refresh token lifetime in seconds.<br/>e.g. `259200`                                                       |
-   | access_token_expiry  | Access token lifetime in seconds.<br/>e.g. `3600`                                                          |
-   | pkce_required        | `true`                                                                                                     |
+2. **Disable Dynamic Client Registration**
 
-   Securely store the `client_id` and `client_secret` as you will need them to configure the OAuth2 credentials in n8n.
+   Toggle **Use Dynamic Client Registration** to **Off**. This reveals the manual OAuth configuration fields.
 
-2. Configure OAuth2 credentials in n8n
+   ![Dynamic Client Registration disabled](../../../../assets/img/guides/mcp_client_setup/n8n/oauth-1.png)
 
-   Fill in the following fields in the n8n OAuth2 credential setup.
+3. **Note the OAuth Redirect URL**
+
+   Copy the **OAuth Redirect URL** shown at the top of the form (e.g., `http://localhost:5678/rest/oauth2-credential/callback`). You'll need this when creating your OAuth Client in Alation.
+
+4. **Create an OAuth Client in Alation**
+
+   Refer to the [OAuth 2.0 User Initiated Authentication Guide](/agent-studio-docs/guides/authentication/user_initiated_auth) to create an OAuth Client. Use these settings:
+
    | Field | Value |
-   | ------------------------------- | ------------------------------------------------------------- |
-   | Use Dynamic Client Registration | Off |
-   | Grant Type | PKCE |
-   | Authorization URL | `https://<your-instance>.alationcloud.com/oauth/v1/authorize` |
-   | Access Token URL | `https://<your-instance>.alationcloud.com/oauth/v1/token` |
-   | Client ID | `client_id` from the OAuth Client you created in Alation |
-   | Client Secret | `client_secret` from the OAuth Client you created in Alation |
-   | Scope | Leave blank |
-   | Auth URI Query Parameters | Leave blank |
-   | Authentication | Header |
+   |-------|-------|
+   | name | Any name (e.g., `n8n-mcp-client`) |
+   | client_type | `confidential` |
+   | redirect_uris | The OAuth Redirect URL from Step 3 |
+   | refresh_token_expiry | `259200` (3 days in seconds) |
+   | access_token_expiry | `3600` (1 hour in seconds) |
    | pkce_required | `true` |
 
-   ![OAuth2 Configuration 1](../../../../assets/img/guides/mcp_client_setup/n8n/oauth-1.png)
-   ![OAuth2 Configuration 2](../../../../assets/img/guides/mcp_client_setup/n8n/oauth-2.png)
+   Save the `client_id` and `client_secret` securely.
 
-   Click **Connect my account** to initiate the OAuth2 flow.
-   A new window will open to ask for your Alation login credentials.
-   Once the account is connected, **save** the configuration and exit.
+5. **Configure OAuth2 credentials**
+
+   Fill in the credential form:
+
+   | Field | Value |
+   |-------|-------|
+   | Grant Type | `PKCE` |
+   | Authorization URL | `https://<YOUR_INSTANCE>.alationcloud.com/oauth/v1/authorize/` |
+   | Access Token URL | `https://<YOUR_INSTANCE>.alationcloud.com/oauth/v1/token/` |
+   | Client ID | Your client ID from Alation |
+   | Client Secret | Your client secret from Alation |
+   | Scope | Leave blank |
+   | Auth URI Query Parameters | Leave blank |
+   | Authentication | `Header` |
+
+   ![OAuth2 Configuration](../../../../assets/img/guides/mcp_client_setup/n8n/oauth-2.png)
+
+6. **Connect your account**
+
+   Click **Connect my account**. A browser window opens for Alation login. Sign in with your credentials.
+
+7. **Verify connection**
+
+   After signing in, you'll see "Account connected". Click **Save** to close the credential dialog.
+
+   ![Account connected](../../../../assets/img/guides/mcp_client_setup/n8n/account-connected.png)
 
 </Steps>
 
@@ -81,18 +112,30 @@ This guide will pick the built-in one which supports the OAuth 2.0 authenticatio
 
 <Steps>
 
-1. Obtain an access token
-   Refer to the [OAuth 2.0 M2M Authentication Guide](/agent-studio-docs/guides/authentication/machine_to_machine) to create an OAuth Client in your Alation instance and obtain an access token.
+1. **Obtain an access token**
 
-2. Configure Bearer Auth in n8n
-   Fill in the access token from the previous step into the Bearer Token field.
+   Refer to the [OAuth 2.0 M2M Authentication Guide](/agent-studio-docs/guides/authentication/machine_to_machine) to create an OAuth Client and obtain an access token.
+
+2. **Configure Bearer Auth**
+
+   Select **Bearer Auth** from the Authentication dropdown, then enter your access token.
+
    ![Bearer Configuration](../../../../assets/img/guides/mcp_client_setup/n8n/bearer.png)
-   Click **Save** and exit.
+
+3. **Save credentials**
+
+   Click **Save** to close the credential dialog.
 
 </Steps>
-## Step 3. Complete the node setup
 
-Once the connection is set up, you will see the list of available tools.
-Choose the tool you want to use in this node and fill in the input parameter values.
-Click **Execute step** to test the tool call.
-![Complete Setup](../../../../assets/img/guides/mcp_client_setup/n8n/final-setup.png)
+## Troubleshooting
+
+- **n8n version compatibility?** Ensure you're running n8n version 1.93 or later, which includes built-in MCP Client Tool support with OAuth.
+
+- **Zscaler or VPN issues with localhost?** When running n8n locally (localhost), disable Zscaler or other security proxies before attempting the OAuth flow, as they can interfere with the authentication redirect.
+
+- **OAuth flow fails or loops?** Log out of any existing Alation sessions in your browser before attempting the OAuth login.
+
+- **Authentication errors?** Verify the Authorization URL and Access Token URL include a trailing slash (e.g., `.../authorize/` not `.../authorize`).
+
+- **Token expired with Bearer Auth?** Bearer tokens need manual refresh when they expire. Consider using MCP OAuth2 for automatic token refresh.
