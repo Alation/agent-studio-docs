@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightImageZoom from "starlight-image-zoom";
+import starlightSidebarTopics from "starlight-sidebar-topics"
 
 import d2 from "astro-d2";
 
@@ -40,77 +41,89 @@ export default defineConfig({
                     "https://github.com/Alation/agent-studio-docs/edit/main/",
             },
             favicon: "favicon.svg",
-            plugins: [starlightImageZoom()],
-            sidebar: [
-                {
-                    label: "Start Here",
-                    items: [
-                        "getting-started/introduction",
-                        "getting-started/key_concepts",
-                        "getting-started/tools",
-                        "getting-started/agents",
-                        "getting-started/flows",
-                        "getting-started/quick_start_mcp"
-                    ]
-                },
-                {
-                    label: "Guides",
-                    items: [
-                        {
-                            label: "Authentication",
-                            autogenerate: {
-                                directory: "guides/authentication",
+            plugins: [
+                starlightImageZoom(),
+                starlightSidebarTopics([
+                    {
+                        label: "Start",
+                        link: "/getting-started/introduction",
+                        icon: "rocket",
+                        items: [
+                            "getting-started/introduction",
+                            "getting-started/key_concepts",
+                            "getting-started/tools",
+                            "getting-started/agents",
+                            "getting-started/flows",
+                            "getting-started/quick_start_mcp"
+                        ]
+                    },  
+                    {
+                        label: "Guides and recipes",
+                        link: "/guides/authentication/introduction",
+                        icon: "open-book",
+                        items: [
+                            {
+                                label: "Authentication",
+                                autogenerate: {
+                                    directory: "guides/authentication",
+                                },
                             },
-                        },
-                        {
-                            label: "MCP Client Setup",
-                            autogenerate: {
-                                directory: "guides/mcp_client_setup",
+                            {
+                                label: "MCP Client Setup",
+                                autogenerate: {
+                                    directory: "guides/mcp_client_setup",
+                                },
                             },
-                        },
-                        {
-                            label: "Rest API",
-                            autogenerate: {
-                                directory: "guides/rest_api",
+                            {
+                                label: "Rest API",
+                                autogenerate: {
+                                    directory: "guides/rest_api",
+                                },
                             },
-                        },
-                    ],
-                },
-                {
-                    label: "Agent Studio SDK",
-                    autogenerate: { directory: "sdk" },
-                },
-                {
-                    label: "Reference",
-                    items: [
-                        {
-                            label: "API Reference",
-                            link: "https://developer.alation.com/dev/reference/alation-ai-api-overview",
-                        },
-                        {
-                            label: "API Role Requirements",
-                            link: "https://developer.alation.com/dev/docs/api-by-roles#ai-apis",
-                        },
-                        {
-                            label: "Agents",
-                            autogenerate: { directory: "reference/agents" },
-                        },
-                        {
-                            label: "Tools",
-                            autogenerate: { directory: "reference/tools" },
-                        },
-                        {
-                            label: "Data Products",
-                            autogenerate: {
-                                directory: "reference/data_products",
+                        ],
+                    },  
+                    {
+                        label: "Agent Studio SDK",
+                        link: "/sdk/using-the-sdk",
+                        icon: "puzzle",
+                        items: [
+                            "sdk/using-the-sdk"
+                        ]
+                    },
+                    {
+                        label: "Reference",
+                        link: "/reference/agents/introduction",
+                        icon: "information",
+                        items: [
+                            {
+                                label: "API Reference",
+                                link: "https://developer.alation.com/dev/reference/alation-ai-api-overview",
                             },
-                        },
-                        {
-                            label: "Evaluation",
-                            autogenerate: { directory: "reference/evaluation" },
-                        },
-                    ],
-                },
+                            {
+                                label: "API Role Requirements",
+                                link: "https://developer.alation.com/dev/docs/api-by-roles#ai-apis",
+                            },
+                            {
+                                label: "Agents",
+                                autogenerate: { directory: "reference/agents" },
+                            },
+                            {
+                                label: "Tools",
+                                autogenerate: { directory: "reference/tools" },
+                            },
+                            {
+                                label: "Data Products",
+                                autogenerate: {
+                                    directory: "reference/data_products",
+                                },
+                            },
+                            {
+                                label: "Evaluation",
+                                autogenerate: { directory: "reference/evaluation" },
+                            },
+                        ],
+                    },
+                ]),
             ],
             lastUpdated: true,
             credits: true,
