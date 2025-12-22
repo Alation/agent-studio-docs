@@ -13,16 +13,36 @@ This guide covers **Remote MCP** setup. For local MCP server setup, see the [Loc
 
 ## Prerequisites
 
-- **OAuth Client credentials** from your Alation instance ([Create OAuth Client](/agent-studio-docs/guides/authentication/user_initiated_auth/))
+- **OAuth Client credentials** from your Alation instance, or a Server Admin role to register a new client.
 - **VS Code** with MCP support enabled
+
+## Create an OAuth Client for VS Code
+
+Follow the [OAuth 2.0 User Initiated Authentication Guide](/agent-studio-docs/guides/authentication/user_initiated_auth) to create an OAuth Client in your Alation instance.
+Use the following payload values when creating the OAuth Client (omit the `localhost` address suggested by VS Code).
+
+```jsonc
+{
+  "name": "VS Code MCP Client",
+  "client_type": "confidential",
+  "redirect_uris": [
+    "https://vscode.dev/redirect"
+  ],
+  "refresh_token_expiry": 259200,
+  "access_token_expiry": 3600,
+  "pkce_required": true
+}
+```
+
+Securely store the `client_id` and `client_secret` values, they will be used during authentication.
 
 ## Adding the MCP Server
 
 <Steps>
 
-1. **Create the configuration file**
+1. **Create the MCP server configuration file**
 
-   In your project root, create a `.vscode` folder if it doesn't exist, then create a file named `mcp.json` inside it.
+   In your project root, create a `.vscode` folder if it doesn't exist, then create (or open) `mcp.json` inside it.
 
 2. **Add the Alation server configuration**
 
@@ -30,7 +50,7 @@ This guide covers **Remote MCP** setup. For local MCP server setup, see the [Loc
    {
      "servers": {
        "alation_mcp": {
-         "url": "https://<YOUR_INSTANCE>.alationcloud.com/ai/mcp/",
+         "url": "https://<YOUR_INSTANCE>.alationcloud.com/ai/mcp/",  // Replace with your Alation instance URL
          "type": "http"
        }
      },
@@ -48,9 +68,9 @@ This guide covers **Remote MCP** setup. For local MCP server setup, see the [Loc
 
    In the `mcp.json` file, click **Start** above the server configuration.
 
-   ![Start button in mcp.json](../../../../assets/img/guides/mcp_client_setup/vscode/vscode-start-button.png)
+   ![Start button in mcp.json](../../../../assets/img/guides/mcp_client_setup/vscode/vscode-mcp-json.png)
 
-2. **Proceed through Dynamic Client Registration**
+2. **Proceed through Registration**
 
    A modal appears saying "Dynamic Client Registration not supported". Click **Proceed**.
 
@@ -58,47 +78,51 @@ This guide covers **Remote MCP** setup. For local MCP server setup, see the [Loc
 
 3. **Enter your credentials**
 
-   VS Code prompts you for:
-   - **Client ID** - Enter your OAuth client ID
-   - **Client Secret** - Enter your OAuth client secret
-
-   Press **Enter** after each.
+   VS Code prompts you (sequentially) for `client_id` and `client_secret` from the OAuth Client you created.
+   Paste each one, pressing **Enter** after each.
 
 4. **Allow authentication**
 
    Click **Allow** when prompted that the MCP server wants to authenticate.
 
-   ![Allow authentication modal](../../../../assets/img/guides/mcp_client_setup/vscode/vscode-allow-modal.png)
+   ![Allow authentication modal](../../../../assets/img/guides/mcp_client_setup/vscode/vscode_mcp_allow_modal.png)
 
-5. **Cancel the first browser prompt**
+5. **Cancel the `localhost` authentication prompt**
 
-   A modal asks to open an external website. Check the URL - if it contains `127.0.0.1`, click **Cancel**.
+   A modal asks to open an external website, with the redirect URI url-encoded to a value similar to `redirect_uri=http%3A%2F%2F127.0.0.1%3A33418%2F`.
+   Click **Cancel** (or cancel via the toast in the bottom right-hand of VS Code if you clicked Open).
 
-   ![First external website modal with loopback address](../../../../assets/img/guides/mcp_client_setup/vscode/vscode-external-cancel.png)
+   ![First external website modal with loopback address](../../../../assets/img/guides/mcp_client_setup/vscode/vscode_local_auth_modal.png)
 
-6. **Accept the second browser prompt**
+6. **Accept the `vscode` authentication prompt**
+   
+   A toast will appear in the bottom right-hand of VS Code asking "Having trouble authenticating?".
+   Click **Yes**.
+   
+   ![Trouble Toast](../../../../assets/img/guides/mcp_client_setup/vscode/vscode_mcp_trouble_toast.png)
 
-   A toast appears asking "Having trouble authenticating?". Click **Yes**.
+   Another external website modal appears with a new oauth link, with a redirect URI similar to `redirect_uri=https%3A%2F%2Fvscode.dev%2Fredirect`.
+   Click **Open**.
 
-   Another external website modal appears. This time the URL contains `vscode.dev/redirect`. Click **Open**.
-
-   ![Second external website modal with vscode.dev redirect](../../../../assets/img/guides/mcp_client_setup/vscode/vscode-external-open.png)
+   ![Second external website modal with vscode.dev redirect](../../../../assets/img/guides/mcp_client_setup/vscode/vscode_mcp_external_auth_modal.png)
 
 7. **Sign in to Alation**
 
    Your browser opens the Alation login page. Sign in with your credentials.
+   
+   ![Alation Login Page](../../../../assets/img/guides/mcp_client_setup/vscode/vscode_mcp_alation_login.png)
 
 8. **Verify connection**
 
-   After signing in, VS Code shows the server as "Running" with available tools.
+   After signing in, VS Code shows the server as "Running" with a number of available tools.
 
-   ![Server running with tools](../../../../assets/img/guides/mcp_client_setup/vscode/vscode-running.png)
+   ![Server running with tools](../../../../assets/img/guides/mcp_client_setup/vscode/vscode_mcp_success.png)
 
 </Steps>
 
 ## Enabling Tools
 
-Tools are available once connected. Click the tool count (e.g., "26 tools") to open the Configure Tools panel and select which tools are available to chat.
+Tools are available once connected. Click the tool count (e.g., "XX tools") to open the Configure Tools panel and select which tools are available to chat.
 
 ![Configure Tools panel](../../../../assets/img/guides/mcp_client_setup/vscode/vscode-tools-list.png)
 
