@@ -57,15 +57,15 @@ You'll also need to specify the `Client ID` and `Client Secret`, which you can o
   https://your-alation-instance.alationcloud.com/openapi/oauth2/
   ```
 
-  Navigate to **OAuth Client Administration** → **POST /oauth/v1/register/** to register a new client.
+  Navigate to **OAuth Client Administration** → **POST /integration/core/v1/clients/** to register a new client.
   You can test the API directly from the documentation page by clicking "Try it out" and providing the required configuration parameters.
 
   **Example payload for a confidential client:**
-  ```json
+  ```jsonc
   {
     "name": "My Application",
-    "redirect_uris": ["https://your-app.com/oauth/callback"],
-    "grant_type": "confidential",
+    "redirect_uris": ["https://your-app.com/oauth/callback"], // Replace these with your application's redirect URI(s)
+    "client_type": "confidential",
     "refresh_token_lifetime": 2592000,
     "access_token_lifetime": 3600,
     "pkce_enabled": true
