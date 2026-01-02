@@ -166,6 +166,60 @@ curl "<tenant_url>/ai/api/v1/sql_evaluation_results/{data_product_id}/{eval_resu
 
 ## Understanding evaluation results
 
+Every SQL evaluation case is run as a chat with a SQL Query agent (by default this is the Query Agent, but any agent with query execution is valid for evaluation).
+The predicted SQL(s) are extracted from the agent's tool calls and compared with the expected SQL(s) from the evaluation case.
+For each case, we first check if any of the expected result sets matches any of the predicted result sets exactly.
+If we find an exact match, the case passes with a score of 1.
+If there is no exact match, we invoke an LLM Judge to compare the expected and predicted SQL(s) for functional equivalence, and it will make the final determination of pass (1) or fail (0) for the case.
+The logic is visualized in the flowchart below.
+
+```d2
+direction: down
+
+expected: "Expected SQL(s)\n& Result Set(s)" {
+  shape: rectangle
+  style.multiple: true
+}
+
+predicted: "Predicted SQL(s)\n& Result Set(s)" {
+  shape: rectangle
+  style.multiple: true
+}
+
+compare: "Exact Match\nComparison" {
+  shape: diamond
+}
+
+expected -> compare
+predicted -> compare
+
+pass_direct: "PASS" {
+  shape: rectangle
+  style.fill: "green"
+}
+
+llm_judge: "LLM Judge\nCompares SQLs &\nResult Sets" {
+  shape: diamond
+}
+
+compare -> pass_direct: "Yes - Exact Match"
+compare -> llm_judge: "No"
+
+
+pass_llm: "PASS" {
+  shape: rectangle
+  style.fill: "green"
+}
+
+fail: "FAIL" {
+  shape: rectangle
+  style.fill: "red"
+}
+
+llm_judge -> pass_llm: "Pass"
+llm_judge -> fail: "Fail"
+```
+
 You can review individual examples for generic evaluations in the UI, to see the inputs, expected output, and generated response, along with the case's score and reasoning from the LLM Judge.
 Further, you may download a CSV report of the run in the UI or via API, or a more detailed JSON report via API.
 
