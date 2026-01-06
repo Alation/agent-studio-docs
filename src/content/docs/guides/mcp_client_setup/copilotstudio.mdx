@@ -38,10 +38,10 @@ Due to a chicken-and-egg situation with redirect URIs, you'll need to complete t
 
    ```bash
    curl -X 'POST' \
-     'https://your-alation-instance.alationcloud.com/integration/core/v1/oauth/clients' \
+     'https://your-alation-instance.alationcloud.com/integration/core/v1/oauth/clients/' \
      -H 'accept: application/json' \
-     -H 'Content-Type: application/json' \
      -H 'TOKEN: YOUR_API_ACCESS_TOKEN' \
+     -H 'Content-Type: application/json' \
      -d '{
        "name": "ms-copilot-studio",
        "client_type": "confidential",
@@ -93,7 +93,7 @@ The `client_secret` is only displayed once during creation. Store it securely im
 
    - **Server name**: `alation-mcp-server` (or any name you prefer)
    - **Server description**: `Tools to interact with the Alation catalog` (or your preferred description)
-   - **Server URL**: `https://your-alation-instance.alationcloud.com/ai/mcp`
+   - **Server URL**: `https://your-alation-instance.alationcloud.com/ai/mcp/`
 
    Then select **OAuth 2.0** for authentication.
 </Steps>
