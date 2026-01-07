@@ -50,11 +50,11 @@ export default defineConfig({
                         icon: "rocket",
                         items: [
                             "getting-started/introduction",
-                            "getting-started/key_concepts",
+                            "getting-started/key-concepts",
                             "getting-started/tools",
                             "getting-started/agents",
                             "getting-started/flows",
-                            "getting-started/quick_start_mcp"
+                            "getting-started/quick-start-mcp"
                         ]
                     },  
                     {
@@ -71,13 +71,13 @@ export default defineConfig({
                             {
                                 label: "MCP Client Setup",
                                 autogenerate: {
-                                    directory: "guides/mcp_client_setup",
+                                    directory: "guides/mcp-client-setup",
                                 },
                             },
                             {
                                 label: "Rest API",
                                 autogenerate: {
-                                    directory: "guides/rest_api",
+                                    directory: "guides/rest-api",
                                 },
                             },
                         ],
@@ -114,7 +114,7 @@ export default defineConfig({
                             {
                                 label: "Data Products",
                                 autogenerate: {
-                                    directory: "reference/data_products",
+                                    directory: "reference/data-products",
                                 },
                             },
                             {
