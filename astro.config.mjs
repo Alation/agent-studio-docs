@@ -112,12 +112,6 @@ export default defineConfig({
                                 autogenerate: { directory: "reference/tools" },
                             },
                             {
-                                label: "Data Products",
-                                autogenerate: {
-                                    directory: "reference/data-products",
-                                },
-                            },
-                            {
                                 label: "Evaluation",
                                 autogenerate: { directory: "reference/evaluation" },
                             },
