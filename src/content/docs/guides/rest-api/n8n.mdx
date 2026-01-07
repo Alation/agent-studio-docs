@@ -14,7 +14,7 @@ This guide shows you how to set up an n8n workflow to call agents and tools in A
 
 ## Step 1. Create an OAuth Client in Alation
 
-Follow the [Authentication Guide](/agent-studio-docs/guides/authentication/machine_to_machine/) to create an OAuth 2.0 Client in your Alation instance.
+Follow the [Authentication Guide](/agent-studio-docs/guides/authentication/machine-to-machine/) to create an OAuth 2.0 Client in your Alation instance.
 Make sure to note down the `client_id` and `client_secret` as you will need them to obtain an access token.
 
 ## Step 2. Get an access token
@@ -40,8 +40,8 @@ We can use n8n's HTTP Request node to obtain an access token.
 
    <details>
      <summary>Example configuration screenshots</summary>
-     ![Authentication Methods](../../../../assets/img/guides/rest_api/n8n-access-token1.png)
-     ![Authentication Methods](../../../../assets/img/guides/rest_api/n8n-access-token2.png)
+     ![Authentication Methods](../../../../assets/img/guides/rest-api/n8n-access-token1.png)
+     ![Authentication Methods](../../../../assets/img/guides/rest-api/n8n-access-token2.png)
    </details>
 
 3. **Execute step** to test the node and obtain an access token.
@@ -69,8 +69,8 @@ We can use n8n's HTTP Request node to obtain an access token.
 
     <details>
      <summary>Example configuration screenshots</summary>
-    ![Authentication Methods](../../../../assets/img/guides/rest_api/n8n-call-agent1.png)
-    ![Authentication Methods](../../../../assets/img/guides/rest_api/n8n-call-agent2.png)
+    ![Authentication Methods](../../../../assets/img/guides/rest-api/n8n-call-agent1.png)
+    ![Authentication Methods](../../../../assets/img/guides/rest-api/n8n-call-agent2.png)
     </details>
 
 3. **Execute step** to test the node and call the agent/tool.
@@ -330,4 +330,4 @@ return results;
 ## Run the end to end workflow
 
 Chain the nodes together to create an end to end workflow that calls an agent/tool and processes the response.
-![Authentication Methods](../../../../assets/img/guides/rest_api/n8n-workflow.png)
+![Authentication Methods](../../../../assets/img/guides/rest-api/n8n-workflow.png)

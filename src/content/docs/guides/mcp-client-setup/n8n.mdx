@@ -20,7 +20,7 @@ Connect your Alation catalog to n8n using the Remote MCP server with OAuth authe
 
    In the n8n editor, search for "MCP" in the node panel. Select **MCP Client Tool** under "Model Context Protocol" (the built-in node, not the community package).
 
-   ![Add MCP Client Tool Node](../../../../assets/img/guides/mcp_client_setup/n8n/add-node.png)
+   ![Add MCP Client Tool Node](../../../../assets/img/guides/mcp-client-setup/n8n/add-node.png)
 
 2. **Configure server transport**
 
@@ -31,7 +31,7 @@ Connect your Alation catalog to n8n using the Remote MCP server with OAuth authe
    | Server Transport | `HTTP Streamable` |
    | MCP Endpoint URL | `https://<YOUR_INSTANCE>.alationcloud.com/ai/mcp` |
 
-   ![MCP Client Tool parameters](../../../../assets/img/guides/mcp_client_setup/n8n/node-parameters.png)
+   ![MCP Client Tool parameters](../../../../assets/img/guides/mcp-client-setup/n8n/node-parameters.png)
 
 </Steps>
 
@@ -44,7 +44,7 @@ Alation supports two authentication methods:
 | **MCP OAuth2** | Recommended for user-delegated access |
 | **Bearer Auth** | Service account style access (requires manual token refresh) |
 
-![Authentication Methods](../../../../assets/img/guides/mcp_client_setup/n8n/auth-methods.png)
+![Authentication Methods](../../../../assets/img/guides/mcp-client-setup/n8n/auth-methods.png)
 
 ### MCP OAuth2 Setup
 
@@ -58,7 +58,7 @@ Alation supports two authentication methods:
 
    Toggle **Use Dynamic Client Registration** to **Off**. This reveals the manual OAuth configuration fields.
 
-   ![Dynamic Client Registration disabled](../../../../assets/img/guides/mcp_client_setup/n8n/oauth-1.png)
+   ![Dynamic Client Registration disabled](../../../../assets/img/guides/mcp-client-setup/n8n/oauth-1.png)
 
 3. **Note the OAuth Redirect URL**
 
@@ -66,7 +66,7 @@ Alation supports two authentication methods:
 
 4. **Create an OAuth Client in Alation**
 
-   Refer to the [OAuth 2.0 User Initiated Authentication Guide](/agent-studio-docs/guides/authentication/user_initiated_auth) to create an OAuth Client. Use these settings:
+   Refer to the [OAuth 2.0 User Initiated Authentication Guide](/agent-studio-docs/guides/authentication/user-initiated-auth) to create an OAuth Client. Use these settings:
 
    | Field | Value |
    |-------|-------|
@@ -94,7 +94,7 @@ Alation supports two authentication methods:
    | Auth URI Query Parameters | Leave blank |
    | Authentication | `Header` |
 
-   ![OAuth2 Configuration](../../../../assets/img/guides/mcp_client_setup/n8n/oauth-2.png)
+   ![OAuth2 Configuration](../../../../assets/img/guides/mcp-client-setup/n8n/oauth-2.png)
 
 6. **Connect your account**
 
@@ -104,7 +104,7 @@ Alation supports two authentication methods:
 
    After signing in, you'll see "Account connected". Click **Save** to close the credential dialog.
 
-   ![Account connected](../../../../assets/img/guides/mcp_client_setup/n8n/account-connected.png)
+   ![Account connected](../../../../assets/img/guides/mcp-client-setup/n8n/account-connected.png)
 
 </Steps>
 
@@ -114,13 +114,13 @@ Alation supports two authentication methods:
 
 1. **Obtain an access token**
 
-   Refer to the [OAuth 2.0 M2M Authentication Guide](/agent-studio-docs/guides/authentication/machine_to_machine) to create an OAuth Client and obtain an access token.
+   Refer to the [OAuth 2.0 M2M Authentication Guide](/agent-studio-docs/guides/authentication/machine-to-machine) to create an OAuth Client and obtain an access token.
 
 2. **Configure Bearer Auth**
 
    Select **Bearer Auth** from the Authentication dropdown, then enter your access token.
 
-   ![Bearer Configuration](../../../../assets/img/guides/mcp_client_setup/n8n/bearer.png)
+   ![Bearer Configuration](../../../../assets/img/guides/mcp-client-setup/n8n/bearer.png)
 
 3. **Save credentials**
 

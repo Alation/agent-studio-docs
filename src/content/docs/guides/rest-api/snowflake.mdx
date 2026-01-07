@@ -14,7 +14,7 @@ This guide shows you how to set up a Snowflake procedure to call agents and tool
 
 ## Step 1. Create an OAuth client in Alation
 
-Follow the [Authentication Guide](/agent-studio-docs/guides/authentication/machine_to_machine/) to create an OAuth 2.0 Client in your Alation instance.
+Follow the [Authentication Guide](/agent-studio-docs/guides/authentication/machine-to-machine/) to create an OAuth 2.0 Client in your Alation instance.
 Make sure to note down the `client_id` and `client_secret` as you will need them to obtain an access token.
 
 For all the steps below; replace the following values:
@@ -240,9 +240,9 @@ CALL call_catalog_context_search_agent(
 ## Step 6: We can add the above defined procedure as an external tool for the agent
 
 When defining a Snowflake agent, we can add a custom tool as follows:
-![Adding Custom Tool](../../../../assets/img/guides/rest_api/snowflake-adding_custom_tool.png)
+![Adding Custom Tool](../../../../assets/img/guides/rest-api/snowflake-adding-custom-tool.png)
 
 ## Step 7: Test it out
 
 Once the agent is saved with the custom tool, we can try it out in playground and/or Snowflake intelligence
-![Test Snowflake Intelligence](../../../../assets/img/guides/rest_api/snowflake-leveraging_alation_context_agent.png)
+![Test Snowflake Intelligence](../../../../assets/img/guides/rest-api/snowflake-leveraging-alation-context-agent.png)

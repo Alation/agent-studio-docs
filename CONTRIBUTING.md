@@ -20,6 +20,7 @@ Here are style guidelines for the content that we strive to follow.
 - Prefer defining diagrams with text using `d2` over adding image blobs (if possible).
   This makes updates easy to see because they are text-based diffs.
   It also makes the visual style consistent.
+- hyphens, not underscores in file/directory names.
 
 In general, we follow the ideas of [Diátaxis](https://diataxis.fr/).
 
