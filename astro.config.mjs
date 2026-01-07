@@ -76,9 +76,12 @@ export default defineConfig({
                             },
                             {
                                 label: "Rest API",
-                                autogenerate: {
-                                    directory: "guides/rest-api",
-                                },
+                                items: [
+                                    "guides/rest-api/auth",
+                                    "guides/rest-api/n8n",
+                                    // TEMP(@vishal): make a hyphen for consistency after Snowflake reviews the link we sent.
+                                    "guides/rest_api/snowflake",
+                                ],
                             },
                         ],
                     },  
