@@ -5,12 +5,17 @@ sidebar:
   order: 2
 ---
 
+export const EXCLUDED_AGENT_PAGE_IDS = [
+  'reference/agents/introduction',
+  'reference/agents',
+];
+
 import { getCollection } from 'astro:content';
 
 export async function getAgentsList() {
   const agents = await getCollection('docs', (entry) => {
     if (!entry.id) return false;
-    return entry.id.startsWith('reference/agents/default')
+    return entry.id.startsWith('reference/agents') && !EXCLUDED_AGENT_PAGE_IDS.includes(entry.id);
   });
   
   return agents.sort((a, b) => a.data.title.localeCompare(b.data.title));
