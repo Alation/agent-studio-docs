@@ -5,15 +5,31 @@ sidebar:
   order: 2
 ---
 
-The following tools are available out-of-the-box in Agent Studio.
+import { getCollection } from 'astro:content';
 
-- [BI Report Search Tool](/agent-studio-docs/reference/tools/bi-report-search-tool)
-- [Get Catalog Object Tool](/agent-studio-docs/reference/tools/get-catalog-object-tool)
-- [Get Data Product Spec Tool](/agent-studio-docs/reference/tools/get-data-product-spec-tool)
-- [Get Data Schema Tool](/agent-studio-docs/reference/tools/get-data-schema-tool)
-- [Get Data Sources Tool](/agent-studio-docs/reference/tools/get-data-sources-tool)
-- [Get Search Filter Fields Tool](/agent-studio-docs/reference/tools/get-search-filter-fields-tool)
-- [Get Search Filter Values Tool](/agent-studio-docs/reference/tools/get-search-filter-values-tool)
-- [List Data Products Tool](/agent-studio-docs/reference/tools/list-data-products-tool)
-- [Search Catalog Tool](/agent-studio-docs/reference/tools/search-catalog-tool)
-- [SQL Execution Tool](/agent-studio-docs/reference/tools/sql-execution-tool)
+export const EXCLUDED_TOOL_PAGE_IDS = [
+  'reference/tools/introduction',
+  'reference/tools/list-of-default-tools',
+];
+
+export async function getToolsList() {
+  const tools = await getCollection('docs', (entry) => {
+    if (!entry.id) return false;
+    return entry.id.startsWith('reference/tools') && !EXCLUDED_TOOL_PAGE_IDS.includes(entry.id);
+  });
+  
+  return tools.sort((a, b) => a.data.title.localeCompare(b.data.title));
+}
+
+export const tools = await getToolsList();
+
+The following tools are available out-of-the-box in Agent Studio:
+
+<ul>
+{tools.map(tool => (
+  <li>
+    <a href={`/agent-studio-docs/${tool.id}/`}>{tool.data.title}</a>
+    {tool.data.description && ` - ${tool.data.description}`}
+  </li>
+))}
+</ul>
