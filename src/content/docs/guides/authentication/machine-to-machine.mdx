@@ -72,3 +72,36 @@ This ensures that your system always has a valid token and can handle token expi
 Generating a new Access Token automatically invalidates the previous token.
 Ensure that your application logic accounts for this to avoid using stale tokens.
 :::
+
+## Configuring Data Warehouse Credentials
+
+When using M2M authentication with agents or tools that execute SQL queries, you must configure data warehouse credentials for each data product you want to query. This is a one-time setup per data product.
+
+### Create credentials
+
+After obtaining your access token, configure credentials for your data product:
+
+```bash
+curl -X POST "https://your-alation-instance.alationcloud.com/api/v2/auth/credentials/" \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state": "unique_identifier",
+    "username": "your_datasource_username",
+    "password": "your_datasource_password",
+    "dp_id": "YOUR_DATA_PRODUCT_ID"
+  }'
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `state` | A unique identifier for this credential configuration |
+| `username` | Username for the data warehouse |
+| `password` | Password for the data warehouse |
+| `dp_id` | The Data Product ID to associate these credentials with |
+
+Once configured, credentials are automatically used when calling SQL-executing agents (Query, Data Product Query, Analytics, Chart Generation) or tools (SQL Execution, Get Data Schema).
+
+:::note[Other authentication modes]
+If you need a different authentication mode apart from username and password, please reach out to us directly.
+:::

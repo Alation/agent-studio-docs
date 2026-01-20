@@ -17,6 +17,10 @@ You need to have a Server Admin role to create an OAuth 2.0 Client.
 Follow the [Authentication Guide](/agent-studio-docs/guides/authentication/machine-to-machine/) to create an OAuth 2.0 Client in your Alation instance.
 Make sure to note down the `client_id` and `client_secret` as you will need them to obtain an access token.
 
+### Configure Data Warehouse Credentials (for SQL agents)
+
+If you plan to call agents that execute SQL queries (Query, Data Product Query, Analytics, Chart Generation), you must first configure data warehouse credentials. See [Configuring Data Warehouse Credentials](/agent-studio-docs/guides/authentication/machine_to_machine/#configuring-data-warehouse-credentials) for setup instructions.
+
 ## REST API authentication
 
 To authenticate with the REST API using OAuth 2.0 Client Credentials Grant, you need to obtain an access token by making a POST request to the token endpoint.
