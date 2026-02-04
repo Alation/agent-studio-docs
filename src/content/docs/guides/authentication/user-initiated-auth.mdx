@@ -91,7 +91,7 @@ ChatGPT and MS Copilot Studio do not yet support **Proof of Key Exchange Code (P
 This option should **not** be selected in the Alation configuration when using those platforms.
 :::
 
-**Known Redirect URLs:**
+**Known Redirect URIs:**
 
 - **VSCode:**
   ```
@@ -111,17 +111,22 @@ This option should **not** be selected in the Alation configuration when using t
   https://chatgpt.com/connector_platform_oauth_redirect
   ```
 
+- **Cursor:**
+  ```
+  cursor://anysphere.cursor-mcp/oauth/callback
+  ```
+
 #### Required configuration values
 
-You'll need the **Redirect URL** (sometimes labeled **Callback URL**) from the third-party application you're building.
+You'll need the **Redirect URI** (sometimes labeled **Callback URI**) from the third-party application you're building.
 This is the location where Alation will pass the user session details to the third-party application.
 
 :::tip[MS Copilot Studio configuration]
 If you're creating a configuration for MS Copilot Studio, you'll need to:
-1. Create the `Client ID` and `Client Secret` without the `Redirect URL` first
+1. Create the `Client ID` and `Client Secret` without the `Redirect URI` first
 2. Configure those credentials within Copilot Studio
-3. Obtain the `Redirect URL` that Copilot Studio generates
-4. Add that `Redirect URL` to the Alation configuration
+3. Obtain the `Redirect URI` that Copilot Studio generates
+4. Add that `Redirect URI` to the Alation configuration
 
 This value must be persisted within Alation for the auth flow to work.
 :::
