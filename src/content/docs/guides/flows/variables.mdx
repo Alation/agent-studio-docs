@@ -1,0 +1,141 @@
+---
+title: "Variables and Context"
+description: "Learn how to pass data between steps in your flows using variables."
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components'
+
+This guide explains how to connect steps in a flow by passing data from one step to the next using variables.
+
+## How variables work
+
+In a flow, each step can produce **outputs** that subsequent steps can use as **inputs**. This is how you chain steps together to create useful workflows.
+
+For example:
+1. An [agent](/agent-studio-docs/getting-started/agents/) generates a chart and returns the image URL
+2. An email [tool](/agent-studio-docs/getting-started/tools/) sends that URL as an attachment
+
+The email tool doesn't know about the chart until you **connect** the agent's output to the email's input.
+
+## Types of inputs
+
+When configuring a step's inputs, you have two options:
+
+### Static values
+
+A fixed value that stays the same every time the flow runs.
+
+Use static values for:
+- Email addresses that don't change
+- Configuration settings
+- Default text
+
+### Variable references
+
+A value that comes from a previous step's output or a runtime parameter.
+
+Use variables for:
+- Passing data between steps
+- Using runtime parameters from the Start step
+- Dynamic content that changes each run
+
+## Selecting variables
+
+When you click on an input field, a dropdown shows all available variables:
+
+![Input dropdown showing available variables from previous steps](../../../../assets/img/guides/flows/08_agent_step_input_mapping_dropdown.png)
+
+Variables are grouped by their source:
+- **Start** — Runtime parameters defined in the Start step
+- **Step names** — Outputs from previous steps (e.g., "Chart Generation Demo Agent")
+
+Click a variable to select it. The input field shows it's using a reference:
+
+![Step inputs configured with variable references](../../../../assets/img/guides/flows/09_agent_step_inputs_configured.png)
+
+## Variable scope
+
+Variables follow a simple rule: **a step can only access outputs from steps that came before it**.
+
+Consider this flow:
+
+```
+[Start] → [Query Tool] → [Analyzer Agent] → [Slack Tool]
+```
+
+- **Start parameters**: accessible by Query Tool, Analyzer Agent, and Slack Tool
+- **Query Tool output**: accessible by Analyzer Agent and Slack Tool only
+- **Analyzer Agent output**: accessible by Slack Tool only
+- **Slack Tool output**: not accessible by any other step (it's last)
+
+<Aside type="caution">
+You cannot reference a step that hasn't run yet. If you need data from a later step, you'll need to reorder your flow.
+</Aside>
+
+## Example: Chaining an agent to an email tool
+
+Here's a complete example of connecting variables between steps.
+
+### Step 1: Configure the agent
+
+The agent receives the `chart-prompt` parameter from Start:
+
+![Agent step with message input referencing Start.chart-prompt](../../../../assets/img/guides/flows/09_agent_step_inputs_configured.png)
+
+The agent produces several outputs:
+- `body` — Email body content
+- `subject` — Email subject line
+- `body_format` — Format type (HTML/plain)
+- `attachment_asset_ids` — Chart image IDs
+
+### Step 2: Configure the email tool
+
+The email tool maps each input to the agent's outputs:
+
+![Email step showing variable dropdown with all available outputs](../../../../assets/img/guides/flows/11_email_step_variable_dropdown.png)
+
+After configuration:
+
+![Email step fully configured with all variable mappings](../../../../assets/img/guides/flows/12_email_step_fully_configured.png)
+
+| Email input | Source |
+|-------------|--------|
+| to | Static value: "user@example.com" |
+| body | Chart Generation Demo Agent.body |
+| subject | Chart Generation Demo Agent.subject |
+| body_format | Chart Generation Demo Agent.body_format |
+| attachment_asset_ids | Chart Generation Demo Agent.attachment_asset_ids |
+
+### Result
+
+When the flow runs, the email tool receives all the data it needs from the agent:
+
+![Email received with chart attachment](../../../../assets/img/guides/flows/17_email_received_gmail.png)
+
+## Runtime parameters
+
+Runtime parameters are defined in the **Start** step and can be provided when the flow runs:
+
+![Start step with runtime parameter configured](../../../../assets/img/guides/flows/05_start_step_chart_prompt_param.png)
+
+These parameters are available to all steps in the flow. They're useful for:
+- Making flows reusable with different inputs
+- Allowing scheduled runs to use different values
+- Testing flows with various scenarios
+
+When you run a flow manually, you're prompted to provide values:
+
+![Run flow dialog prompting for parameter values](../../../../assets/img/guides/flows/14_run_flow_dialog.png)
+
+## Tips
+
+**Use descriptive step names.** Clear names make it easier to identify which variable you need when configuring inputs.
+
+**Check available outputs.** The dropdown shows all outputs a step produces. If you don't see what you expect, check the agent or tool's documentation.
+
+**Test incrementally.** After connecting variables, run the flow to verify data passes correctly before adding more steps.
+
+## Next steps
+
+- [Scheduling Flows](/agent-studio-docs/guides/flows/scheduling/) — Automate flow execution with schedules
+- [Flows overview](/agent-studio-docs/getting-started/flows/) — Return to the main flows introduction

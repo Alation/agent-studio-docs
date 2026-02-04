@@ -3,199 +3,251 @@ title: "Flows"
 description: "Learn about Agent Flows—how to orchestrate and schedule agents for automated workflows and complex multi-step processes."
 sidebar:
   badge:
-    text: coming soon
-    variant: note
+    text: Beta
+    variant: tip
 ---
 
-import { Aside, Card, CardGrid, Badge } from '@astrojs/starlight/components'
+import { Aside, Card, CardGrid, Badge, LinkCard, Steps } from '@astrojs/starlight/components'
 
-<Aside type="caution" title="Preview Feature">
-Agent Flows represent the next evolution of Agent Studio, enabling enterprise-scale automation and orchestration.
-This feature is currently in development.
+<Aside type="tip" title="Related Guides">
+This page introduces Agent Flows. For detailed guides on specific topics, see:
+- [Scheduling Flows](/agent-studio-docs/guides/flows/scheduling/) — Set up automated schedules
+- [Variables and Context](/agent-studio-docs/guides/flows/variables/) — Understand how data flows between steps
 </Aside>
 
-### Overview
+## Overview
 
-**Agent Flows** are the foundation for operationalizing AI agents at scale.
-While individual agents excel at interactive and exploratory tasks, they typically require manual invocation and human guidance.
-Agent Flows extend this capability by enabling agents and tools to run autonomously, in structured sequences, and on schedules.
+**Agent Flows** let you chain [agents](/agent-studio-docs/getting-started/agents/) and [tools](/agent-studio-docs/getting-started/tools/) into automated workflows that run on demand or on a schedule.
 
-<Badge text="Key Benefit" variant="success" /> Transform repeatable questions and workflows into automated processes that deliver insights, summaries, or actions exactly when needed.
+Instead of manually running an agent, copying its output, and pasting it into another tool, you can create a flow that does this automatically. For example:
+- Generate a weekly chart and email it to your team
+- Run a data quality check and create a JIRA ticket if issues are found
+- Summarize new data and post to Slack
 
-## What are agent flows?
+<Badge text="Key Benefit" variant="success" /> Transform repetitive multi-step tasks into automated processes that run exactly when needed.
 
-Agent Flows allow you to orchestrate a **sequence of agent and tool steps** into a single, reusable workflow.
-Each flow can be:
+## How Flows Work
 
-- **Executed manually** for testing or ad hoc analysis
-- **Scheduled to run automatically** (daily, weekly, monthly, etc.)
-- **Parameterized** to support multiple scenarios with the same logic
+A flow is a sequence of **steps** that run one after another. Each step is either an [**agent**](/agent-studio-docs/getting-started/agents/) (which can reason and make decisions) or a [**tool**](/agent-studio-docs/getting-started/tools/) (which performs a specific action).
 
-This makes Agent Flows ideal for tasks that are repetitive or time-based, predictable in structure, and valuable when summarized or acted on automatically.
+```d2
+direction: right
 
-### Example use case
+start: Start {
+  shape: circle
+}
 
-A sales representative reviews pipeline health and conversion metrics every Monday.
-Instead of logging into a chatbot and asking the same questions each week, they can:
+step1: Step 1 {
+  shape: rectangle
+}
 
-1. **Build an Agent Flow** that runs the same sales analytics agent
-2. **Chain it with a notification tool** for automated delivery
-3. **Schedule the flow** to run every Monday morning
-4. **Receive a concise summary** directly in Slack or email
+step2: Step 2 {
+  shape: rectangle
+}
 
-**Result:** Less manual work, faster insights, and consistent reporting.
+step3: Step 3 {
+  shape: rectangle
+}
 
-## Key capabilities
+done: Done {
+  shape: circle
+}
 
-**Visual flow builder**
-- Drag-and-drop interface for chaining agents and tools
-- Intuitive workflow design and modification
+start -> step1 -> step2 -> step3 -> done
+```
 
-**Typed input parameters**
-- Reusable, scenario-based execution patterns
-- Input validation and type safety
+### Data flows forward
 
-**Agent steps**
-- AI-driven reasoning and analysis within workflows
-- Complex decision-making capabilities
+When a step runs, it produces **outputs**. Later steps can use those outputs as **inputs**:
 
-**Tool steps**
-- Deterministic actions such as notifications, tickets, and API calls
-- Integration with external systems
+```d2
+direction: right
 
-**Output referencing**
-- Pass data seamlessly between workflow steps
-- Build complex data processing pipelines
+start: Start {
+  shape: rectangle
+  label: "Start\n─────────\nruntime parameters\n(e.g., chart-prompt)"
+}
 
-**Manual runs and scheduling**
-- Test flows manually during development
-- Deploy with automated scheduling for production use
+agent: Agent {
+  shape: rectangle
+  label: "Agent\n─────────\ngenerates chart\noutputs: body,\nsubject, attachments"
+}
 
-**Run history and status tracking**
-- Complete observability and audit trails
-- Performance monitoring and debugging capabilities
+tool: Email Tool {
+  shape: rectangle
+  label: "Email Tool\n─────────\nsends email\nuses: body, subject\nfrom Agent's outputs"
+}
 
-## Creating an agent flow
+start -> agent: "chart-prompt"
+agent -> tool: "body, subject,\nattachments"
+```
 
-To create an Agent Flow, navigate to the **Flow** tab in Agent Studio and follow the steps below.
+<Aside type="tip" title="Key rule">
+A step can only use outputs from steps that came before it. You cannot reference something that hasn't run yet.
+</Aside>
 
-### Step 1: create a new flow
+### Execution model
 
-Click **Create New Flow** to open the flow builder.
-Each flow starts with a **Start** node, which defines how the flow is invoked.
+| Behavior | What it means |
+|----------|---------------|
+| **Sequential** | Steps run one at a time, in order |
+| **Fail-fast** | If any step fails, the flow stops immediately |
+| **No loops** | Each step runs exactly once |
 
-![Start step configuration](../../../assets/img/getting-started/flows/start-step.png)
+### What you control
 
-### Step 2: define input parameters (optional)
+| You define... | Example |
+|---------------|---------|
+| **Runtime parameters** | Values you provide each time the flow runs |
+| **Step inputs** | Map each input to a static value or a previous step's output |
+| **Schedule** (optional) | When the flow should run automatically |
 
-Input parameters allow the same flow to be reused across different contexts (for example, different sales reps, regions, or time windows).
+## Accessing Flows
 
-For each input parameter, you can:
-- Specify a data type (e.g., string, number)
-- Define validation rules
-- Provide optional default values
+Navigate to **Flows** in the Agent Studio sidebar.
 
-Inputs are available throughout the flow and can be referenced by downstream steps.
+![Agent Studio sidebar showing Flows menu with Beta tag](../../../assets/img/guides/flows/01_agent_studio_sidebar_flows_menu.png)
 
-:::note
-Input parameters are optional.
-If your flow always runs with the same values, you can omit this step.
-:::
+The Flows page shows all your existing flows with their run history, schedules, and status.
 
-### Step 3: build the flow sequence
+![Empty flows list with Create flow button](../../../assets/img/guides/flows/02_flows_list_empty.png)
 
-Next, define the sequence of steps that make up your flow.
-Each step can be one of two types:
+## Creating a flow
 
-#### Agent steps
-Agent steps invoke an AI agent and return:
-- The agent's primary message output
-- Any additional structured outputs defined by the agent
+<Steps>
+1. Click **+ Create flow** to open the flow editor
+2. Define runtime inputs (parameters the flow needs when it runs)
+3. Add agent and tool steps
+4. Connect outputs from one step to inputs of the next
+5. Save and test your flow
+</Steps>
 
-These steps are ideal for reasoning, summarization, classification, or analysis.
+### The flow editor
 
-#### Tool steps
-Tool steps execute deterministic actions and are best suited for:
-- Sending emails or Slack messages
-- Creating tickets or records
-- Triggering downstream systems via APIs
+When you create a new flow, you start with a visual canvas showing a **Start** node.
 
-![Agent and tool steps in a flow](../../../assets/img/getting-started/flows/flow-steps.png)
+![New flow editor with Start node and Add step button](../../../assets/img/guides/flows/03_new_flow_editor_start.png)
 
-You can mix agent and tool steps freely to create end-to-end workflows.
+The Start node is where you define **runtime inputs**—parameters that can be provided each time the flow runs.
 
-### Step 4: reference outputs between steps
+### Defining runtime inputs
 
-Flows become powerful when steps build on one another.
-Any step can reference outputs from **previous steps** using the `{{ }}` syntax.
+Runtime inputs let you reuse the same flow with different values. For example, a reporting flow might accept a date range or a specific query.
 
-For example:
-- Use an agent's summary as input to a notification tool
-- Pass a classification result into a conditional action
+![Start step showing Runtime inputs configuration](../../../assets/img/guides/flows/04_start_step_runtime_inputs.png)
 
-![Referencing outputs from previous steps](../../../assets/img/getting-started/flows/output-reference.png)
+Add parameters with a name and optional default value:
 
-**Important rules:**
-- Only outputs from earlier steps can be referenced
-- All required inputs must be resolved for the flow to be valid
+![Start step with chart-prompt parameter configured](../../../assets/img/guides/flows/05_start_step_chart_prompt_param.png)
 
-The flow builder automatically validates these references before execution.
+### Adding steps
 
-### Step 5: validate the flow
+Click **+ Add step** to add an agent or tool to your flow.
 
-A flow can only be executed when:
-- All steps have valid inputs
-- All required references resolve correctly
-- Input types match the expected schema
+![Step selector showing available agents and tools](../../../assets/img/guides/flows/06_agent_selector_chart_generation.png)
 
-Validation errors are surfaced directly in the builder to help you resolve issues quickly.
+The selector shows all available agents and tools with their descriptions and required inputs. Search or browse to find what you need.
 
-## Running an agent flow
+After adding a step, the canvas updates to show the connection:
 
-Agent Flows support both **manual execution** and **scheduled runs**.
+![Flow canvas showing Start connected to Chart Generation agent](../../../assets/img/guides/flows/07_flow_canvas_with_agent_step.png)
 
-### Manual (dry) runs
+### Connecting steps with variables
 
-For testing or one-off execution:
-1. Click **Run**
-2. Provide values for any input parameters
-3. Execute the flow and review results step by step
+The power of flows comes from **connecting outputs to inputs**. When configuring a step's inputs, you can:
+- Enter a **static value** (fixed text or number)
+- Select a **variable** from a previous step's output
 
-This is the recommended approach while developing and refining a flow.
+![Dropdown showing available variables from previous steps](../../../assets/img/guides/flows/08_agent_step_input_mapping_dropdown.png)
 
-### Scheduled runs
+In this example, the agent's `message` input receives the `chart-prompt` parameter from the Start step.
 
-Once you are satisfied with the flow:
-- Attach one or more schedules (e.g., daily, weekly, monthly)
-- Define the input values for each schedule
-- Deploy the flow to run automatically
+![Agent step with inputs fully configured](../../../assets/img/guides/flows/09_agent_step_inputs_configured.png)
 
-Each schedule acts as an independent trigger, enabling the same flow to serve multiple use cases.
+For a deeper dive into how variables work, see the [Variables and Context guide](/agent-studio-docs/guides/flows/variables/).
 
-### API runs
+### Chaining multiple steps
 
-Just like agents, agent flows can also be invoked programmatically via API.
-For advanced users that want to build custom schedules or trigger, the API route provide more flexibility for automation.
+You can add as many steps as needed. Each step can reference outputs from any previous step.
 
-Each schedule acts as an independent trigger, enabling the same flow to serve multiple use cases.
+![Tool selector showing Send email tool](../../../assets/img/guides/flows/10_tool_selector_send_email.png)
 
-## Monitoring and run history
+When configuring the email tool, you can map its inputs to the agent's outputs:
 
-The **Run History** tab provides visibility into all executions of a flow, including:
-- Run time
-- Trigger type (manual, scheduled, API)
-- Execution status (success or failure)
+![Email step showing variable dropdown with agent outputs](../../../assets/img/guides/flows/11_email_step_variable_dropdown.png)
 
-![Flow run history](../../../assets/img/getting-started/flows/run-history.png)
+![Email step fully configured with all inputs mapped](../../../assets/img/guides/flows/12_email_step_fully_configured.png)
 
-This makes it easy to audit past runs, troubleshoot failures, and confirm successful execution over time.
+### Saving your flow
+
+Click **Save** and provide a title and description:
+
+![Title and description dialog for the flow](../../../assets/img/guides/flows/13_flow_title_description_dialog.png)
+
+## Running a flow
+
+### Manual runs
+
+To test your flow or run it on demand:
+
+<Steps>
+1. Open the flow
+2. Click **Run**
+3. Provide values for any runtime inputs
+4. Click **Run** to start execution
+</Steps>
+
+![Run flow dialog with runtime parameter input](../../../assets/img/guides/flows/14_run_flow_dialog.png)
+
+### Monitoring execution
+
+The **Runs** tab shows execution progress in real-time:
+
+![Flow run in progress showing step status](../../../assets/img/guides/flows/15_flow_run_in_progress.png)
+
+Each step shows its status (Completed, Running, or Pending). Expand completed steps to see their outputs.
+
+![Completed flow run with expanded output details](../../../assets/img/guides/flows/16_flow_run_completed.png)
+
+### Viewing results
+
+The outputs from your flow depend on what steps you've configured. In this example, the email was sent successfully:
+
+![Email received in Gmail with chart attachment](../../../assets/img/guides/flows/17_email_received_gmail.png)
+
+![Chart attachment preview showing data visualization](../../../assets/img/guides/flows/18_chart_attachment_preview.png)
+
+## Scheduling flows
+
+Flows can run automatically on a schedule—daily, weekly, or at custom intervals.
+
+<Aside type="note">
+Scheduling requires one-time authorization. See the [Scheduling Flows guide](/agent-studio-docs/guides/flows/scheduling/) for setup instructions.
+</Aside>
+
+Once authorized, you can create schedules from the **Schedule** tab:
+
+![Schedule tab showing created schedule](../../../assets/img/guides/flows/23_schedule_created.png)
 
 ## Summary
 
-Agent Flows bridge the gap between interactive AI and automated operations.
-By chaining agents and tools into structured, repeatable workflows, you can:
-- Eliminate repetitive manual tasks
-- Ensure consistent execution
-- Deliver insights and actions proactively
+Agent Flows let you:
+- **Chain agents and tools** into multi-step workflows
+- **Pass data between steps** using variable references
+- **Run manually** for testing or on-demand execution
+- **Schedule automatically** for recurring tasks
 
-As Agent Flows evolve, they will become the backbone for scalable, autonomous AI-driven operations across your organization.
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="Scheduling Flows"
+    description="Set up automated schedules for your flows"
+    href="/agent-studio-docs/guides/flows/scheduling/"
+  />
+  <LinkCard
+    title="Variables and Context"
+    description="Learn how data flows between steps"
+    href="/agent-studio-docs/guides/flows/variables/"
+  />
+</CardGrid>

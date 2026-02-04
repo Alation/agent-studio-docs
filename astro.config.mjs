@@ -75,6 +75,12 @@ export default defineConfig({
                                 },
                             },
                             {
+                                label: "Flows",
+                                autogenerate: {
+                                    directory: "guides/flows",
+                                },
+                            },
+                            {
                                 label: "Rest API",
                                 items: [
                                     "guides/rest-api/auth",
@@ -128,6 +134,10 @@ export default defineConfig({
         d2({
             pad: 10,
             layout: "elk",
+            theme: {
+                default: "0",   // Neutral Default (light)
+                dark: "200",    // Dark Mauve (dark)
+            },
         }),
     ],
 });
