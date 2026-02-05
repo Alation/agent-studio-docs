@@ -3,8 +3,6 @@ title: User-Initiated OAuth Clients
 description: Learn how to implement user-initiated OAuth authorization flows with Alation's 3-Legged Authorization Grant.
 ---
 
-import { Badge } from '@astrojs/starlight/components';
-
 :::caution[Before you begin]
 Only users with the **Server Admin** role can create OAuth clients in Alation.
 :::
@@ -51,8 +49,11 @@ Replace `your-alation-instance` with your specific Alation instance.
 :::
 
 You'll also need to specify the `Client ID` and `Client Secret`, which you can obtain from Alation through:
-- **The Alation User Interface** <Badge text="Coming Soon" variant="caution" size="small" />
-- **OpenAPI documentation** <Badge text="Available from 2025.3.3" variant="success" size="small" /> at:
+- **The Alation User Interface** at:
+  ```txt "your-alation-instance"
+  https://your-alation-instance.alationcloud.com/app/admin/oauth-client-apps/
+  ```
+- **OpenAPI documentation** at:
   ```txt "your-alation-instance"
   https://your-alation-instance.alationcloud.com/openapi/oauth2/
   ```
@@ -71,8 +72,6 @@ You'll also need to specify the `Client ID` and `Client Secret`, which you can o
     "pkce_enabled": true
   }
   ```
-
-- **Alation Support**
 
 ### Alation Configuration
 

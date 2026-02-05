@@ -3,9 +3,9 @@ title: Cursor
 description: Connect Alation to Cursor via Remote MCP Server
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Badge, Steps } from '@astrojs/starlight/components';
 
-Connect your Alation catalog to Cursor using the Remote MCP Server with OAuth authentication.
+<Badge text="Available from 2026.2.0" variant="success" size="small" /> Connect your Alation catalog to Cursor using the Remote MCP Server with OAuth authentication.
 
 :::note
 This guide covers **Remote MCP** setup with OAuth authentication in Cursor.
@@ -34,7 +34,7 @@ This guide covers **Remote MCP** setup with OAuth authentication in Cursor.
 ## Adding the MCP Server
   Copy and Paste the following json into the `mcp.json` file.
   Replace the placeholder values with your actual Alation instance details.
-  ```json
+  ```json "<your-instance>" "<client_id>" "<client_secret>"
   {
     "mcpServers": {
       "alation-server": {
