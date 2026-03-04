@@ -2,7 +2,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightImageZoom from "starlight-image-zoom";
-import starlightSidebarTopics from "starlight-sidebar-topics"
+import starlightSidebarTopics from "starlight-sidebar-topics";
 
 import d2 from "astro-d2";
 
@@ -54,9 +54,9 @@ export default defineConfig({
                             "getting-started/tools",
                             "getting-started/agents",
                             "getting-started/flows",
-                            "getting-started/quick-start-mcp"
-                        ]
-                    },  
+                            "getting-started/quick-start-mcp",
+                        ],
+                    },
                     {
                         label: "Guides and recipes",
                         link: "/guides/authentication/introduction",
@@ -90,14 +90,12 @@ export default defineConfig({
                                 ],
                             },
                         ],
-                    },  
+                    },
                     {
                         label: "Agent Studio SDK",
                         link: "/sdk/using-the-sdk",
                         icon: "puzzle",
-                        items: [
-                            "sdk/using-the-sdk"
-                        ]
+                        items: ["sdk/using-the-sdk"],
                     },
                     {
                         label: "Reference",
@@ -122,7 +120,9 @@ export default defineConfig({
                             },
                             {
                                 label: "Evaluation",
-                                autogenerate: { directory: "reference/evaluation" },
+                                autogenerate: {
+                                    directory: "reference/evaluation",
+                                },
                             },
                         ],
                     },
@@ -135,8 +135,8 @@ export default defineConfig({
             pad: 10,
             layout: "elk",
             theme: {
-                default: "0",   // Neutral Default (light)
-                dark: "200",    // Dark Mauve (dark)
+                default: "0", // Neutral Default (light)
+                dark: "200", // Dark Mauve (dark)
             },
         }),
     ],
