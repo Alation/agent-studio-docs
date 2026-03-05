@@ -55,6 +55,7 @@ export default defineConfig({
                             "getting-started/agents",
                             "getting-started/flows",
                             "getting-started/quick-start-mcp",
+                            "getting-started/sql-evaluations",
                         ],
                     },
                     {
