@@ -1,0 +1,88 @@
+---
+title: Using the Slack assistant
+description: Chat with Alation AI agents through DMs and channel @mentions.
+sidebar:
+  order: 1
+---
+
+Once you've [installed and configured](/agent-studio-docs/guides/slack/setup/) the Alation AI Assistant, you're ready to start asking questions.
+
+## Try it now
+
+The fastest way to get started: type `@Alation AI Assistant` in any Slack channel followed by a question.
+
+For example:
+> `@Alation AI Assistant what tables have revenue data?`
+
+The assistant uses your default agent and replies in the thread. That's it.
+
+## Three ways to chat
+
+| Method | Best for | Context |
+|--------|----------|---------|
+| **@mention in a channel** | Quick questions where you're already working | Each thread is a separate conversation. New @mention = fresh context. |
+| **Direct message** | Longer back-and-forth exploration | Continuous conversation within the thread. |
+| **Agent menu** (top-right) | Starting a DM without finding the app first | Same as DM. |
+
+## Direct messages
+
+Open a DM with the Alation AI Assistant.
+The assistant starts a thread with your default agent selected.
+
+![DM chat view with agent selector](../../../../assets/img/guides/slack/08-dm-chat-view-with-agent-selector.png)
+
+Type your question and the agent responds in the same thread.
+Follow-up questions carry context, so the agent remembers what you've already discussed.
+
+### Switching agents
+
+To change agents mid-conversation, use the dropdown at the top of the thread.
+The switch only applies to the current thread — it doesn't change your default agent.
+
+### Starting from the agent menu
+
+You can also start a conversation from Slack's agent selector in the top-right corner, or by searching in the "Select an agent" dialog.
+
+![Select an agent modal](../../../../assets/img/guides/slack/09-select-an-agent-modal-dialog.png)
+
+![Agent dropdown from top-right menu](../../../../assets/img/guides/slack/10-agent-dropdown-top-right-menu.png)
+
+## Channel @mentions
+
+Type `@Alation AI Assistant` followed by your question in any channel.
+The assistant gets auto-invited if it's not already in the channel.
+
+![Channel @mention and invite](../../../../assets/img/guides/slack/11-channel-at-mention-and-invite.png)
+
+### What the response looks like
+
+The assistant shows a processing indicator while the agent works.
+
+![Processing indicator](../../../../assets/img/guides/slack/14-channel-second-question-processing.png)
+
+Responses can include formatted tables, analysis, CSV file attachments, and chart images.
+Each response shows the agent name and processing time at the bottom, with a link to Agent Studio.
+
+![Thread response with table and chart](../../../../assets/img/guides/slack/12-thread-response-yoy-furniture-sales.png)
+
+### Conversation context
+
+- **Same thread:** the agent remembers earlier messages, so follow-ups work.
+- **New @mention outside a thread:** starts a fresh conversation with no prior context.
+- **Agent selection:** your default agent (from the Home tab) is used for all @mentions.
+
+### Private vs public responses
+
+By default, @mention responses are **private** — the assistant posts a short notice in the channel and sends the full answer to your DMs.
+
+![Private mode DM redirect](../../../../assets/img/guides/slack/15-thread-private-mode-dm-redirect.png)
+
+Change this to **Public** in the [Home tab settings](/agent-studio-docs/guides/slack/setup/#mention-visibility) if you want everyone in the channel to see the response.
+
+## Chat history
+
+The **History** tab in the app shows your past conversations from both DMs and channel @mentions.
+
+![History tab](../../../../assets/img/guides/slack/16-app-home-history-tab.png)
+
+Click any conversation to jump back to the original thread.
