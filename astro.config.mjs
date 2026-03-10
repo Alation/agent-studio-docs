@@ -82,6 +82,12 @@ export default defineConfig({
                                 },
                             },
                             {
+                                label: "Slack",
+                                autogenerate: {
+                                    directory: "guides/slack",
+                                },
+                            },
+                            {
                                 label: "Rest API",
                                 items: [
                                     "guides/rest-api/auth",
