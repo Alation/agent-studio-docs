@@ -68,30 +68,27 @@ If you're not an admin, ask your Slack workspace admin to install the app, then 
 The install above is a one-time admin action. Everything from here on is per-user — each person in the workspace connects their own Alation account.
 :::
 
-<Steps>
+You can connect from two places:
 
-1. Open the Alation AI Assistant in Slack and go to the **Home** tab.
+**From the Home tab:** Open the Alation AI Assistant app and click **Connect to Alation**.
 
-   ![Connect your account](../../../../assets/img/guides/slack/04-app-home-connect-your-account.png)
+**From a channel:** @mention the assistant — if you're not connected, you'll see an ephemeral prompt with a connect button.
 
-   Click **Connect to Alation**.
+![Channel connect prompt](../../../../assets/img/guides/slack/01-channel-mention-connect-prompt.png)
 
-2. Sign in with your Alation credentials if prompted.
-   After authorizing, you should see the confirmation page.
+Click **Connect to Alation**, complete the sign-in in your browser, and you'll see a confirmation back in Slack.
 
-   ![Authorization success](../../../../assets/img/guides/slack/05-alation-authorization-success.png)
+![Authentication flow and success](../../../../assets/img/guides/slack/02-channel-auth-flow-and-success.png)
 
-   Click **Go to Slack**.
-
-</Steps>
+Click **Dismiss** to clear the messages once you're done.
 
 :::tip
-If the Home tab still shows "Connect Your Account" after returning to Slack, press **Ctrl+R** (or **Cmd+R** on Mac) to refresh.
+If the Home tab still shows "Connect to Alation" after connecting, press **Ctrl+R** (or **Cmd+R** on Mac) to refresh.
 :::
 
 ## Authentication and permissions
 
-When you connect your Alation account from the Home tab, the Slack app logs in as you.
+When you connect your Alation account, the Slack app logs in as you.
 It inherits your Alation permissions — if you can run an agent in Agent Studio, you can run the same agent in Slack (as long as it's compatible).
 
 :::caution[Data product SSO credentials]
@@ -105,12 +102,12 @@ Slack cannot initiate SSO flows — if your SSO session has expired, you'll need
 After connecting, the Home tab shows your agent settings.
 All settings are per-user, so your choices don't affect anyone else in the workspace.
 
-![Agent configuration settings](../../../../assets/img/guides/slack/06-app-home-settings-agents-config.png)
+![Agent configuration settings](../../../../assets/img/guides/slack/05-app-home-settings-updated-design.png)
 
-### Active agents
+### Your agents
 
-By default, all compatible agents are enabled.
-Deselect any you don't want in your assistant threads or @mention responses.
+Select which agents you want available in your Slack conversations.
+A default agent is pre-selected when you first connect.
 
 :::note[Which agents appear in Slack?]
 The Slack integration currently supports message-only interactions.
@@ -123,20 +120,19 @@ You can still use it in [Agent Studio](https://developer.alation.com).
 
 ### Default agent
 
-Pick the agent that gets used when you start a new conversation or @mention the assistant without specifying one.
-
-![Default agent dropdown](../../../../assets/img/guides/slack/07-default-agent-dropdown-selection.png)
+The agent used when you start a new chat or @mention the assistant in a channel.
+Change it anytime from the dropdown.
 
 ### @mention visibility
 
 Controls who sees the response when you @mention the assistant in a channel:
 
-- **Private** (default) — only you see the response, sent as a DM
+- **Private** — only you see the response, sent as a DM
 - **Public** — everyone in the channel sees the response in the thread
 
 ### File downloads
 
 Controls whether agent-generated files (CSVs, charts) are uploaded to Slack after each response:
 
-- **Download automatically** (default) — files appear in the thread
+- **Download automatically** — files appear in the thread
 - **Never** — files are skipped, but the response tells you they're available
