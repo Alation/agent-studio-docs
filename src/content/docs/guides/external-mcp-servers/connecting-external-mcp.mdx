@@ -1,0 +1,219 @@
+---
+title: Connecting External MCP Servers
+description: How to connect external MCP servers to Agent Studio agents, enabling them to use tools from any MCP-compatible service.
+---
+
+import {Steps, Aside, Badge} from '@astrojs/starlight/components'
+
+<Badge text="Coming Soon" variant="caution" />
+
+Agents in Agent Studio can use tools from **external MCP servers** in addition to built-in tools.
+This lets you connect agents to any service that exposes an MCP-compatible interface, such as another Alation instance, Atlassian Confluence, Slack, or any custom MCP server you build.
+
+<Aside type="tip">
+External MCP servers are a powerful way to extend agents beyond the built-in catalog tools.
+For example, you could connect an Atlassian MCP server so an agent can search and retrieve policy documents from Confluence, then use that context to tag data in the catalog.
+</Aside>
+
+## How it works
+
+An external MCP server connection in Agent Studio consists of two parts:
+
+1. **Auth Config** -- stores the credentials used to authenticate with the remote MCP server (OAuth, API key, basic auth, etc.)
+2. **MCP Server Config** -- stores the URL, timeout, and reference to the auth config. When created, Agent Studio tests the connection and discovers available tools.
+
+Once created, you assign the MCP server config to an agent. At runtime, the agent can call any tool exposed by that remote server.
+
+## Supported authentication types
+
+| Auth Type | Description | Use Case |
+|-----------|-------------|----------|
+| `NONE` | No authentication (can include custom headers for API keys) | Public MCP servers or API-key-based auth via headers |
+| `BASIC` | HTTP Basic (username/password) | Simple username/password auth |
+| `CLIENT_CREDENTIALS` | OAuth 2.0 Client Credentials (2-legged) | Server-to-server, no user interaction |
+| `AUTHORIZATION_CODE` | OAuth 2.0 Authorization Code (3-legged, with optional PKCE) | User-delegated access, e.g. connecting to another Alation instance |
+
+## Connecting with OAuth Authorization Code flow
+
+This is the most common flow when connecting to another Alation instance or any OAuth-protected MCP server.
+
+<Steps>
+1. **Register an OAuth client on the remote server**
+
+   On the remote MCP server (e.g. another Alation instance), create an OAuth client app and obtain the:
+   - **Client ID**
+   - **Client Secret**
+   - **Authorization URL** (e.g. `https://remote-instance.alationcloud.com/oauth/v1/authorize`)
+   - **Token URL** (e.g. `https://remote-instance.alationcloud.com/oauth/v1/token`)
+   - **Redirect URI** -- any URI you control where the OAuth provider will redirect after authorization
+
+2. **Create an auth config**
+
+   ```bash
+   curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/auth_configs' \
+     -H 'Cookie: sessionid=<your-session-id>' \
+     -H 'Content-Type: application/json' \
+     -d '{
+       "name": "Remote Alation OAuth",
+       "auth_type": "AUTHORIZATION_CODE",
+       "authorization_url": "https://remote-instance.alationcloud.com/oauth/v1/authorize",
+       "token_url": "https://remote-instance.alationcloud.com/oauth/v1/token",
+       "client_id": "<client-id>",
+       "client_secret": "<client-secret>",
+       "allowed_redirect_uris": ["https://your-redirect-uri.com/callback"],
+       "use_pkce": true
+     }'
+   ```
+
+   Note the returned `id` (the auth config ID).
+
+3. **Start the OAuth authorization flow**
+
+   ```bash
+   curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/oauth/<auth-config-id>/authorize?redirect_uri=https://your-redirect-uri.com/callback' \
+     -H 'Cookie: sessionid=<your-session-id>'
+   ```
+
+   This returns an `authorization_url`. Open it in a browser to authorize. After approval, the OAuth provider redirects to your redirect URI with a `code` and `state` parameter.
+
+4. **Complete the OAuth callback**
+
+   Pass the `code` and `state` back to Agent Studio to exchange for tokens:
+
+   ```bash
+   curl 'https://your-instance.alationcloud.com/ai/api/v1/oauth/callback?code=<auth-code>&state=<state-value>' \
+     -H 'Cookie: sessionid=<your-session-id>'
+   ```
+
+   On success, the auth config now holds valid OAuth tokens and will automatically refresh them when they expire.
+
+5. **Create the MCP server config**
+
+   ```bash
+   curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/config/mcp-server' \
+     -H 'Cookie: sessionid=<your-session-id>' \
+     -H 'Content-Type: application/json' \
+     -d '{
+       "name": "Remote Alation MCP",
+       "description": "MCP server on remote Alation instance",
+       "url": "https://remote-instance.alationcloud.com/ai/mcp/",
+       "timeout_seconds": 60,
+       "auth_config_id": "<auth-config-id>"
+     }'
+   ```
+
+   Agent Studio tests the connection before saving. If the connection test fails, no records are created and you'll receive a 422 error with details.
+
+   On success, the response includes a `connection_test_result` with the list of tools discovered on the remote server.
+
+6. **Assign the MCP server to an agent**
+
+   When creating or updating an agent, include the MCP server config ID in the `mcp_server_config_ids` array:
+
+   ```bash
+   curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/config/agent' \
+     -H 'Cookie: sessionid=<your-session-id>' \
+     -H 'Content-Type: application/json' \
+     -d '{
+       "name": "My Agent",
+       "description": "Agent with remote MCP tools",
+       "prompt": "You are a helpful assistant.",
+       "llm_config_id": "<llm-config-id>",
+       "mcp_server_config_ids": ["<mcp-server-config-id>"],
+       "input_json_schema": {
+         "type": "object",
+         "properties": { "message": { "type": "string" } },
+         "required": ["message"]
+       }
+     }'
+   ```
+</Steps>
+
+## Connecting with simpler auth types
+
+For MCP servers that use API keys or basic authentication, you can create the auth config and MCP server config in a single step by providing `auth_config` inline:
+
+### API key via custom headers
+
+```bash
+curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/config/mcp-server' \
+  -H 'Cookie: sessionid=<your-session-id>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "My MCP Server",
+    "url": "https://mcp-server.example.com/mcp/",
+    "auth_config": {
+      "name": "API Key Auth",
+      "auth_type": "NONE",
+      "custom_headers": {
+        "X-Api-Key": "your-api-key"
+      }
+    }
+  }'
+```
+
+### Basic authentication
+
+```bash
+curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/config/mcp-server' \
+  -H 'Cookie: sessionid=<your-session-id>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "My MCP Server",
+    "url": "https://mcp-server.example.com/mcp/",
+    "auth_config": {
+      "name": "Basic Auth",
+      "auth_type": "BASIC",
+      "username": "user",
+      "password": "password"
+    }
+  }'
+```
+
+### Client Credentials (M2M OAuth)
+
+```bash
+curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/config/mcp-server' \
+  -H 'Cookie: sessionid=<your-session-id>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "My MCP Server",
+    "url": "https://mcp-server.example.com/mcp/",
+    "auth_config": {
+      "name": "M2M OAuth",
+      "auth_type": "CLIENT_CREDENTIALS",
+      "token_url": "https://auth.example.com/oauth/token",
+      "client_id": "<client-id>",
+      "client_secret": "<client-secret>"
+    }
+  }'
+```
+
+## Testing an existing connection
+
+You can re-test the connection for an existing MCP server config at any time:
+
+```bash
+curl -X POST 'https://your-instance.alationcloud.com/ai/api/v1/config/mcp-server/<config-id>/test' \
+  -H 'Cookie: sessionid=<your-session-id>'
+```
+
+This returns the current connection status, tool count, and tool names.
+
+## API reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/ai/api/v1/auth_configs` | `POST` | Create an auth config |
+| `/ai/api/v1/auth_configs` | `GET` | List auth configs |
+| `/ai/api/v1/auth_configs/{id}` | `GET` | Get an auth config |
+| `/ai/api/v1/auth_configs/{id}` | `PATCH` | Update an auth config |
+| `/ai/api/v1/auth_configs/{id}` | `DELETE` | Delete an auth config |
+| `/ai/api/v1/oauth/{auth_config_id}/authorize` | `POST` | Start OAuth authorization flow |
+| `/ai/api/v1/oauth/callback` | `GET` | Handle OAuth callback |
+| `/ai/api/v1/config/mcp-server` | `POST` | Create MCP server config (tests connection) |
+| `/ai/api/v1/config/mcp-server` | `GET` | List MCP server configs |
+| `/ai/api/v1/config/mcp-server/{id}` | `GET` | Get an MCP server config |
+| `/ai/api/v1/config/mcp-server/{id}` | `PATCH` | Update MCP server config |
+| `/ai/api/v1/config/mcp-server/{id}` | `DELETE` | Delete MCP server config |
+| `/ai/api/v1/config/mcp-server/{id}/test` | `POST` | Test MCP server connection |

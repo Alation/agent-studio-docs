@@ -1,0 +1,95 @@
+---
+title: Roles and Permissions
+description: How Agent Studio enforces role-based access controls for agents, tools, and flows using Alation roles.
+---
+
+import {Aside, Badge} from '@astrojs/starlight/components'
+
+<Badge text="Coming Soon" variant="caution" />
+
+Agent Studio uses your existing Alation roles to enforce access controls across agents, custom tools, and flows.
+The core philosophy is simple: **you always have full control over resources you create**, while restrictions only apply to actions on other people's resources.
+
+<Aside type="tip">
+Access controls apply to both the Agent Studio UI and API calls (including MCP). The same role-based rules are enforced regardless of how you interact with Agent Studio.
+</Aside>
+
+## Role tiers
+
+Alation roles are grouped into four tiers for Agent Studio permissions:
+
+| Tier | Roles | Summary |
+|------|-------|---------|
+| **God** | Server Admin | Full control over all resources, including other users' |
+| **Admin** | Catalog Admin | Can see all resources, edit others' flows |
+| **Standard** | Composer, Steward, Source Admin | Full control over own resources |
+| **Restricted** | Viewer, Explorer | Full control over own resources |
+
+## Agents
+
+### Permission matrix
+
+| Action | Server Admin | Catalog Admin | Standard roles | Viewer / Explorer |
+|--------|:---:|:---:|:---:|:---:|
+| Create agent | Yes | Yes | Yes | Yes |
+| Edit own agent | Yes | Yes | Yes | Yes |
+| Edit others' agent | Yes | No | No | No |
+| Delete own agent | Yes | Yes | Yes | Yes |
+| Delete others' agent | Yes | No | No | No |
+| Clone others' agent | Yes | Yes | Yes | Yes |
+
+## Custom tools (SMTP / HTTP)
+
+Custom tools have simpler access controls than agents because they have no visibility filtering — all custom tools are visible to all authenticated users.
+
+| Action | Server Admin | Catalog Admin | Standard roles | Viewer / Explorer |
+|--------|:---:|:---:|:---:|:---:|
+| Create tool | Yes | Yes | Yes | Yes |
+| Edit own tool | Yes | Yes | Yes | Yes |
+| Edit others' tool | Yes | No | No | No |
+| Delete own tool | Yes | Yes | Yes | Yes |
+| Delete others' tool | Yes | No | No | No |
+| See all tools | Yes | Yes | Yes | Yes |
+
+## Flows (workflows)
+
+Flows have two unique access control behaviors compared to agents:
+
+1. **Catalog Admin can edit others' flows** (unlike agents, where they cannot).
+2. **Viewer and Explorer cannot trigger others' flows** (but can trigger their own).
+
+| Action | Server Admin | Catalog Admin | Standard roles | Viewer / Explorer |
+|--------|:---:|:---:|:---:|:---:|
+| Create flow | Yes | Yes | Yes | Yes |
+| Edit own flow | Yes | Yes | Yes | Yes |
+| Edit others' flow | Yes | **Yes** | No | No |
+| Delete own flow | Yes | Yes | Yes | Yes |
+| Delete others' flow | Yes | No | No | No |
+| See all flows | Yes | Yes | Yes | Yes |
+| Trigger own flow | Yes | Yes | Yes | Yes |
+| Trigger others' flow | Yes | Yes | Yes | **No** |
+
+## Ownership and role changes
+
+Access controls are based on **ownership**, which is determined by the user that created the resource. Ownership does not change when a user's role changes.
+
+This means:
+- If a Composer creates an agent and is later downgraded to Viewer, they can still see, edit, and delete that agent.
+
+Role changes take effect **immediately** on the next request. There is no need to log out and log back in.
+
+## MCP and OAuth
+
+When connecting via MCP or using OAuth authentication, the same role-based access controls apply. Your role is determined by how you authenticate:
+
+- **User sessions** -- your Alation role is used directly.
+- **Machine-to-machine (M2M) OAuth apps** -- the role assigned to the OAuth application when it was created is used.
+
+## Error responses
+
+Agent Studio uses standard HTTP status codes for access control errors:
+
+| Status code | Meaning |
+|-------------|---------|
+| `404 Not Found` | The resource is invisible to you (e.g., another user's draft agent). The existence of the resource is not revealed. |
+| `403 Forbidden` | You can see the resource but do not have permission to perform the requested action. |

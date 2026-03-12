@@ -76,6 +76,24 @@ export default defineConfig({
                                 },
                             },
                             {
+                                label: "External MCP Servers",
+                                autogenerate: {
+                                    directory: "guides/external-mcp-servers",
+                                },
+                            },
+                            {
+                                label: "Custom Tools",
+                                autogenerate: {
+                                    directory: "guides/custom-tools",
+                                },
+                            },
+                            {
+                                label: "Access Controls",
+                                autogenerate: {
+                                    directory: "guides/access-controls",
+                                },
+                            },
+                            {
                                 label: "Flows",
                                 autogenerate: {
                                     directory: "guides/flows",
