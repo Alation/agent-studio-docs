@@ -1,0 +1,146 @@
+---
+title: LibreChat
+description: Connect Alation to LibreChat via Remote MCP Server
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+Connect your Alation catalog to LibreChat using the Remote MCP server with OAuth authentication.
+
+:::note[Version requirements]
+LibreChat **v0.8.2+** is required for UI-based configuration. **v0.7.9+** is sufficient for YAML-based configuration.
+:::
+
+:::caution[LibreChat is a rapidly evolving product]
+Settings, UI layouts, and configuration options may change between releases. While we aim to keep this guide up to date, it may drift from the latest version. When in doubt, refer to the [official LibreChat MCP documentation](https://www.librechat.ai/docs/features/mcp) as the source of truth.
+:::
+
+## Prerequisites
+
+- **Admin access** to your LibreChat instance
+- **Server Admin** role on your Alation instance (to create the OAuth client)
+
+## Overview
+
+Setting up the connection involves three steps:
+
+1. **Choose a server name** and determine the redirect URI
+2. **Create an OAuth client** in Alation using that redirect URI
+3. **Configure the MCP server** in LibreChat (via the UI or YAML)
+
+## Step 1: Determine Your Redirect URI
+
+Before creating the OAuth client in Alation, you need to know the redirect URI that LibreChat will use. This is based on the **server name** you choose — decide on it now, as it must stay consistent across both systems.
+
+```txt "<your-librechat-domain>" "<server-name>"
+https://<your-librechat-domain>/api/mcp/<server-name>/oauth/callback
+```
+
+| Placeholder | Description |
+|---|---|
+| `<your-librechat-domain>` | The domain where your LibreChat instance is hosted |
+| `<server-name>` | The name for this MCP server (e.g., `alation-mcp-server`) |
+
+**Example:** If your LibreChat instance is at `chat.example.com` and you name the server `alation-mcp-server`:
+```txt "chat.example.com" "alation-mcp-server"
+https://chat.example.com/api/mcp/alation-mcp-server/oauth/callback
+```
+
+:::tip[Naming convention]
+Use lowercase letters and hyphens only (e.g., `alation-mcp-server`). Avoid spaces or special characters.
+:::
+
+:::caution
+This redirect URI must be registered **exactly** in your Alation OAuth client — any trailing slash or case mismatch will cause authentication to fail. Do not use `/api/oauth/callback` or `/api/oauth/openid/callback` — those are for LibreChat's own login, not MCP.
+:::
+
+## Step 2: Create an OAuth Client in Alation
+
+Follow the [User-Initiated OAuth Client guide](/agent-studio-docs/guides/authentication/user-initiated-auth/) to create an OAuth client in your Alation instance. Use the redirect URI from Step 1.
+
+Securely store the **Client ID** and **Client Secret** — you'll need them in the next step.
+
+## Step 3: Configure the MCP Server in LibreChat
+
+You'll need the following values. Replace the placeholders with your actual details.
+
+| Field | Value |
+|-------|-------|
+| **Server Name** | The name you chose in [Step 1](#step-1-determine-your-redirect-uri) (e.g., `alation-mcp-server`) |
+| **MCP Server URL** | `https://<your-alation-instance>.alationcloud.com/ai/mcp/` |
+| **Transport** | `Streamable HTTPS` |
+| **Authorization URL** | `https://<your-alation-instance>.alationcloud.com/oauth/v1/authorize/` |
+| **Token URL** | `https://<your-alation-instance>.alationcloud.com/oauth/v1/token/` |
+| **Client ID** | From [Step 2](#step-2-create-an-oauth-client-in-alation) |
+| **Client Secret** | From [Step 2](#step-2-create-an-oauth-client-in-alation) |
+| **Redirect URI** | From [Step 1](#step-1-determine-your-redirect-uri) |
+| **Scope** | Leave empty (`""`). If that doesn't work, try `"openid"` |
+
+Choose one of the methods below:
+
+### Option A: Via the UI
+
+<Steps>
+
+1. **Open MCP Settings**
+
+   Navigate to the **MCP Settings** panel in the right sidebar and click the **+** button to add a new server. ([Not seeing it? Check the LibreChat docs](https://www.librechat.ai/docs/features/mcp#mcp-settings-panel-visibility))
+
+2. **Configure the server**
+
+   Fill in the **Server Name**, **MCP Server URL**, and **Transport**. Set **Authentication** to **OAuth** and click **Create**.
+
+3. **Enter OAuth credentials**
+
+   You'll be prompted to enter the OAuth details. Provide the **Authorization URL**, **Token URL**, **Client ID**, **Client Secret**, **Redirect URI**, and **Scope**.
+
+4. **Authenticate**
+
+   The server appears with an **amber key icon** indicating authentication is required. Click the **authenticate/connect** button — a browser tab opens to your Alation login page. Sign in with your credentials. The tab closes automatically and LibreChat securely stores the tokens.
+
+</Steps>
+
+:::note
+If the UI-based OAuth flow does not complete successfully, try [Option B (YAML)](#option-b-via-librechatyaml) instead.
+:::
+
+### Option B: Via `librechat.yaml`
+
+Add the following to the `mcpServers` section of your `librechat.yaml`:
+
+```yaml "<your-alation-instance>" "<your-librechat-domain>" "<client_id>" "<client_secret>"
+mcpServers:
+  alation-mcp-server:
+    type: streamable-http
+    url: "https://<your-alation-instance>.alationcloud.com/ai/mcp/"
+    initTimeout: 150000
+    oauth:
+      authorization_url: "https://<your-alation-instance>.alationcloud.com/oauth/v1/authorize/"
+      token_url: "https://<your-alation-instance>.alationcloud.com/oauth/v1/token/"
+      client_id: "<client_id>"
+      client_secret: "<client_secret>"
+      redirect_uri: "https://<your-librechat-domain>/api/mcp/alation-mcp-server/oauth/callback"
+      scope: ""
+```
+
+`initTimeout` is set to `150000` (150 seconds) to allow enough time for users to complete the OAuth flow.
+
+After saving, **restart LibreChat** to initialize the connection. Each user will be prompted to authenticate the first time they use the server.
+
+:::note[Optional OAuth fields]
+LibreChat supports additional OAuth fields (`grant_types_supported`, `token_endpoint_auth_methods_supported`, `response_types_supported`, `code_challenge_methods_supported`) but the defaults work with Alation. See the [MCP Servers configuration reference](https://www.librechat.ai/docs/configuration/librechat_yaml/object_structure/mcp_servers#oauth) for details.
+:::
+
+## Verify Connection
+
+Once authenticated, you should see the Alation MCP tools available in LibreChat. For a full list of available tools and what they do, see the [Tools Reference](/agent-studio-docs/reference/tools/introduction/).
+
+## Troubleshooting
+
+- **Authentication failing?** Double-check that the redirect URI in your Alation OAuth client matches the one in LibreChat exactly — including case, slashes, and the server name.
+- **Connection timing out?** Ensure `initTimeout` is set to at least `150000` (150 seconds).
+- **YAML changes not taking effect?** You must restart LibreChat after any changes to `librechat.yaml`.
+
+:::tip[LibreChat MCP documentation]
+For more advanced configuration options (custom variables, environment placeholders, server instructions), see the [LibreChat MCP documentation](https://www.librechat.ai/docs/features/mcp).
+:::
