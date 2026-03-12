@@ -1,7 +1,15 @@
 ---
 title: User-Initiated OAuth Clients
-description: Learn how to implement user-initiated OAuth authorization flows with Alation's 3-Legged Authorization Grant.
+description: Learn how to create and manage user-initiated OAuth clients through the Alation Admin Settings UI.
 ---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import settingsGearIcon from '../../../../assets/img/guides/authentication/user-initiated-auth/01-top-nav-settings-gear-icon.png';
+import adminSettingsPage from '../../../../assets/img/guides/authentication/user-initiated-auth/02-admin-settings-user-management.png';
+import createOAuthForm from '../../../../assets/img/guides/authentication/user-initiated-auth/03-create-oauth-client-form.png';
+import creationSuccess from '../../../../assets/img/guides/authentication/user-initiated-auth/04-oauth-client-creation-success.png';
+import contextMenu from '../../../../assets/img/guides/authentication/user-initiated-auth/05-oauth-client-context-menu.png';
 
 :::caution[Before you begin]
 Only users with the **Server Admin** role can create OAuth clients in Alation.
@@ -19,20 +27,72 @@ Delegated authorization requires several systems interacting in concert and foll
 :::
 
 For delegated authorization to work, configurations are required within Alation and within the third-party application.
-Unfortunately, there is a chicken and egg problem as both configurations depend on each other.
 
-### Third-Party Application Configuration
-
-Each application or platform is slightly different, but any that support OAuth 2.0 needs to support these items: `Authorization URL`, `Token URL`, `Client ID`, and `Client Secret`.
-
-:::note
-Different platforms may refer to these values with slightly different labels.
+:::caution
+Throughout this guide, replace `your-alation-instance` with your specific Alation instance domain.
 :::
 
-At a conceptual level, the **Authorization URL** accepts the pair of `Client ID` and `Client Secret` as well as the `Redirect URI` and returns a refresh token.
-The **Token URL** accepts the refresh token and returns an access token, which is what's required to access resources.
+## Creating an OAuth Client in Alation
 
-To configure your third-party application, you need the following values:
+You can navigate directly to the OAuth Client Applications page at:
+```txt "your-alation-instance"
+https://your-alation-instance.alationcloud.com/app/admin/oauth-client-apps/
+```
+
+Or follow the steps below:
+
+<Steps>
+1. **Open Admin Settings**
+
+   Click the **gear icon** in the top-right corner of the Alation navigation bar to open the Admin Settings page.
+
+   <Image src={settingsGearIcon} alt="Gear icon in the Alation top navigation bar showing the Settings tooltip" style="max-width: 50%; height: auto;" />
+
+2. **Navigate to OAuth Client Applications**
+
+   Under the **User Management** section, click the **OAuth Client Applications** card.
+
+   <Image src={adminSettingsPage} alt="Admin Settings page showing the User Management section with the OAuth Client Applications card" style="max-width: 80%; height: auto;" />
+
+3. **Fill out the creation form**
+
+   Click **Create** to open the form. Fill in the following fields:
+
+   - **Name** — A unique display name for your OAuth client (e.g., the platform or application it's for).
+   - **Client Type** — Select **Confidential** (recommended) for backend integrations where credentials can be kept secure, or **Public** for single-page applications or mobile apps.
+   - **Redirect URIs** — The callback URI(s) where Alation will redirect users after authorization. Enter one URI per line. HTTP is only allowed for `localhost` or `127.0.0.1` (development). See [Known Redirect URIs](#known-redirect-uris) below.
+   - **Access Token Expiry (seconds)** — Lifetime of access tokens. Min: 3,600 (1 hour), Max: 259,200 (3 days).
+   - **Refresh Token Expiry (seconds)** — Lifetime of refresh tokens. Min: 259,200 (3 days), Max: 15,552,000 (180 days).
+   - **PKCE Required** — Whether to enforce Proof Key for Code Exchange. Recommended for security. Must be enabled for public clients. See [PKCE notes](#pkce-proof-key-for-code-exchange) below.
+
+   Click **Continue** when done.
+
+   <Image src={createOAuthForm} alt="Create User-Initiated OAuth Client form with fields for name, client type, redirect URIs, token expiry, and PKCE" style="max-width: 70%; height: auto;" />
+
+4. **Copy your Client ID and Client Secret**
+
+   After creation, a success dialog displays your **Client ID** and **Client Secret**. Use the **Copy** buttons to save both values.
+
+   :::caution[Important]
+   The **Client Secret** is only shown once. Copy it before closing this dialog — it cannot be retrieved later.
+   :::
+
+   <Image src={creationSuccess} alt="Success dialog showing the Client ID and Client Secret with copy buttons" style="max-width: 70%; height: auto;" />
+</Steps>
+
+## Managing Existing OAuth Clients
+
+Each OAuth client in the list has a three-dot menu (**...**) with the following actions:
+
+- **View / Edit** — View or modify the client's settings (name, redirect URIs, token expiry, PKCE). Note that the **Client Secret is not viewable** from this screen — if you've lost it, you must rotate it or create a new client.
+- **Rotate Secret** — Generate a new client secret. The old secret is immediately invalidated, and the new one is shown only once.
+- **Delete** — Permanently delete the OAuth client.
+
+<Image src={contextMenu} alt="Context menu on an OAuth client row showing View/Edit, Rotate Secret, and Delete options" style="max-width: 30%; height: auto;" />
+
+## Third-Party Application Configuration
+
+To connect your third-party application to Alation, configure it with the following values:
 
 **Authorization URL:**
 ```txt "your-alation-instance"
@@ -44,40 +104,9 @@ https://your-alation-instance.alationcloud.com/oauth/v1/authorize/
 https://your-alation-instance.alationcloud.com/oauth/v1/token/
 ```
 
-:::caution
-Replace `your-alation-instance` with your specific Alation instance.
-:::
+You'll also need the **Client ID** and **Client Secret** that were generated when you [created the OAuth client](#creating-an-oauth-client-in-alation).
 
-You'll also need to specify the `Client ID` and `Client Secret`, which you can obtain from Alation through:
-- **The Alation User Interface** at:
-  ```txt "your-alation-instance"
-  https://your-alation-instance.alationcloud.com/app/admin/oauth-client-apps/
-  ```
-- **OpenAPI documentation** at:
-  ```txt "your-alation-instance"
-  https://your-alation-instance.alationcloud.com/openapi/oauth2/
-  ```
-
-  Navigate to **OAuth Client Administration** → **POST /integration/core/v1/clients/** to register a new client.
-  You can test the API directly from the documentation page by clicking "Try it out" and providing the required configuration parameters.
-
-  **Example payload for a confidential client:**
-  ```jsonc
-  {
-    "name": "My Application",
-    "redirect_uris": ["https://your-app.com/oauth/callback"], // Replace these with your application's redirect URI(s)
-    "client_type": "confidential",
-    "refresh_token_lifetime": 2592000,
-    "access_token_lifetime": 3600,
-    "pkce_enabled": true
-  }
-  ```
-
-### Alation Configuration
-
-To generate the `Client ID` and `Client Secret`, you'll need to provide information about how you intend to use them.
-
-#### Platform-Specific Considerations
+### Platform-Specific Considerations
 
 Different platforms have different requirements and capabilities.
 
@@ -85,12 +114,7 @@ Different platforms have different requirements and capabilities.
 For detailed step-by-step instructions for each platform, refer to their individual documentation pages in the [MCP Client Setup guides](../../mcp-client-setup/introduction/).
 :::
 
-:::caution[PKCE Support]
-ChatGPT and MS Copilot Studio do not yet support **Proof of Key Exchange Code (PKCE)**.
-This option should **not** be selected in the Alation configuration when using those platforms.
-:::
-
-**Known Redirect URIs:**
+### Known Redirect URIs
 
 - **VSCode:**
   ```
@@ -115,37 +139,20 @@ This option should **not** be selected in the Alation configuration when using t
   cursor://anysphere.cursor-mcp/oauth/callback
   ```
 
-#### Required configuration values
-
-You'll need the **Redirect URI** (sometimes labeled **Callback URI**) from the third-party application you're building.
-This is the location where Alation will pass the user session details to the third-party application.
-
 :::tip[MS Copilot Studio configuration]
 If you're creating a configuration for MS Copilot Studio, you'll need to:
-1. Create the `Client ID` and `Client Secret` without the `Redirect URI` first
-2. Configure those credentials within Copilot Studio
-3. Obtain the `Redirect URI` that Copilot Studio generates
-4. Add that `Redirect URI` to the Alation configuration
-
-This value must be persisted within Alation for the auth flow to work.
+1. Create the OAuth client without the Redirect URI first
+2. Configure the Client ID and Client Secret within Copilot Studio
+3. Obtain the Redirect URI that Copilot Studio generates
+4. Edit the OAuth client in Alation to add that Redirect URI
 :::
 
-#### Grant types
-
-**Grant Type** — Alation supports `public` and `confidential` grants:
-- **Confidential** (recommended): Use this for most MCP server integrations where credentials can be kept secure
-- **Public**: Intended for Single Page Applications or mobile apps where credentials cannot be secured
-
-#### Token expiry settings
-
-All tokens have an expiry and can only be used while they are fresh. You can adjust these expiry times within the allowed ranges:
-
-| Token Type | Minimum | Maximum |
-|------------|---------|---------|
-| **Refresh Token Expiry** | 3 days | 180 days |
-| **Access Token Expiry** | 1 hour | 3 days |
-
-#### PKCE (Proof of Key Exchange Code)
+### PKCE (Proof Key for Code Exchange)
 
 PKCE is an additional security measure added to OAuth 2.0.
-Not all platforms support it (see above), but if you're in doubt, it's best to leave it enabled as a starting point.
+Not all platforms support it — if you're in doubt, it's best to leave it enabled as a starting point.
+
+:::caution[PKCE Support]
+ChatGPT and MS Copilot Studio do not yet support PKCE.
+Disable the **PKCE Required** option when creating OAuth clients for those platforms.
+:::
