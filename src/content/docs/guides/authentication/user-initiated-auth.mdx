@@ -111,7 +111,7 @@ You'll also need the **Client ID** and **Client Secret** that were generated whe
 Different platforms have different requirements and capabilities.
 
 :::tip[Platform-specific setup guides]
-For detailed step-by-step instructions for each platform, refer to their individual documentation pages in the [MCP Client Setup guides](../../mcp-client-setup/introduction/).
+For detailed step-by-step instructions for each platform, refer to their individual documentation pages in the [MCP Client Setup guides](../../mcp-client-setup/claude/).
 :::
 
 ### Known Redirect URIs
@@ -138,6 +138,12 @@ For detailed step-by-step instructions for each platform, refer to their individ
   ```
   cursor://anysphere.cursor-mcp/oauth/callback
   ```
+
+- **LibreChat:**
+  ```
+  https://<your-librechat-domain>/api/mcp/<server-name>/oauth/callback
+  ```
+  Replace `<your-librechat-domain>` with your LibreChat instance domain and `<server-name>` with the name of the MCP server in LibreChat (e.g., `alation-mcp-server`).
 
 :::tip[MS Copilot Studio configuration]
 If you're creating a configuration for MS Copilot Studio, you'll need to:
