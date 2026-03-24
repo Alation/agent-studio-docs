@@ -3,9 +3,7 @@ title: Roles and Permissions
 description: How Agent Studio enforces role-based access controls for agents, tools, and flows using Alation roles.
 ---
 
-import {Aside, Badge} from '@astrojs/starlight/components'
-
-<Badge text="Coming Soon" variant="caution" />
+import {Aside, Badge, Code, TabItem, Tabs} from '@astrojs/starlight/components'
 
 Agent Studio uses your existing Alation roles to enforce access controls across agents, custom tools, and flows.
 The core philosophy is simple: **you always have full control over resources you create**, while restrictions only apply to actions on other people's resources.
@@ -20,12 +18,25 @@ Alation roles are grouped into four tiers for Agent Studio permissions:
 
 | Tier | Roles | Summary |
 |------|-------|---------|
-| **God** | Server Admin | Full control over all resources, including other users' |
+| **Global** | Server Admin | Full control over all resources, including other users' |
 | **Admin** | Catalog Admin | Can see all resources, edit others' flows |
-| **Standard** | Composer, Steward, Source Admin | Full control over own resources |
-| **Restricted** | Viewer, Explorer | Full control over own resources |
+| **Standard** | Composer, Steward, Source Admin | Full control over own resources, can publish agents as tools |
+| **Restricted** | Viewer, Explorer | Full control over own resources, **cannot** publish agents as tools |
 
 ## Agents
+
+### Published vs draft
+
+Every agent has a **published status** that controls who can see it:
+
+- **Published** agents are visible to all roles.
+- **Draft** agents are only visible to the **owner** and **admin-tier roles** (Server Admin, Catalog Admin).
+
+When you create a new agent, it starts in **draft** status. This means other non-admin users cannot see or interact with it until it is published.
+
+<Aside type="note">
+The Agent Studio UI does not currently have a publish button. To publish an agent, use the API. See [Publishing an agent via API](#publishing-an-agent-via-api) below.
+</Aside>
 
 ### Permission matrix
 
@@ -36,11 +47,74 @@ Alation roles are grouped into four tiers for Agent Studio permissions:
 | Edit others' agent | Yes | No | No | No |
 | Delete own agent | Yes | Yes | Yes | Yes |
 | Delete others' agent | Yes | No | No | No |
+| Set own agent published / draft | Yes | Yes | Yes | Yes |
+| Set others' agent published / draft | Yes | No | No | No |
+| Publish / unpublish own agent as tool | Yes | Yes | Yes | **No** |
+| Publish / unpublish others' agent as tool | Yes | No | No | No |
 | Clone others' agent | Yes | Yes | Yes | Yes |
+| See others' draft agents | Yes | Yes | No | No |
+| See published agents | Yes | Yes | Yes | Yes |
+
+### Visibility
+
+When a non-admin user lists agents, they see only **published agents** plus **their own drafts**.
+
+### Agent-as-tool visibility
+
+When an agent is published as a tool (for use in MCP or as a sub-agent), the tool inherits the parent agent's visibility:
+
+- If the parent agent is **published**, the tool appears for all users.
+- If the parent agent is **draft**, the tool only appears for the owner and admin-tier roles.
+
+<Aside type="note">
+**Published status** and **publish as tool** are independent concepts. Published status controls who can *see* the agent. Publishing as a tool creates an MCP tool entry so other agents or MCP clients can *invoke* it.
+</Aside>
+
+### Publishing an agent via API
+
+To change an agent's published status, send a `PATCH` request:
+
+<Tabs>
+<TabItem label="curl">
+```bash
+curl -X PATCH 'https://<your-tenant>.alationcloud.com/ai/api/v1/config/agent/<agent-id>' \
+  -H 'Content-Type: application/json' \
+  -H 'x-csrftoken: <your-csrf-token>' \
+  -H 'Cookie: sessionid=<your-session-id>; csrftoken=<your-csrf-token>' \
+  -d '{"published_status": "published"}'
+```
+</TabItem>
+<TabItem label="Bearer token">
+```bash
+curl -X PATCH 'https://<your-tenant>.alationcloud.com/ai/api/v1/config/agent/<agent-id>' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <your-oauth-token>' \
+  -d '{"published_status": "published"}'
+```
+</TabItem>
+</Tabs>
+
+To unpublish (set back to draft), use `{"published_status": "draft"}`.
+
+**Who can change published status:**
+- Any role can set their **own** agent to published or draft.
+- Only Server Admin can change **other users'** agents' published status.
+
+**Finding your agent ID:**
+
+The agent ID is visible in the URL when viewing an agent in the Agent Studio UI:
+```
+https://<tenant>.alationcloud.com/app/studio/agents/a/<agent-id>
+```
+
+You can also list all your agents via the API:
+```bash
+GET /ai/api/v1/config/agent
+```
 
 ## Custom tools (SMTP / HTTP)
 
-Custom tools have simpler access controls than agents because they have no visibility filtering — all custom tools are visible to all authenticated users.
+Custom tools have simpler access controls than agents because they have no visibility filtering -- all custom tools are visible to all authenticated users.
 
 | Action | Server Admin | Catalog Admin | Standard roles | Viewer / Explorer |
 |--------|:---:|:---:|:---:|:---:|
@@ -75,6 +149,7 @@ Access controls are based on **ownership**, which is determined by the user that
 
 This means:
 - If a Composer creates an agent and is later downgraded to Viewer, they can still see, edit, and delete that agent.
+- The only thing that changes is their ability to **publish as a tool** -- Viewer and Explorer cannot publish their agents as MCP tools.
 
 Role changes take effect **immediately** on the next request. There is no need to log out and log back in.
 
@@ -84,6 +159,8 @@ When connecting via MCP or using OAuth authentication, the same role-based acces
 
 - **User sessions** -- your Alation role is used directly.
 - **Machine-to-machine (M2M) OAuth apps** -- the role assigned to the OAuth application when it was created is used.
+
+MCP tool visibility follows the same rules as the API: draft agent-as-tools are only visible to the owner and admin-tier roles.
 
 ## Error responses
 
