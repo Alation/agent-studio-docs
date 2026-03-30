@@ -9,11 +9,6 @@ Evaluations can be used in 2 ways:
 1. **Development aid**: Helps in developing data product definitions by testing against expected user questions and refining agent responses
 2. **Regression testing**: Ensures new releases, prompt changes, or data product modifications don't break existing questions
 
-Alation AI supports two types of evaluations, depending on the type of object you are evaluating:
-
-- **SQL evaluation**: Tests data products by evaluating SQL query generation accuracy via executing SQL and comparing tables. (This article).
-- **Generic evaluation**: Tests agents using LLM-as-judge evaluation with custom rubrics. See [Agent Evaluations](/agent-studio-docs/reference/evaluation/agent-evaluations).
-
 ## SQL evaluation (for Data Products)
 
 SQL evaluation tests data products by providing natural language inputs(questions/tasks) and expected SQL queries, then generating new responses for the inputs and comparing the generated response to the saved queries.
@@ -91,6 +86,8 @@ question,sql
 
 ### Running SQL evaluations
 
+Central Evaluations is the easiest way to run SQL evaluations with custom agents across any number of eval cases.
+See [Central Evaluations](/agent-studio-docs/getting-started/sql-evaluations) for more details.
 
 You can click the "Run" button on the upper righthand side to trigger an evaluation run, which will create chats for each of the questions, and run them against the selected agent configuration.
 The selected agent should be a query agent.
@@ -220,7 +217,7 @@ llm_judge -> pass_llm: "Pass"
 llm_judge -> fail: "Fail"
 ```
 
-You can review individual examples for generic evaluations in the UI, to see the inputs, expected output, and generated response, along with the case's score and reasoning from the LLM Judge.
+You can review individual examples for sql evaluations in the UI, to see the inputs, expected output, and generated response, along with the case's score and reasoning from the LLM Judge.
 Further, you may download a CSV report of the run in the UI or via API, or a more detailed JSON report via API.
 
 ### SQL evaluation metrics
