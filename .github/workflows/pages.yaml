@@ -45,7 +45,7 @@ jobs:
                     fi
                   done
             - name: Install, build, and upload your site
-              uses: withastro/action@v5
+              uses: withastro/action@v6
               with:
                   path: .
     deploy:

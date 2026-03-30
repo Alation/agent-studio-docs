@@ -37,7 +37,7 @@ jobs:
                   done
 
             - name: Install and build site
-              uses: withastro/action@v5
+              uses: withastro/action@v6
               with:
                   path: .
 
