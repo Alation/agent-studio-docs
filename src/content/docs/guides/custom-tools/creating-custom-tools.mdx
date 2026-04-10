@@ -100,6 +100,76 @@ When an agent calls the SMTP tool, it provides the following parameters:
 | `cc` | string or list | No | CC recipient(s) |
 | `bcc` | string or list | No | BCC recipient(s) |
 
+### Sensitivity labels (Microsoft Purview)
+
+If your organization uses Microsoft 365 with [Microsoft Purview sensitivity labels](https://learn.microsoft.com/en-us/purview/information-protection), you can configure the SMTP tool to stamp outgoing emails with a sensitivity classification.
+This allows downstream systems — including Outlook and Exchange Online — to apply data protection policies based on the label.
+
+<Aside type="note" title="Microsoft 365 only">
+Sensitivity labels are a Microsoft Purview feature.
+On non-Microsoft email infrastructure the `msip_labels` header is ignored.
+Existing SMTP tool configurations are not affected.
+</Aside>
+
+#### How it works
+
+When the agent sends an email with a `sensitivity_label` value, Agent Studio looks up the corresponding header string in the tool's `sensitivity_label_mappings` config and attaches it as an `msip_labels` MIME header.
+Exchange Online reads this header and applies the matching Purview label to the message.
+
+The labels classify the email — they do not encrypt it at send time.
+If a label triggers Azure Rights Management (RMS) encryption, that enforcement happens on the Exchange side after the email is received.
+
+#### Admin configuration
+
+An admin must add `sensitivity_label_mappings` to the SMTP tool config.
+The keys are the label names the agent will use; the values are the full `msip_labels` header strings from your organization's Microsoft 365 tenant.
+
+```jsonc
+{
+  "sensitivity_label_mappings": {
+    "Public": "MSIP_Label_{guid}_Enabled=true;MSIP_Label_{guid}_SiteId={tenant-id};MSIP_Label_{guid}_SetDate=2024-01-01T00:00:00Z;MSIP_Label_{guid}_Method=Standard;MSIP_Label_{guid}_Name=Public;MSIP_Label_{guid}_ContentBits=0",
+    "Confidential": "MSIP_Label_{guid}_Enabled=true;MSIP_Label_{guid}_SiteId={tenant-id};MSIP_Label_{guid}_SetDate=2024-01-01T00:00:00Z;MSIP_Label_{guid}_Method=Standard;MSIP_Label_{guid}_Name=Confidential;MSIP_Label_{guid}_ContentBits=8"
+  }
+}
+```
+
+Replace `{guid}` with the label's GUID and `{tenant-id}` with your Microsoft 365 tenant ID.
+Admins can retrieve these values from the [Microsoft Purview compliance portal](https://compliance.microsoft.com) or via PowerShell:
+
+```bash
+Connect-IPPSSession
+Get-Label | Select DisplayName, Guid
+```
+
+<Aside type="caution" title="GUIDs are tenant-specific">
+Label GUIDs and tenant IDs vary per Microsoft 365 organization.
+Alation cannot provide defaults — these values must come from your organization's Microsoft 365 tenant.
+</Aside>
+
+#### Sensitivity label config reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `sensitivity_label_mappings` | object | Optional. Map of label name → full `msip_labels` header string. |
+
+#### Using sensitivity labels in workflows
+
+When adding the SMTP tool as a step in a flow, pass `sensitivity_label` as an input parameter with one of the label names configured in `sensitivity_label_mappings`.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sensitivity_label` | string | No | Label name to apply, e.g. `"Confidential"`. Must match a key in `sensitivity_label_mappings`. |
+
+<Aside type="tip">
+Label names are case-sensitive — `"Confidential"` and `"confidential"` are treated as different keys.
+Use the exact label name configured in `sensitivity_label_mappings`.
+</Aside>
+
+#### Exchange Online transport rules
+
+By default, Exchange Online honors the `msip_labels` header from authenticated senders.
+Check with your Microsoft 365 admin to confirm that transport rules are not configured to strip custom headers from inbound messages.
+
 ---
 
 ## HTTP tools
