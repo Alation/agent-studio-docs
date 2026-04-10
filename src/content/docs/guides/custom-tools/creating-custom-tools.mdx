@@ -160,16 +160,6 @@ When adding the SMTP tool as a step in a flow, pass `sensitivity_label` as an in
 |-----------|------|----------|-------------|
 | `sensitivity_label` | string | No | Label name to apply, e.g. `"Confidential"`. Must match a key in `sensitivity_label_mappings`. |
 
-<Aside type="tip">
-Label names are case-sensitive — `"Confidential"` and `"confidential"` are treated as different keys.
-Use the exact label name configured in `sensitivity_label_mappings`.
-</Aside>
-
-#### Exchange Online transport rules
-
-By default, Exchange Online honors the `msip_labels` header from authenticated senders.
-Check with your Microsoft 365 admin to confirm that transport rules are not configured to strip custom headers from inbound messages.
-
 ---
 
 ## HTTP tools
