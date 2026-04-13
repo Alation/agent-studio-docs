@@ -117,6 +117,12 @@ export default defineConfig({
                         ],
                     },
                     {
+                        label: "Alation Agent Skills",
+                        link: "/agent-skills/overview",
+                        icon: "seti:markdown",
+                        items: ["agent-skills/overview"],
+                    },
+                    {
                         label: "Agent Studio SDK",
                         link: "/sdk/using-the-sdk",
                         icon: "puzzle",

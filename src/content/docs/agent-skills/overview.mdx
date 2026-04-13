@@ -1,0 +1,41 @@
+---
+title: Alation Agent Skills
+description: "Use Alation directly inside Claude Code, Gemini CLI, Codex, Snowflake Cortex Code, and any Agent Skills-compatible AI tool."
+---
+
+Agent skills let you work with Alation directly inside your AI coding tool.
+They can query data products, search the catalog, perform analysis, create custom agents and automated workflows, and more, letting you use natural language to interact with the Alation catalog.
+
+Skills are available for all platforms supporting the [Agent Skills](https://agentskills.io) format, including Claude Code, Claude Cowork, Gemini CLI, Codex, Snowflake Cortex Code, and more.
+
+The full plugin source and latest releases are on GitHub: [Alation/alation-plugins](https://github.com/Alation/alation-plugins)
+
+## What is an agent skill?
+
+An **agent skill** is a reusable, self-contained set of instructions that tells an AI agent how to perform a specific class of tasks.
+
+Skills define capabilities, workflows, and provide CLI commands an agent can run on your behalf.
+Each skill is atomic and bundles everything it needs: documentation, command schemas, and (for non-Claude platforms) the Alation CLI itself.
+
+When you install Alation skills, your AI tool learns how to:
+- Understand what you're asking for in natural language
+- Translate your intent into the right Alation API calls
+- Handle errors, pagination, and multi-step workflows automatically
+
+You never need to memorize commands or API shapes — just describe what you want.
+
+## Installation
+
+Download the [latest release](https://github.com/Alation/alation-plugins/releases/latest) as a plugin or individual agent skills, or use the [installation script](https://github.com/Alation/alation-plugins?tab=readme-ov-file#codex--gemini-cli) to install skills for a project or globally.
+
+## Getting Started
+
+First authorize the skill to interact with an Alation catalog using the `setup` skill, then use the skills in a workflow either standalone or in conjunction with other skills.
+Examples of usage:
+- Answer data-dependent questions directly (`ask`)
+- Search for relevant data (`explore`)
+- Manage and use data products (`curate`, `ask`)
+- Manage, search, or reference metadata (`curate`, `explore`)
+- Create, manage, or invoke custom agents (`configure`, `ask`)
+
+These skills can be used directly to answer questions or complete tasks, or in an orchestrated workflow to inform agent actions with metadata from a single source of truth.
