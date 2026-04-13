@@ -6,23 +6,28 @@ description: Answers complex questions about the Alation data catalog by analyzi
 The catalog context search agent is designed to answer questions about the Alation data catalog.
 This includes finding relevant objects, understanding relationships between objects, answering questions about the objects, and more.
 
+For a comprehensive usage guide with examples and tips, see the [Catalog Context Search Guide](/agent-studio-docs/guides/context-search/using-catalog-context-search/).
+
 ## How it works
 
 The agent follows this workflow:
 
 1. Receives a natural language request from the user
-2. Analyzes the question to determine the best search strategy
-3. Searches for relevant custom fields, datasources, and filters to narrow down the search
-4. Defines a search signature to specify which objects and fields of the objects to retrieve
-5. Performs a preliminary search for relevant catalog objects using the search signature
-6. Retrieves relevant object details from the preliminary search results
-7. Addresses the user request using the retrieved object details
+2. Analyzes the question to determine the search type (semantic search vs filter-based enumeration)
+3. Routes to the appropriate tool based on the question
+4. The tool orchestrates signature generation internally (resolving IDs, custom fields, etc.)
+5. Retrieves relevant catalog objects using the generated signature
+6. Summarizes the results to address the user's request
 
 ## Input parameters
 
 Required:
 
 - `message` (string): The natural language question or request to send to the agent
+
+Optional:
+
+- `base_signature` (object): Pre-configured signature to restrict object types or apply filters
 
 ## Output format
 
@@ -31,45 +36,61 @@ The final message, assuming no errors, is a `string` which addresses the user's 
 
 ## Available tools
 
-The agent is configured with 6 tools:
+The agent is configured with 2 tools:
 
-### Analyze catalog question
+### get_search_context
 
-Analyzes the user's question and determines a search strategy to address the request.
+Searches for catalog objects using semantic search (by name, keyword, or business concept).
 
-**Key parameters:**
-- `message`: The user's natural language question
-
-### Get datasources
-
-Retrieves all datasources (paginated) in the Alation catalog.
-
-### Get custom fields definition
-
-Retrieves all custom fields defined in the Alation catalog, including information on how to use them.
-
-### Get signature creation instructions
-
-Lists instructions for generating a good search signature.
-
-### Get catalog context by IDs & signature
-
-Searches for catalog objects using a search signature containing object types, fields, and search phrases.
+**When used:**
+- Questions with search terms: "Find sales tables", "Search for revenue columns"
+- Combined search + filter: "Find customer tables in the finance schema"
+- Parent-child queries: "What columns are in the orders table?"
 
 **Key parameters:**
-- `search_signature`: The search signature defining object types, fields, and search phrases
+- `question`: The user's natural language question
+- `base_signature`: Optional pre-configured signature
 
-### Bulk retrieval
+**Internal behavior:**
+- Orchestrates the Signature Generator agent to build the search signature
+- Resolves names to IDs automatically (datasources, schemas, domains, tags, etc.)
+- Fetches custom field definitions when needed
+- Returns raw context from the catalog
 
-Final search tool that retrieves detailed information about catalog objects by their IDs and a specified set of fields.
+### get_filter_context
 
+Enumerates catalog objects using filter-based retrieval (no keyword search).
+
+**When used:**
+- Pure enumeration: "List all tables in the finance schema"
+- Filter by metadata: "Show all PII-classified columns"
+- Hierarchical listing: "What reports are in the Sales workbook?"
 
 **Key parameters:**
+- `question`: The user's natural language question
+- `base_signature`: Optional pre-configured signature
+- `ids_by_object_type`: Optional direct ID fetch (e.g., `{"table": [1, 2, 3]}`)
 
-- `search_signature`: The search signature defining object types and ids, and fields to retrieve
+**Internal behavior:**
+- Orchestrates the Signature Generator agent to build the search signature
+- Resolves names to IDs automatically
+- Returns raw context from the catalog without keyword search
+
+## Routing logic
+
+The agent routes to tools based on the question:
+
+| Question Pattern | Tool Used |
+|------------------|-----------|
+| Contains name/keyword/concept to search | `get_search_context` |
+| Pure enumeration by filters only | `get_filter_context` |
+
+**Key rule**: If the question mentions ANY name, keyword, or concept to search for, `get_search_context` is used. `get_filter_context` is only used for pure enumeration with no search terms.
 
 ## Behavior notes
 
 - The agent will answer the question provided as text, not just provide a list of search results.
-- The agent may use multiple search steps to refine results before answering the question.
+- The agent may retry with a different tool if the first search returns insufficient results.
+- Default limit is 3 results for specific questions, 20 for "list all" questions. Users can request more.
 - If you know which object types are relevant to your request, including that in the request can help improve results.
+- The Signature Generator agent runs internally to handle ID resolution and signature creation.
