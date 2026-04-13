@@ -106,6 +106,12 @@ export default defineConfig({
                                 },
                             },
                             {
+                                label: "Context Search",
+                                autogenerate: {
+                                    directory: "guides/context-search",
+                                },
+                            },
+                            {
                                 label: "Models",
                                 autogenerate: {
                                     directory: "guides/models",
