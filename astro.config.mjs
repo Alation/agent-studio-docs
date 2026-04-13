@@ -59,7 +59,7 @@ export default defineConfig({
                         ],
                     },
                     {
-                        label: "Guides and recipes",
+                        label: "Guides and Recipes",
                         link: "/guides/authentication/introduction",
                         icon: "open-book",
                         items: [
