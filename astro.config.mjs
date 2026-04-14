@@ -106,6 +106,12 @@ export default defineConfig({
                                 },
                             },
                             {
+                                label: "Models",
+                                autogenerate: {
+                                    directory: "guides/models",
+                                },
+                            },
+                            {
                                 label: "Rest API",
                                 items: [
                                     "guides/rest-api/auth",

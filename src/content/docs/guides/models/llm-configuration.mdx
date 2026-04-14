@@ -1,0 +1,187 @@
+---
+title: LLM Configuration Guide
+description: Learn how to configure which LLMs are used by different features and agents in Alation AI.
+---
+
+This guide explains how to configure which LLMs (Large Language Models) are used by different features and agents in Alation AI.
+
+---
+
+## Configuring via UI
+
+### Accessing LLM Settings
+
+1. Open **Agent Studio**
+2. Click the **hamburger menu** (three horizontal lines) at the top
+3. Select **Settings**
+
+### Setting a Tenant-Wide Default
+
+The tenant default LLM applies to all agents and product areas unless overridden per-feature.
+
+1. In Settings, find the **Default LLM** dropdown at the top
+2. Select your preferred LLM config
+3. Click **Save**
+
+To reset to Alation's built-in default, click **Reset to default**.
+
+### Per-Feature Overrides
+
+Use overrides when you want different LLMs for specific product areas or agents. Overrides take priority over the tenant default.
+
+1. In Settings, scroll to **Per-feature overrides**
+2. Find the product area or agent you want to override
+3. Toggle **Override** to enabled
+4. Select your preferred LLM config from the dropdown
+5. Click **Save**
+
+To remove an override, toggle **Override** to disabled.
+
+---
+
+## Configuring via API
+
+Use the API if you prefer programmatic configuration or need to configure settings not available in the UI.
+
+### Accessing the API
+
+Go to `https://<your-alation-domain>/ai/docs` to open the Swagger UI.
+
+### Finding the LLM Config ID
+
+To configure preferences or overrides, you need the UUID of the LLM config you want to use.
+
+**List available LLM configs:**
+```http
+GET /ai/api/v1/config/llm
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "My GPT-4o",
+      "provider": "openai",
+      "is_default": false,
+      ...
+    },
+    {
+      "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "name": "Bedrock Claude Sonnet 4.5",
+      "provider": "bedrock_us-west-2",
+      "is_default": true,
+      ...
+    }
+  ],
+  "total": 2
+}
+```
+
+Use the `id` field as the `llm_config_id` in the configuration APIs below.
+
+To add your own models, see the [BYOM Setup Guide](/agent-studio-docs/guides/models/byom-setup/).
+
+### Setting a Tenant-Wide Default
+
+```http
+PUT /ai/api/v1/config/llm_preference
+Content-Type: application/json
+
+{
+  "default_llm_config_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+To clear the tenant default (revert to Alation default):
+```json
+{
+  "default_llm_config_id": null
+}
+```
+
+### Per-Feature Overrides
+
+**List existing overrides:**
+```http
+GET /ai/api/v1/config/feature_llm_overrides
+```
+
+**Create or update an override:**
+```http
+PUT /ai/api/v1/config/feature_llm_overrides
+Content-Type: application/json
+
+{
+  "feature_type": "DEFAULT_AGENT",
+  "feature_key": "curation_agent",
+  "llm_config_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+- `feature_type`: Use `DEFAULT_AGENT` for agents, `PRODUCT_AREA` for product areas
+- `feature_key`: The agent or product area identifier. If you don't know the valid keys, run the request with the default value - it will fail and return the list of valid keys. Use those to run the request again.
+
+**Delete an override:**
+```http
+DELETE /ai/api/v1/config/feature_llm_overrides/{feature_type}/{feature_key}
+```
+
+### Default Embedding Model
+
+Set the embedding model used for semantic search and sampling:
+
+```http
+PUT /ai/api/v1/config/llm_preference
+Content-Type: application/json
+
+{
+  "default_embedding_config_id": "uuid-of-your-embedding-config"
+}
+```
+
+To list embedding configs specifically:
+```http
+GET /ai/api/v1/config/llm?is_embedding=true
+```
+
+**Note:** Changing the embedding model deletes existing indexes. They will be rebuilt on the next sampling run.
+
+### Hide Alation Default Models
+
+Hide Alation's built-in models from selection dropdowns:
+
+```http
+PUT /ai/api/v1/config/llm_preference
+Content-Type: application/json
+
+{
+  "hide_default_models": true
+}
+```
+
+### Viewing Current Configuration
+
+**Get current preference:**
+```http
+GET /ai/api/v1/config/llm_preference
+```
+
+**List all feature overrides:**
+```http
+GET /ai/api/v1/config/feature_llm_overrides
+```
+
+---
+
+## API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/ai/api/v1/config/llm` | GET | List available LLM configs |
+| `/ai/api/v1/config/llm_preference` | GET | Get current tenant preference |
+| `/ai/api/v1/config/llm_preference` | PUT | Set or update tenant preference |
+| `/ai/api/v1/config/feature_llm_overrides` | GET | List all feature overrides |
+| `/ai/api/v1/config/feature_llm_overrides` | PUT | Create or update a feature override |
+| `/ai/api/v1/config/feature_llm_overrides/{feature_type}/{feature_key}` | DELETE | Delete a feature override |
