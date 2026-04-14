@@ -105,6 +105,8 @@ When an agent calls the SMTP tool, it provides the following parameters:
 If your organization uses Microsoft 365 with [Microsoft Purview sensitivity labels](https://learn.microsoft.com/en-us/purview/information-protection), you can configure the SMTP tool to stamp outgoing emails with a sensitivity classification.
 This allows downstream systems — including Outlook and Exchange Online — to apply data protection policies based on the label.
 
+![Sensitivity label mappings configuration in the SMTP tool form](../../../../assets/img/guides/custom-tools/sensitivity-label-mappings.png)
+
 <Aside type="note" title="Microsoft 365 only">
 Sensitivity labels are a Microsoft Purview feature.
 On non-Microsoft email infrastructure the `msip_labels` header is ignored.
@@ -155,6 +157,8 @@ Alation cannot provide defaults — these values must come from your organizatio
 #### Using sensitivity labels in workflows
 
 When adding the SMTP tool as a step in a flow, pass `sensitivity_label` as an input parameter with one of the label names configured in `sensitivity_label_mappings`.
+
+![Sensitivity label input field when using the SMTP tool in a workflow](../../../../assets/img/guides/custom-tools/sensitivity-label-workflow.png)
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
