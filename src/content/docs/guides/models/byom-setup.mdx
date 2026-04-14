@@ -1,0 +1,370 @@
+---
+title: BYOM Setup Guide
+description: Connect your own LLM provider credentials to Alation AI so agents can use models from your account.
+---
+
+BYOM (Bring Your Own Model) lets you connect your own LLM provider credentials to Alation AI so agents can use models from your account.
+
+---
+
+## Supported Providers
+
+| Provider | Credential Type | Auth Method |
+|----------|-----------------|-------------|
+| OpenAI | API_KEY | API key |
+| Anthropic | API_KEY | API key |
+| OpenAI-compatible (DeepSeek, Groq, Together AI, Fireworks, SambaNova, Cerebras) | API_KEY | API key + custom base URL |
+| AWS Bedrock | AWS | IAM access key + secret key |
+| Azure OpenAI | AZURE | API key or service principal |
+| Google (Gemini / Vertex AI) | GCP | API key or service account |
+
+---
+
+## Prerequisites
+
+- Appropriate credentials for your LLM provider (API key, IAM credentials, service account, etc.)
+
+---
+
+## Setup via UI
+
+### Step 1: Navigate to the Models page
+
+Go to **Agent Studio > Explore models**, or navigate directly to `/app/studio/models`.
+
+### Step 2: Add a model provider
+
+Click **+ Add model provider**. The form fields change based on the provider you select.
+
+#### OpenAI
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name (e.g., "My OpenAI Account") |
+| API Key | Yes | Your OpenAI API key (`sk-proj-...`) |
+
+**Tip:** If you encounter errors with the OpenAI provider, try selecting **Custom (OpenAI-Compatible)** from the provider dropdown instead and set the base URL to `https://api.openai.com/v1`.
+
+#### Anthropic
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name (e.g., "My Anthropic Account") |
+| API Key | Yes | Your Anthropic API key (`sk-ant-...`) |
+
+#### Custom (OpenAI-Compatible Providers)
+
+Use this for providers that expose an OpenAI-compatible API (DeepSeek, Groq, Together AI, Fireworks, SambaNova, Cerebras, or self-hosted vLLM/Ollama).
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name (e.g., "Groq") |
+| API Key | Yes | Provider API key |
+| Base URL | Yes | Provider's API base URL (see table below) |
+
+**Common base URLs:**
+
+| Provider | Base URL |
+|----------|----------|
+| DeepSeek | `https://api.deepseek.com/v1` |
+| Together AI | `https://api.together.xyz/v1` |
+| Groq | `https://api.groq.com/openai/v1` |
+| SambaNova | `https://api.sambanova.ai/v1` |
+| Cerebras | `https://api.cerebras.ai/v1` |
+| Fireworks | `https://api.fireworks.ai/inference/v1` |
+| Self-hosted (vLLM/Ollama) | Your endpoint, e.g., `http://llm-service:8000/v1` |
+
+#### AWS Bedrock
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name (e.g., "AWS Bedrock US West") |
+| Access Key ID | Yes | AWS IAM access key (`AKIA...`) |
+| Secret Access Key | Yes | AWS IAM secret key |
+| Region | Yes | AWS region (e.g., `us-west-2`) |
+| Session Token | No | For temporary STS credentials only |
+
+**Note:** The IAM user must have `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream` permissions. For temporary credentials (STS or Vault-managed), you must update the credentials before they expire.
+
+#### Azure OpenAI
+
+**Option A: API Key**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name |
+| Endpoint | Yes | Azure OpenAI endpoint (e.g., `https://myresource.openai.azure.com/`) |
+| API Version | Yes | API version (e.g., `2024-10-21`) |
+| API Key | Yes | Azure API key |
+
+**Option B: Service Principal**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name |
+| Endpoint | Yes | Azure OpenAI endpoint |
+| API Version | Yes | API version |
+| Client ID | Yes | Azure AD application (client) ID |
+| Client Secret | Yes | Azure AD client secret |
+| Token URL | Yes | `https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token` |
+
+#### Google (Gemini API Key)
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name |
+| API Key | Yes | Google AI Studio API key (`AIza...`) |
+
+#### Google (Vertex AI Service Account)
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Name | Yes | Display name |
+| Project ID | Yes | Google Cloud project ID |
+| Location | Yes | Region (e.g., `us-central1`) |
+| Service Account JSON | Yes | Full service account key JSON |
+
+### Step 3: Validate and select models
+
+After entering credentials, click **Validate & Continue**. If validation succeeds, a **Select models** dialog appears with available models from the provider.
+
+- Use the search bar to filter models
+- Check the models you want to add
+- Click **Continue**
+
+**Note:** If the model list appears empty (some OpenAI-compatible providers don't support listing), manual model entry in the UI is not yet supported. Use the API instead (see Setup via API below).
+
+### Step 4: Set display names
+
+For each selected model, set a friendly display name. Leave blank to use the model ID.
+
+Click **Complete** to finish.
+
+### Quick Test
+
+To verify, create a custom agent in Agent Studio. In the LLM dropdown, you should see your newly added model(s) by the display name you provided.
+
+---
+
+## Setup via API
+
+For automation or programmatic setup, BYOM can be configured via the API. The flow is: create credentials, validate, then create LLM config(s).
+
+### Accessing the API
+
+Go to `https://<your-alation-domain>/ai/docs` to open the Swagger UI.
+
+### Step 1: Create Credentials
+
+```http
+POST /ai/api/v1/llm_credentials
+Content-Type: application/json
+```
+
+**OpenAI:**
+```json
+{
+  "name": "My OpenAI Account",
+  "creds_type": "API_KEY",
+  "api_key": "sk-proj-..."
+}
+```
+
+**Anthropic:**
+```json
+{
+  "name": "Anthropic",
+  "creds_type": "API_KEY",
+  "api_key": "sk-ant-..."
+}
+```
+
+**OpenAI-compatible (e.g., Groq):**
+```json
+{
+  "name": "Groq",
+  "creds_type": "API_KEY",
+  "api_key": "gsk_...",
+  "base_url": "https://api.groq.com/openai/v1"
+}
+```
+
+**AWS Bedrock:**
+```json
+{
+  "name": "AWS Bedrock US West",
+  "creds_type": "AWS",
+  "aws_access_key_id": "AKIA...",
+  "aws_secret_access_key": "...",
+  "aws_region": "us-west-2"
+}
+```
+
+**Azure OpenAI (API Key):**
+```json
+{
+  "name": "Azure OpenAI",
+  "creds_type": "AZURE",
+  "azure_endpoint": "https://myresource.openai.azure.com/",
+  "api_version": "2024-10-21",
+  "api_key": "..."
+}
+```
+
+**Azure OpenAI (Service Principal):**
+```json
+{
+  "name": "Azure OpenAI SP",
+  "creds_type": "AZURE",
+  "azure_endpoint": "https://myresource.openai.azure.com/",
+  "api_version": "2024-10-21",
+  "azure_client_id": "...",
+  "azure_client_secret": "...",
+  "azure_token_url": "https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token"
+}
+```
+
+**Google (API Key):**
+```json
+{
+  "name": "Gemini",
+  "creds_type": "GCP",
+  "api_key": "AIza..."
+}
+```
+
+**Google (Vertex AI Service Account):**
+```json
+{
+  "name": "Vertex AI",
+  "creds_type": "GCP",
+  "gcp_project": "my-project-id",
+  "gcp_location": "us-central1",
+  "gcp_service_account": { "type": "service_account", "project_id": "...", "..." : "..." }
+}
+```
+
+### Step 2: Validate Credentials
+
+```http
+POST /ai/api/v1/llm_credentials/{credentials_id}/validate
+Content-Type: application/json
+```
+
+**List available models:**
+```json
+{
+  "provider": "openai"
+}
+```
+
+**Validate a specific model:**
+```json
+{
+  "provider": "openai",
+  "model_name": "gpt-4o"
+}
+```
+
+**Validate an embedding model:**
+```json
+{
+  "provider": "openai",
+  "model_name": "text-embedding-3-small",
+  "is_embedding": true
+}
+```
+
+**Response:**
+```json
+{
+  "valid": true,
+  "models": ["gpt-4o", "gpt-4o-mini", "gpt-5.4", "..."],
+  "error": null
+}
+```
+
+For Bedrock, use `"provider": "bedrock"`. The region is resolved automatically from the credentials.
+
+### Step 3: Create LLM Config
+
+Use the `id` returned from the credentials creation response as the `llm_credentials_id`.
+
+```http
+POST /ai/api/v1/config/llm
+Content-Type: application/json
+```
+
+**Completion model:**
+```json
+{
+  "name": "My GPT-4o",
+  "provider": "openai",
+  "llm_credentials_id": "<id from credential creation response>",
+  "model_name": "gpt-4o"
+}
+```
+
+**Embedding model:**
+```json
+{
+  "name": "My Embeddings",
+  "provider": "openai",
+  "llm_credentials_id": "<id from credential creation response>",
+  "model_name": "text-embedding-3-large",
+  "is_embedding": true,
+  "embedding_dimensions": 3072
+}
+```
+
+### Managing Configs
+
+**List LLM configs:**
+```http
+GET /ai/api/v1/config/llm
+GET /ai/api/v1/config/llm?llm_credentials_id=<uuid>
+GET /ai/api/v1/config/llm?is_embedding=true
+```
+
+**List credentials:**
+```http
+GET /ai/api/v1/llm_credentials
+```
+
+**Delete:**
+```http
+DELETE /ai/api/v1/config/llm/{id}
+DELETE /ai/api/v1/llm_credentials/{id}
+```
+
+**Note:** Delete LLM configs before deleting credentials, as configs reference credentials.
+
+---
+
+## Provider Quick Reference
+
+| Provider | creds_type | provider | Required Fields |
+|----------|------------|----------|-----------------|
+| OpenAI | API_KEY | openai | api_key |
+| Anthropic | API_KEY | anthropic | api_key |
+| OpenAI-compatible | API_KEY | openai | api_key, base_url |
+| AWS Bedrock | AWS | bedrock | aws_access_key_id, aws_secret_access_key, aws_region |
+| Azure OpenAI (Key) | AZURE | azure_openai | azure_endpoint, api_version, api_key |
+| Azure OpenAI (SP) | AZURE | azure_openai | azure_endpoint, api_version, azure_client_id, azure_client_secret, azure_token_url |
+| Google Gemini | GCP | google | api_key |
+| Google Vertex AI | GCP | google | gcp_project, gcp_location, gcp_service_account |
+
+---
+
+## Troubleshooting
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| Validation fails with 401 | Invalid API key or credentials | Verify the key is correct and active |
+| Validation fails with 403 | Insufficient permissions | Check IAM policy (Bedrock) or role assignments (Azure) |
+| "Model not found" during validation | Model name doesn't match provider | Check exact model ID (e.g., `anthropic.claude-sonnet-4-5-20250929-v1:0` for Bedrock) |
+| "aws_region is required" | Region missing for Bedrock | Provide `aws_region` in credentials |
+| "api_key is required for API_KEY creds type" | Missing API key | Include `api_key` in the request |
+| "azure_endpoint and api_version are required" | Missing Azure fields | Provide both endpoint and API version |
+| Cannot delete credentials | LLM configs still reference them | Delete associated LLM configs first |
+| Validation returns `valid: null` | Provider doesn't support model listing | Use model-specific validation by providing a `model_name` |
