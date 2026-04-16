@@ -161,10 +161,22 @@ This is useful when your agent needs to process the raw catalog data itself rath
 
 ## Base Signature
 
-The **base_signature** lets you pre-configure what to search for. This is useful for:
+The **base_signature** is an optional input argument available on the `get_search_context` and `get_filter_context` tools. It lets you pre-configure what to search for. This is useful when you want to focus on specific object types or a particular set of objects, such as:
 - Restricting searches to specific object types
 - Pre-applying filters
 - Customizing what fields are returned
+
+:::note
+The base_signature is optional. If you don't provide one, the entire catalog is considered and the agent will automatically determine the appropriate object types based on your question.
+:::
+
+### How to Add a Base Signature
+
+To configure a base signature in Agent Studio:
+
+1. In your agent configuration, go to the **Tools** section
+2. Click **Edit** on the tool you want to configure (`get_search_context` or `get_filter_context`)
+3. In the dialog that opens, you'll see the **base_signature** parameter where you can add your configuration
 
 ### How Base Signature Works
 
