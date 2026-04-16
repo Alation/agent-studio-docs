@@ -21,7 +21,7 @@ Alation roles are grouped into four tiers for Agent Studio permissions:
 | **Global** | Server Admin | Full control over all resources, including other users' |
 | **Admin** | Catalog Admin | Can see all resources, edit others' flows |
 | **Standard** | Composer, Steward, Source Admin | Full control over own resources, can publish agents as tools |
-| **Restricted** | Viewer, Explorer | Full control over own resources, **cannot** publish agents as tools |
+| **Restricted** | Viewer, Explorer | Read-only for agents (can view and use published agents, cannot create/edit/delete/clone) |
 
 ## Agents
 
@@ -42,18 +42,19 @@ The Agent Studio UI does not currently have a publish button. To publish an agen
 
 | Action | Server Admin | Catalog Admin | Standard roles | Viewer / Explorer |
 |--------|:---:|:---:|:---:|:---:|
-| Create agent | Yes | Yes | Yes | Yes |
-| Edit own agent | Yes | Yes | Yes | Yes |
+| Create agent | Yes | Yes | Yes | No |
+| Edit own agent | Yes | Yes | Yes | No |
 | Edit others' agent | Yes | No | No | No |
-| Delete own agent | Yes | Yes | Yes | Yes |
+| Delete own agent | Yes | Yes | Yes | No |
 | Delete others' agent | Yes | No | No | No |
-| Set own agent published / draft | Yes | Yes | Yes | Yes |
+| Set own agent published / draft | Yes | Yes | Yes | No |
 | Set others' agent published / draft | Yes | No | No | No |
-| Publish / unpublish own agent as tool | Yes | Yes | Yes | **No** |
+| Publish / unpublish own agent as tool | Yes | Yes | Yes | No |
 | Publish / unpublish others' agent as tool | Yes | No | No | No |
-| Clone others' agent | Yes | Yes | Yes | Yes |
+| Clone others' agent | Yes | Yes | Yes | No |
 | See others' draft agents | Yes | Yes | No | No |
 | See published agents | Yes | Yes | Yes | Yes |
+| Use published agents | Yes | Yes | Yes | Yes |
 
 ### Visibility
 
@@ -97,7 +98,8 @@ curl -X PATCH 'https://<your-tenant>.alationcloud.com/ai/api/v1/config/agent/<ag
 To unpublish (set back to draft), use `{"published_status": "draft"}`.
 
 **Who can change published status:**
-- Any role can set their **own** agent to published or draft.
+- Standard roles and above can set their **own** agent to published or draft.
+- Viewer and Explorer roles **cannot** change published status (they cannot edit agents at all).
 - Only Server Admin can change **other users'** agents' published status.
 
 **Finding your agent ID:**
@@ -148,8 +150,8 @@ Flows have two unique access control behaviors compared to agents:
 Access controls are based on **ownership**, which is determined by the user that created the resource. Ownership does not change when a user's role changes.
 
 This means:
-- If a Composer creates an agent and is later downgraded to Viewer, they can still see, edit, and delete that agent.
-- The only thing that changes is their ability to **publish as a tool** -- Viewer and Explorer cannot publish their agents as MCP tools.
+- If a Composer creates an agent and is later downgraded to Viewer, they **lose the ability to edit or delete** that agent. Viewer and Explorer roles have read-only access to agents.
+- Viewer and Explorer roles can still **see and use** published agents, including agents they previously created.
 
 Role changes take effect **immediately** on the next request. There is no need to log out and log back in.
 
