@@ -115,6 +115,11 @@ You can either:
 7. **Configure tool inputs**
    - Define how each tool receives its input parameters (see next section)
 
+8. **Publish the agent**
+   - New agents start in **draft** status and are only visible to you and admin roles
+   - When ready, click **Publish** in the top-right corner to make the agent visible to all users
+   - See [Publishing and unpublishing agents](/guides/access-controls/roles-and-permissions/#publishing-and-unpublishing-agents-in-the-ui) for details
+
 ## Tool input configuration
 
 Tools expose multiple input parameters, but not all of them need to be controlled by the agent at runtime.
@@ -178,7 +183,11 @@ This traceability is critical for debugging, optimization, and trust.
 
 ## Deploying an agent
 
-Once an agent meets your quality and performance expectations, it can be deployed in multiple ways:
+Once an agent meets your quality and performance expectations, it can be deployed in multiple ways.
+
+<Aside type="tip">
+Before deploying, make sure your agent is **published**. Draft agents are only visible to you and admin roles. See [Publishing and unpublishing agents](/guides/access-controls/roles-and-permissions/#publishing-and-unpublishing-agents-in-the-ui).
+</Aside>
 
 **API**
 - Invoke the agent using the `POST /messages` endpoint
