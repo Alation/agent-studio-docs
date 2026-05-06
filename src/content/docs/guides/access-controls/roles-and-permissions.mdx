@@ -3,7 +3,7 @@ title: Roles and Permissions
 description: How Agent Studio enforces role-based access controls for agents, tools, and flows using Alation roles.
 ---
 
-import {Aside, Badge, Code, TabItem, Tabs} from '@astrojs/starlight/components'
+import {Aside, Badge, Code, TabItem, Tabs, Steps} from '@astrojs/starlight/components'
 
 Agent Studio uses your existing Alation roles to enforce access controls across agents, custom tools, and flows.
 The core philosophy is simple: **you always have full control over resources you create**, while restrictions only apply to actions on other people's resources.
@@ -32,10 +32,36 @@ Every agent has a **published status** that controls who can see it:
 - **Published** agents are visible to all roles.
 - **Draft** agents are only visible to the **owner** and **admin-tier roles** (Server Admin, Catalog Admin).
 
-When you create a new agent, it starts in **draft** status. This means other non-admin users cannot see or interact with it until it is published.
+When you create a new agent, it starts in **draft** status. This means other non-admin users cannot see or interact with it until you publish it.
 
-<Aside type="note">
-The Agent Studio UI does not currently have a publish button. To publish an agent, use the API. See [Publishing an agent via API](#publishing-an-agent-via-api) below.
+### Publishing and unpublishing agents in the UI
+
+You can publish or unpublish agents directly from the Agent Studio UI.
+
+<Steps>
+1. **Open your agent** in Agent Studio.
+
+2. **Locate the publish controls** in the top-right corner of the agent page.
+   - Draft agents show a **Publish** button.
+   - Published agents show a **Published** badge and an **Unpublish** button.
+
+   ![Draft agent with Publish button](../../../../assets/img/guides/access-controls/agent-publish-button.png)
+
+   ![Published agent with Unpublish button](../../../../assets/img/guides/access-controls/agent-published-status.png)
+
+3. **Click the button** to toggle the published status.
+   - Clicking **Publish** makes the agent visible to all users.
+   - Clicking **Unpublish** returns the agent to draft status, hiding it from non-admin users.
+</Steps>
+
+### Finding draft agents
+
+Your draft agents appear in the **Draft** tab when browsing agents. Other users' draft agents are not visible to you unless you are a Server Admin or Catalog Admin.
+
+![Agent browse view with Draft tab](../../../../assets/img/guides/access-controls/agent-browse-draft-tab.png)
+
+<Aside type="caution">
+If you unpublish an agent that others are using, they will no longer be able to see or interact with it. The agent will only be visible in your Draft tab and to admin-tier roles.
 </Aside>
 
 ### Permission matrix
@@ -71,9 +97,9 @@ When an agent is published as a tool (for use in MCP or as a sub-agent), the too
 **Published status** and **publish as tool** are independent concepts. Published status controls who can *see* the agent. Publishing as a tool creates an MCP tool entry so other agents or MCP clients can *invoke* it.
 </Aside>
 
-### Publishing an agent via API
+### Publishing an agent via API (alternative)
 
-To change an agent's published status, send a `PATCH` request:
+You can also change an agent's published status programmatically. Send a `PATCH` request:
 
 <Tabs>
 <TabItem label="curl">
