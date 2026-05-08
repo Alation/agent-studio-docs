@@ -18,6 +18,7 @@
     "starlight-image-zoom": "^0.13.2",
     "starlight-sidebar-topics": "^0.6.2"
   },
+  "packageManager": "pnpm@10.17.1",
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
