@@ -126,6 +126,12 @@ export default defineConfig({
                                     "guides/rest_api/snowflake",
                                 ],
                             },
+                            {
+                                label: "Observability",
+                                autogenerate: {
+                                    directory: "guides/observability",
+                                },
+                            },
                         ],
                     },
                     {
