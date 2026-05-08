@@ -1,0 +1,69 @@
+---
+title: Customer Impact Notes
+description: Changes that affect customers, require action, or modify existing behavior.
+---
+
+import { Aside, Badge, Card, CardGrid, Steps } from '@astrojs/starlight/components'
+
+This page highlights changes that **directly affect customers**. These entries focus on:
+
+- **Breaking changes** that require customer action
+- **Behavioral changes** that modify how existing features work
+- **Migration guides** for affected functionality
+
+For a full list of releases, see [Release Notes](/agent-studio-docs/releases/).
+
+<Aside type="caution" title="Action required">
+Entries marked with <Badge text="Action Required" variant="danger" /> require customers to take specific steps to maintain functionality.
+</Aside>
+
+---
+
+## 2026-05-06: Custom Agents Now Require Publishing
+
+<Badge text="Action Required" variant="danger" />
+<Badge text="Behavioral Change" variant="caution" />
+
+**Affects:** All tenants with custom agents created before 2026-05-06
+
+### What Changed
+
+Custom agents now have a **published/draft** status:
+
+- **Published** agents are visible to all users
+- **Draft** agents are only visible to the owner and admin roles
+
+**Existing custom agents were moved to draft status**, which means they are no longer visible to other users until published.
+
+### Why This Changed
+
+This change was requested by customers who wanted to iterate on agents privately before making them available to their organization. The draft/published feature gives agent creators control over when their agents become visible.
+
+### Required Action
+
+<Steps>
+1. **Navigate to Agent Studio** and select the **Draft** tab
+2. **Find your existing custom agents** — they now appear here
+3. **Open each agent** and click the **Publish** button in the top-right corner
+4. **Confirm** the agent now appears in the **Custom** tab for all users
+</Steps>
+
+For detailed instructions, see [Publishing and Unpublishing Agents](/agent-studio-docs/guides/access-controls/roles-and-permissions/#publishing-and-unpublishing-agents-in-the-ui).
+
+### Who Is Affected
+
+- Users who created custom agents before 2026-05-06
+- Organizations where custom agents were shared across teams
+
+### Timeline
+
+- **2026-05-06**: Change deployed to all tenants
+- **No deadline**: Agents can be published at any time
+
+---
+
+## Archive
+
+| Date | Change | Impact Level |
+|------|--------|--------------|
+| 2026-05-06 | [Custom agents require publishing](#2026-05-06-custom-agents-now-require-publishing) | <Badge text="Action Required" variant="danger" /> |
