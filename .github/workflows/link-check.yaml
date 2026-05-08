@@ -56,7 +56,7 @@ jobs:
                   fail: true
                   # Note: --exclude skips checking URLs matching the pattern (for new pages not yet deployed)
                   # Remove exclusions once pages are live
-                  args: --accept "100..=103,200..=299,403,418,429" --cache-exclude-status 401 --remap '/dist/agent-studio-docs /dist' --root-dir="${{ github.workspace }}/dist" --cache --max-cache-age 3d --exclude "alation.github.io/agent-studio-docs/guides/flows" --exclude "alation.github.io/agent-studio-docs/guides/observability" "dist/**/*.html"
+                  args: --accept "100..=103,200..=299,403,418,429" --cache-exclude-status 401 --remap '/dist/agent-studio-docs /dist' --root-dir="${{ github.workspace }}/dist" --cache --max-cache-age 3d --exclude "alation.github.io/agent-studio-docs/guides/flows" --exclude "alation.github.io/agent-studio-docs/guides/observability" --exclude "alation.github.io/agent-studio-docs/releases/" "dist/**/*.html"
                   jobSummary: true
                   format: markdown
                   workingDirectory: .

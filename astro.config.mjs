@@ -153,6 +153,15 @@ export default defineConfig({
                         items: ["sdk/using-the-sdk"],
                     },
                     {
+                        label: "Releases",
+                        link: "/releases",
+                        icon: "document",
+                        items: [
+                            "releases/overview",
+                            "releases/customer-impact",
+                        ],
+                    },
+                    {
                         label: "Reference",
                         link: "/reference/agents/introduction",
                         icon: "information",
