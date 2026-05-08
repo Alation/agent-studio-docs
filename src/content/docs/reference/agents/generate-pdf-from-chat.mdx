@@ -1,0 +1,67 @@
+---
+title: Generate PDF from Chat
+description: Generates a structured PDF summary of a chat conversation.
+---
+
+The Generate PDF from Chat agent creates structured PDF summaries of chat conversations.
+It reads the chat history, plans a document structure based on the user's request, and produces a formatted PDF with findings, tables, charts, and other content.
+
+## Model
+
+- **Model**: GPT-5
+- **Reasoning mode**: High
+
+## How it works
+
+The agent follows this workflow:
+
+1. Reads the full history of the specified chat conversation
+2. Plans the document section structure based on the user's formatting and content request
+3. Calls the PDF generation tool with the planned sections array
+4. If the tool returns a validation error, retries with a single targeted fix (never reduces scope)
+5. Returns a string acknowledgment; the PDF is delivered as a file attachment in the conversation
+
+## Input parameters
+
+Required:
+
+- `message` (string): The user's formatting or content request (e.g., "Summarize the key findings", "Export as a report with tables")
+
+Optional:
+
+- `source_chat_id` (UUID string): The ID of the chat to export. Defaults to the current chat session if not provided.
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the request.
+The final message is a `string` acknowledgment. The generated PDF is delivered as a file attachment in the conversation.
+
+## Available tools
+
+### Generate PDF
+
+Renders a PDF document from a structured array of sections.
+
+**Supported section types:**
+
+| Type | Description |
+|---|---|
+| `title` | Document title |
+| `heading` | Section heading |
+| `paragraph` | Body text |
+| `code` | Code block with syntax highlighting |
+| `table` | Markdown-style table |
+| `data_table` | Structured data table |
+| `image` | Image from a URL or chart output |
+| `list` | Bulleted or numbered list |
+| `spacer` | Vertical spacing |
+| `page_break` | Force a new page |
+
+## Behavior notes
+
+- **Lead with findings**: The PDF is structured around findings and conclusions, not process steps or tool call sequences.
+- **Preserve exact values**: Numbers, names, dates, and other specific values are reproduced exactly from the source chat — never paraphrased or rounded.
+- **No meta-sections**: Sections titled "Introduction" or "Conclusion" are avoided unless explicitly requested.
+- **Minimal code blocks**: Code is only included when explicitly requested or when it is central to the content.
+- **Targeted retries**: If PDF generation fails validation, the agent retries with exactly one fix per attempt without reducing the scope of the document.
+- **Agent-as-tool usage**: Other agents can invoke this agent as a tool to export their results as PDFs.

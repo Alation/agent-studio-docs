@@ -6,6 +6,11 @@ description: An agent for querying databases associated with data products and g
 The Data Product Query agent enables natural language querying of databases associated with data products.
 It can execute SQL queries, retrieve schemas, and generate visualizations using charts.
 
+## Model
+
+- **Model**: GPT-5
+- **Reasoning mode**: Low
+
 ## How it works
 
 The agent follows this workflow:
@@ -26,7 +31,7 @@ Required:
 
 Optional:
 
-- `auth_id` (string): The ID of the authentication credentials to use for the query
+- `auth_id` (string): The ID of the user-supplied database credential binding. Required for data products that use user-specific authentication rather than shared credentials.
 
 ## Output format
 

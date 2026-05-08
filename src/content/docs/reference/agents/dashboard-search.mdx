@@ -5,6 +5,11 @@ description: An agent for querying BI reports.
 
 The dashboard search agent retrieves relevant dashboards from the catalog.
 
+## Model
+
+- **Model**: Bedrock Sonnet 4.5
+- **Reasoning mode**: Default
+
 ## How it works
 
 The agent follows this workflow:
@@ -55,7 +60,7 @@ Identifies relevant fields which are available in the system to refine the dashb
 - `search_term`: The filter field search term extracted from the user's question
 - `limit`: The maximum number of filter fields to return
 
-### Search filter fields
+### Search filter values
 
 Search over values of a specific field to identify relevant values to refine the dashboard search.
 

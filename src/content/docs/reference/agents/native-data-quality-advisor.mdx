@@ -1,0 +1,85 @@
+---
+title: Native Data Quality Advisor
+description: Recommends data quality checks or authors DQ skills for catalog tables.
+---
+
+The Native Data Quality Advisor helps users define and improve data quality for catalog tables.
+It operates in two modes: recommending specific DQ checks for a table's columns, or conversationally authoring custom DQ skills.
+
+## Model
+
+- **Model**: Bedrock Sonnet 4.5
+- **Reasoning mode**: Default
+
+## How it works
+
+The agent operates in one of two modes based on the inputs provided:
+
+**Recommendation mode** — triggered when `table_metadata` is present:
+1. Loads available DQ rules and tenant-specific skills on the first turn
+2. Analyzes the table schema and column profiles provided in `table_metadata`
+3. Returns structured check recommendations for each relevant column and for the table as a whole
+
+**Skill authoring mode** — when `table_metadata` is not present:
+1. Loads available DQ rules and skills on the first turn
+2. Engages conversationally to understand the user's quality requirements
+3. Produces or refines a DQ skill definition as a markdown document
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language request or question
+
+Optional:
+
+- `table_id` (string): The ID of the table to recommend DQ checks for
+- `skill_ids` (list of integers): IDs of existing DQ skills to reference or improve
+- `skill_content` (string): The content of an existing skill to refine
+- `table_metadata` (object): Table and column metadata provided by the UI. When present, triggers Recommendation mode.
+
+## Output format
+
+The agent returns a structured JSON object:
+
+```json
+{
+  "message": "string",
+  "checks": {
+    "column_id_or_table": [
+      {
+        "metric_name": "string",
+        "operator": "string",
+        "threshold": "value",
+        "configuration_keys": {}
+      }
+    ]
+  },
+  "skill_content": "string"
+}
+```
+
+Fields:
+
+- `message` (string): A natural language explanation of the recommendations or current authoring state
+- `checks` (object): Recommended DQ checks keyed by column ID (as a string) or the literal `"table"` for table-level checks. Each value is a list of check configurations. Present in Recommendation mode.
+- `skill_content` (string): The authored or revised DQ skill definition as a markdown string. Present in Skill Authoring mode only.
+
+## Available tools
+
+### Fetch DQ rules
+
+Retrieves the catalog of available built-in data quality rules and their configuration options.
+
+### Fetch DQ skills
+
+Retrieves existing tenant-specific DQ skills.
+The `skill_content` and `skill_ids` input parameters are bound to this tool automatically.
+
+## Behavior notes
+
+- **Mode selection**: Recommendation mode activates automatically when `table_metadata` is present. Without it, the agent defaults to Skill Authoring mode.
+- **Initialization**: On every first turn, the agent calls both `FETCH_DQ_RULES` and `FETCH_DQ_SKILLS` before generating output.
+- **Cautious profiling**: When row sample data is available, the agent uses it as context but treats it as a sample rather than representative of the full dataset.
+- **Built-in and custom skills**: Recommendations draw from both built-in DQ rules and any tenant-specific skills available in the catalog.
+- **Check keys**: Table-level checks are keyed with the literal string `"table"`. Column-level checks are keyed by column ID as a string.

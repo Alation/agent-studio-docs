@@ -6,6 +6,11 @@ description: Improves data product semantic layers by analyzing SQL evaluation r
 The Revise Data Product agent improves data product semantic layers through iterative refinement.
 It analyzes SQL evaluation results, identifies failures, updates data product specifications, and verifies improvements through re-evaluation.
 
+## Model
+
+- **Model**: Bedrock Sonnet 4.5
+- **Reasoning mode**: Extended thinking (up to 4,096 token budget)
+
 ## How it works
 
 The agent follows this workflow:
@@ -78,6 +83,7 @@ Requires the complete specification with all fields preserved.
 - **Verify improvements**: Changes are only kept if they improve evaluation scores
 - **Iterative approach**: The agent can make multiple rounds of refinements based on evaluation feedback
 - **Cached results**: If the data product hasn't changed, evaluation returns cached results for efficiency
+- **Deferred tools**: This agent uses deferred tool execution for long-running evaluation and update operations
 
 ## Common use cases
 

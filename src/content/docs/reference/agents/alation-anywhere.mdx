@@ -1,0 +1,45 @@
+---
+title: Alation Anywhere
+description: A Chrome extension assistant for BI dashboards that grounds answers in live catalog context.
+---
+
+The Alation Anywhere agent assists users within their BI tools via the Alation Chrome extension.
+It answers questions about the active dashboard by grounding responses in Alation catalog context.
+
+## Model
+
+- **Model**: GPT-5
+- **Reasoning mode**: Default
+
+## How it works
+
+The agent routes to one of two skills depending on the request:
+
+1. Receives a natural language question from the user, with page context injected automatically by the Chrome extension
+2. Routes to the appropriate skill:
+   - **Explore** — for catalog browsing questions ("What does this column mean?", "Who owns this dashboard?")
+   - **Query** — for data questions that require SQL execution ("What were last quarter's sales?")
+3. Uses progressive search to match catalog objects referenced in the active dashboard
+4. Returns an answer grounded in catalog context, with citations to specific catalog objects
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language question or request from the user
+
+Optional:
+
+- `PAGE_CONTEXT` (string): The content of the active BI dashboard page. Injected automatically by the Chrome extension — not visible to the agent model, used as background context for grounding responses.
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` addressing the user's question.
+
+## Behavior notes
+
+- **Chrome extension required**: The Chrome extension must be active and inject `PAGE_CONTEXT` for the agent to ground its answers in the current dashboard. Without it, the agent cannot reference the active page.
+- **Catalog citations**: Answers reference specific catalog objects (tables, columns, data products) to support traceability.
+- **Progressive search**: When catalog objects referenced in the page cannot be matched directly, the agent progressively broadens its search strategy before answering.
+- **No fabricated schema assumptions**: The agent never assumes column definitions or table structures not explicitly found in the catalog.

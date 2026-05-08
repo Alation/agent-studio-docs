@@ -1,0 +1,76 @@
+---
+title: Lineage Agent
+description: Navigates lineage graphs and generates lineage documentation for catalog objects.
+---
+
+The Lineage Agent navigates data lineage graphs and generates lineage documentation.
+It can answer questions about upstream and downstream dependencies, and optionally produce and save lineage documentation back to catalog objects.
+
+## Model
+
+- **Model**: Bedrock Sonnet 4.6
+- **Reasoning mode**: Default
+
+## How it works
+
+The agent routes to one of two paths depending on the user's question:
+
+**Path 1 — Transformation analysis** ("How does column X get calculated?", "What transformations happen between these tables?")
+1. Locates the relevant catalog object via search
+2. Checks whether lineage documentation already exists
+3. Generates a transformation analysis using the lineage documentation tool
+4. Optionally saves the documentation back to the catalog object if requested
+
+**Path 2 — Dependency traversal** ("What's upstream of this table?", "What reports depend on this dataset?")
+1. Locates the relevant catalog object via search
+2. Traverses the lineage graph in the requested direction (upstream, downstream, or both)
+3. Returns the lineage graph results
+
+In both paths, documentation is only written to the catalog if the user explicitly requests it.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language question or request about lineage
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` describing the lineage findings or the generated documentation.
+
+## Available tools
+
+The agent is configured with 6 tools:
+
+### Get search context
+
+Searches for catalog objects by name, keyword, or business concept to locate the starting point for lineage traversal.
+
+### Get filter context
+
+Enumerates catalog objects using filter-based retrieval when the object name or type is known precisely.
+
+### Lineage
+
+Traverses the lineage graph for a catalog object, returning upstream and downstream dependencies.
+Supports both table-level and column-level lineage.
+
+### Generate lineage documentation
+
+Analyzes transformation logic along the lineage path and generates natural language documentation describing how data is produced or transformed.
+
+### Get document templates
+
+Retrieves available documentation templates from the catalog to guide the format of generated lineage documentation.
+
+### Update catalog object
+
+Saves generated lineage documentation back to a catalog object's documentation field.
+
+## Behavior notes
+
+- **Two distinct paths**: Transformation questions ("how is X calculated?") route to lineage documentation generation. Dependency questions ("what's upstream/downstream?") route to lineage graph traversal.
+- **Table and column-level lineage**: Both table-level and column-level lineage are supported. Specify the target object precisely in the `message` to get column-level results.
+- **Optional documentation writing**: The agent generates documentation on request but only writes it back to the catalog if the user explicitly asks.
+- **Template-aware**: When writing documentation, the agent checks for existing templates to ensure output matches expected formats.

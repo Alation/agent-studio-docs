@@ -1,0 +1,79 @@
+---
+title: Data Marketplace Query
+description: An agent for running natural language queries across a data marketplace, with optional chart generation.
+---
+
+The Data Marketplace Query agent discovers data products in a marketplace, executes natural language queries against them, and optionally generates visualizations.
+
+## Model
+
+- **Model**: Bedrock Sonnet 4.6
+- **Reasoning mode**: Default
+
+## How it works
+
+The agent follows this workflow:
+
+1. Identifies the user's intent and formulates a data product search query
+2. Searches the marketplace for relevant data products (up to 2 search rounds, max 5 products)
+3. Retrieves schemas for the most relevant products to understand available data
+4. Generates and executes SQL queries against the selected products
+5. Generates a chart if visualization is requested
+6. Returns a structured response including the final answer and the IDs of products queried
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language question or request
+
+Optional:
+
+- `marketplace_id` (string): The ID of the marketplace to search. If not provided, the agent searches across all accessible marketplaces.
+- `auth_id` (string): The ID of the user-supplied database credential binding. Required for data products that use user-specific authentication rather than shared credentials.
+
+## Output format
+
+The agent returns a structured JSON object:
+
+```json
+{
+  "message": "string",
+  "data_product_ids": ["id1", "id2"]
+}
+```
+
+Fields:
+
+- `message` (string): The final answer to the user's question
+- `data_product_ids` (array of strings): The IDs of data products that were actually queried, up to 5
+
+## Available tools
+
+The agent is configured with 4 tools:
+
+### List available data products
+
+Searches for data products in the marketplace relevant to the user's question.
+The `marketplace_id` input parameter is bound to this tool automatically when provided.
+
+### Get data schema
+
+Retrieves schema information for a data product, including tables and columns.
+Supports optional semantic search of sample values.
+
+### SQL execution
+
+Executes SQL queries against a data product's database.
+The `auth_id` input parameter is bound to this tool automatically when provided.
+
+### Generate chart
+
+Generates visualizations using Altair and Python based on SQL query results.
+
+## Behavior notes
+
+- **Structured output**: The agent always returns a JSON object, not a plain string.
+- **Product discovery limits**: The agent performs at most 2 rounds of product search and queries at most 5 data products per request.
+- **Product tracking**: `data_product_ids` in the response reflects which products were actually queried, not just discovered during search.
+- **Authentication**: `auth_id` is optional but required for data products that use user-level database credentials.

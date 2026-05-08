@@ -1,0 +1,75 @@
+---
+title: Curation Automation
+description: Batch structured metadata generation for catalog objects with confidence scoring.
+---
+
+The Curation Automation agent generates structured metadata for catalog objects in bulk.
+It produces field values with confidence scores for scalable catalog enrichment.
+
+## Model
+
+- **Model**: Bedrock Sonnet 4.6
+- **Reasoning mode**: Default (extended thinking enabled in Preview Mode only)
+
+## How it works
+
+The agent receives a batch of catalog objects with their context and generates metadata for each:
+
+1. Receives a message containing catalog object context (object IDs, types, field IDs, and source data)
+2. Generates a metadata value for each object/field combination
+3. Assigns a confidence score (0–100) reflecting certainty in the generated value
+4. In Preview Mode, includes reasoning explaining the confidence score
+5. Returns a structured JSON object containing all generated metadata
+
+## Input parameters
+
+Required:
+
+- `message` (string): The batch curation request, including object context — object IDs, object types, field IDs, and source data for each object to curate
+
+## Output format
+
+The agent returns a structured JSON object:
+
+```json
+{
+  "metadata": [
+    {
+      "object_id": "string",
+      "object_type": "string",
+      "field_id": 123,
+      "value": "string or array",
+      "confidence_score": 85,
+      "reasoning": "string (Preview Mode only)"
+    }
+  ]
+}
+```
+
+Fields:
+
+- `object_id` (string): The catalog object ID, exactly matching the input
+- `object_type` (string): The catalog object type, exactly matching the input
+- `field_id` (integer): The field ID, exactly matching the input
+- `value` (string or array): The generated metadata value. Never null.
+- `confidence_score` (integer, 0–100): Confidence in the generated value
+- `reasoning` (string): Explanation of the confidence score. Only included when Preview Mode is active.
+
+### Confidence score tiers
+
+| Score | Tier |
+|---|---|
+| ≥ 75 | High |
+| 50–74 | Medium |
+| 20–49 | Low |
+| < 20 | Very Low |
+
+## Available tools
+
+None. The agent generates all output directly from the LLM without calling external tools.
+
+## Behavior notes
+
+- **Exact ID matching**: `object_id`, `object_type`, and `field_id` in the output must exactly match the inputs. The agent never generates IDs or field references not present in the input.
+- **No null values**: The `value` field is always populated. If confidence is very low, a best-effort value is still returned with an appropriately low confidence score.
+- **Preview Mode**: Extended thinking is enabled only when the message contains "Preview Mode". In Preview Mode, the `reasoning` field is populated for each metadata entry.

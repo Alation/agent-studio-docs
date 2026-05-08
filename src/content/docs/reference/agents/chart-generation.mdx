@@ -5,13 +5,21 @@ description: Chart generation agent using structured configuration approach with
 
 The chart generation agent creates custom data visualizations based on user requests.
 
+## Model
+
+- **Model**: GPT-5
+- **Reasoning mode**: Default
+
 ## How it works
 
 The agent uses this workflow:
 
-1. Receives a natural language request from the user
-2. Executes queries to obtain relevant data for the visualization
-3. Generates the requested chart(s)
+1. Receives a natural language visualization request and the data product context
+2. Retrieves the data schema to understand available tables and columns
+3. Executes SQL queries to obtain the data needed for the chart
+4. Selects the appropriate chart type and configuration for the data and request
+5. Generates the chart using structured ChartGrammar configuration where possible, falling back to custom Python/Altair code for complex or unsupported chart types
+6. Returns the chart as HTML and JSON vega configuration
 
 ## Input parameters
 
