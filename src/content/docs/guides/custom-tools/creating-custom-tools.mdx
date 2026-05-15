@@ -83,7 +83,7 @@ You can also use the **Edit as JSON** button at the bottom of the tool form to p
 
 <Aside type="caution" title="Microsoft 365">
 Microsoft 365 (`smtp.office365.com`) has deprecated SMTP Basic Authentication tenant-wide.
-If your organization uses Microsoft 365, see the [Sending email via Microsoft Graph API](#example-sending-email-via-microsoft-graph-api) section below for an alternative approach using HTTP tools.
+Use [OAuth 2.0 authentication](#microsoft-365-oauth-smtp) instead, or see the [Sending email via Microsoft Graph API](#example-sending-email-via-microsoft-graph-api) section for an HTTP-based alternative.
 </Aside>
 
 ### Tool inputs at runtime
@@ -99,6 +99,132 @@ When an agent calls the SMTP tool, it provides the following parameters:
 | `attachment_asset_ids` | list | No | Asset IDs to attach to the email |
 | `cc` | string or list | No | CC recipient(s) |
 | `bcc` | string or list | No | BCC recipient(s) |
+
+### Microsoft 365 OAuth SMTP
+
+Microsoft 365 has deprecated SMTP Basic Authentication. To send emails via `smtp.office365.com`, configure OAuth 2.0 Client Credentials authentication.
+
+<Aside type="note" title="Microsoft 365 only">
+OAuth SMTP is currently only supported for Microsoft 365 / Exchange Online.
+Other providers (Gmail, SendGrid, etc.) should use Basic authentication or API keys.
+</Aside>
+
+#### Prerequisites
+
+Before configuring the SMTP tool, an Azure AD administrator must:
+
+1. **Create an Entra (Azure AD) app registration**
+2. **Create an Exchange service principal** for the app
+3. **Assign the SMTP.SendAsApp role** with a scoped sender group
+4. **Enable SMTP AUTH** for the sender mailbox
+
+<Aside type="caution">
+These steps require **Exchange Administrator** role in Microsoft 365.
+Without this role, the required PowerShell cmdlets will not be available.
+</Aside>
+
+#### Azure AD setup summary
+
+<Steps>
+1. **Create the app registration**
+
+   In the [Microsoft Entra admin center](https://entra.microsoft.com):
+   - Go to **Identity** → **Applications** → **App registrations** → **New registration**
+   - Name: e.g., `Alation SMTP OAuth`
+   - Supported account types: **Single tenant**
+   - Leave Redirect URI blank (not needed for client credentials flow)
+
+2. **Create a client secret**
+
+   In the app registration:
+   - Go to **Certificates & secrets** → **Client secrets** → **New client secret**
+   - Copy the secret value immediately — you'll need it for Agent Studio
+
+3. **Find the Enterprise Application Object ID**
+
+   Using Microsoft Graph PowerShell:
+   ```powershell
+   Connect-MgGraph -Scopes "Application.Read.All"
+   Get-MgServicePrincipal -Filter "appId eq '<CLIENT_ID>'" |
+     Format-List DisplayName,AppId,Id
+   ```
+   The `Id` value is the **Enterprise Application Object ID** (different from the App Registration Object ID).
+
+4. **Create the Exchange service principal**
+
+   ```powershell
+   Connect-ExchangeOnline -UserPrincipalName "admin@yourdomain.com"
+   New-ServicePrincipal `
+     -AppId "<CLIENT_ID>" `
+     -ObjectId "<ENTERPRISE_APP_OBJECT_ID>" `
+     -DisplayName "Alation SMTP OAuth"
+   ```
+
+5. **Create a scoped sender group**
+
+   ```powershell
+   New-DistributionGroup -Name "Alation SMTP Senders" -Type Security
+   Add-DistributionGroupMember -Identity "Alation SMTP Senders" `
+     -Member "sender@yourdomain.com"
+   ```
+
+6. **Create a management scope and assign the role**
+
+   ```powershell
+   $groupDn = (Get-DistributionGroup "Alation SMTP Senders").DistinguishedName
+   New-ManagementScope -Name "Alation SMTP Scope" `
+     -RecipientRestrictionFilter "MemberOfGroup -eq '$groupDn'"
+   New-ManagementRoleAssignment -Name "Alation SMTP SendAsApp" `
+     -Role "Application SMTP.SendAsApp" `
+     -App "<CLIENT_ID>" `
+     -CustomResourceScope "Alation SMTP Scope"
+   ```
+
+7. **Enable SMTP AUTH for the sender mailbox**
+
+   ```powershell
+   Set-CASMailbox -Identity "sender@yourdomain.com" `
+     -SmtpClientAuthenticationDisabled $false
+   ```
+
+8. **Validate the setup**
+
+   ```powershell
+   Test-ServicePrincipalAuthorization `
+     -Identity "<CLIENT_ID>" `
+     -Resource "sender@yourdomain.com"
+   ```
+   Expected: `InScope : True`
+</Steps>
+
+#### Agent Studio configuration
+
+Once the Azure AD setup is complete, configure the SMTP tool in Agent Studio:
+
+| Field | Value |
+|-------|-------|
+| **SMTP Host** | `smtp.office365.com` |
+| **Port** | `587` |
+| **Use TLS** | Enabled |
+| **Sender email** | The mailbox email (must be in the scoped sender group) |
+| **Authentication method** | `OAuth 2.0 (Microsoft 365 only)` |
+| **Token URL** | `https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token` |
+| **Client ID** | Application (client) ID from the app registration |
+| **Client secret** | The secret value created in step 2 |
+| **Scopes** | `https://outlook.office365.com/.default` |
+
+<Aside type="tip">
+Replace `{tenant-id}` with your Microsoft 365 tenant ID.
+Find it in the Azure portal under **Microsoft Entra ID** → **Overview** → **Tenant ID**.
+</Aside>
+
+#### Common errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `535 5.7.3 Authentication unsuccessful` | Wrong token scope, SMTP AUTH disabled, or invalid credentials | Verify scope is `https://outlook.office365.com/.default`, check mailbox SMTP AUTH is enabled |
+| `430 4.2.0 STOREDRV; mailbox logon failure` | App not authorized for sender mailbox | Run `Test-ServicePrincipalAuthorization` to verify `InScope: True` |
+| `AuthenticationContext has no rights` | Cached token has old permissions | Wait 5–30 minutes for permission changes to propagate, then edit the SMTP tool in Agent Studio and click **Save** to force a fresh token request |
 
 ### Sensitivity labels (Microsoft Purview)
 
