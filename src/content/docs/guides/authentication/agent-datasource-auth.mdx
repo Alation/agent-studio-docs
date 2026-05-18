@@ -1,0 +1,165 @@
+---
+title: Agent Authentication to Data Sources
+description: How Alation AI Studio agents authenticate to external data sources when executing queries or API calls, and how to enforce user-level access control.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+When an agent executes a tool that connects to an external data source (e.g., running SQL against Databricks, or calling a REST API), it must authenticate to that data source. Alation AI Studio supports multiple authentication modes, allowing administrators to choose between shared service credentials and user-level access control.
+
+## Authentication Modes Overview
+
+| Mode | Tool Type | User-Level Access | Use Case |
+|------|-----------|-------------------|----------|
+| User credentials (`auth_id`) | SQL | Yes | Each user's queries run with their own permissions |
+| Service account (`auth_mode`) | SQL | No | Shared credentials for all users |
+| OAuth 2.0 Authorization Code | REST | Yes | Agent acts on behalf of the authenticated user |
+| OAuth 2.0 Client Credentials | REST | No | Agent uses a shared service identity |
+| Basic Auth | REST | No | Shared username/password for an API |
+| No Auth (Custom Headers) | REST | Varies | API key or token passed via headers |
+
+## SQL Tools
+
+SQL tools (SQL Execution, Get Data Schema) support two authentication modes for connecting to the underlying data warehouse.
+
+### User Credentials
+
+With user credentials, each user provides their own data source authentication. The agent executes queries using that specific user's permissions, enforcing row-level security, column masking, and any other access policies defined in the data warehouse.
+
+<!-- TODO: Screenshot of the auth_id parameter configuration in the tool editor -->
+
+To use this mode:
+
+<Steps>
+1. The administrator configures the SQL tool to accept user-provided credentials.
+2. Each user registers their data warehouse credentials through the Alation credentials API or through the product UI.
+3. When the agent executes a query, it uses the invoking user's stored credentials.
+</Steps>
+
+:::tip[When to use]
+Use user credentials when you need to enforce data-warehouse-level access control (e.g., Databricks Unity Catalog permissions, Snowflake RBAC) so that each user can only query data they are authorized to see.
+:::
+
+### Service Account
+
+With the service account mode, the agent uses centrally managed credentials configured by an administrator. All users' queries run under the same data warehouse identity.
+
+<!-- TODO: Screenshot of the auth_mode service account option in the tool editor -->
+
+To use this mode:
+
+<Steps>
+1. The administrator configures data source credentials on the data product or datasource.
+2. The administrator enables the service account mode for the SQL tool.
+3. All agent queries against this data source use the shared service account.
+</Steps>
+
+:::caution[Access control consideration]
+With service account mode, the agent has the same level of data access regardless of which user is asking. Ensure the service account follows the principle of least privilege — grant only the minimum permissions needed for the agent's intended use case.
+:::
+
+## REST Tools
+
+REST tools (custom HTTP integrations) support multiple authentication types, configured when the tool is created or edited.
+
+### OAuth 2.0 Authorization Code (User-Delegated)
+
+The agent authenticates on behalf of the individual user via a standard 3-legged OAuth flow. When a user invokes the agent, they are prompted to authorize access through the external service's login page. The agent then uses the user's access token, respecting that user's permissions in the external system.
+
+<!-- TODO: Screenshot of the Authorization Code auth type selection in REST tool editor -->
+
+:::tip[When to use]
+Use this when the external API enforces per-user permissions and you want the agent to only access data the invoking user can see (e.g., a user's Databricks workspace resources via REST, or a user's Salesforce records).
+:::
+
+### OAuth 2.0 Client Credentials (Machine-to-Machine)
+
+The agent authenticates as a service identity using a client ID and client secret to obtain an access token. This is non-interactive — no user login prompt.
+
+<!-- TODO: Screenshot of the Client Credentials auth type selection in REST tool editor -->
+
+Configuration fields:
+- **Token URL** — The OAuth token endpoint of the external service
+- **Client ID** — The application's client identifier
+- **Client Secret** — The application's secret key
+
+### Basic Auth
+
+The agent authenticates using a shared username and password sent with each request.
+
+<!-- TODO: Screenshot of the Basic Auth type selection in REST tool editor -->
+
+### No Auth (Custom Headers)
+
+For APIs that use API keys or custom token schemes, select No Auth and configure the credentials via custom headers (e.g., `Authorization: Bearer <token>` or `X-API-Key: <key>`).
+
+<!-- TODO: Screenshot of the Custom Headers configuration in REST tool editor -->
+
+## Choosing the Right Mode
+
+```d2
+direction: down
+
+question: "Does the tool execute SQL or call a REST API?" {
+  shape: diamond
+}
+
+sql: "SQL Tool" {
+  shape: rectangle
+}
+
+rest: "REST Tool" {
+  shape: rectangle
+}
+
+sql_choice: "Need per-user\naccess control?" {
+  shape: diamond
+}
+
+rest_choice: "Need per-user\naccess control?" {
+  shape: diamond
+}
+
+user_creds: "Use: User Credentials\n(auth_id)" {
+  shape: rectangle
+  style.fill: "#e8f5e9"
+}
+
+service_acct: "Use: Service Account\n(auth_mode)" {
+  shape: rectangle
+  style.fill: "#fff3e0"
+}
+
+auth_code: "Use: Authorization Code\n(OAuth 2.0)" {
+  shape: rectangle
+  style.fill: "#e8f5e9"
+}
+
+client_creds: "Use: Client Credentials\nor Basic Auth" {
+  shape: rectangle
+  style.fill: "#fff3e0"
+}
+
+question -> sql: SQL
+question -> rest: REST
+sql -> sql_choice
+rest -> rest_choice
+sql_choice -> user_creds: Yes
+sql_choice -> service_acct: No
+rest_choice -> auth_code: Yes
+rest_choice -> client_creds: No
+```
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="User-Initiated OAuth Clients"
+    description="Set up 3-legged OAuth clients in Alation for user-delegated authentication"
+    href="../user-initiated-auth/" />
+  <LinkCard
+    title="Machine-to-Machine OAuth Clients"
+    description="Set up M2M OAuth clients and configure data warehouse credentials"
+    href="../machine-to-machine/" />
+</CardGrid>
