@@ -173,6 +173,12 @@ export default defineConfig({
                                     directory: "reference/evaluation",
                                 },
                             },
+                            {
+                                label: "Zero Data",
+                                autogenerate: {
+                                    directory: "reference/zerodata",
+                                },
+                            },
                         ],
                     },
                 ]),
