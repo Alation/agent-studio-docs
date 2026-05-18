@@ -112,6 +112,12 @@ export default defineConfig({
                                 },
                             },
                             {
+                                label: "Lineage",
+                                autogenerate: {
+                                    directory: "guides/lineage",
+                                },
+                            },
+                            {
                                 label: "Models",
                                 autogenerate: {
                                     directory: "guides/models",
