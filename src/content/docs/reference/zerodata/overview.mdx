@@ -1,0 +1,48 @@
+---
+title: 'Overview'
+sidebar:
+  order: 1
+---
+
+In a Zero Data deployment, customer data never passes through Alation's cloud.
+The client browser sends requests directly to a [k3s](https://k3s.io/)-based agent running in the customer's environment, and the agent communicates back to cloud services over an mTLS tunnel when it needs catalog metadata or session context.
+
+```d2 title="Zero Data Architecture Overview"
+browser: Client Browser {
+  shape: c4-person
+  width: 100
+  height: 100
+}
+
+cloud: Alation Cloud {
+}
+
+agent: Agent {
+  aai: alation-ai
+  connector: connector
+  proxy: proxy
+}
+
+llm: LLM {
+  shape: hexagon
+}
+db: Customer DB {
+  shape: cylinder
+}
+
+browser -> agent
+agent.aai -> agent.proxy
+agent.aai <-> llm
+agent.aai -> agent.connector
+agent.connector <-> db
+
+agent.proxy <-> cloud: mTLS {
+  style {
+    stroke-dash: 3
+  }
+}
+
+version: |md
+  <small>`v26.04.29`</small>
+| {near: bottom-right}
+```
