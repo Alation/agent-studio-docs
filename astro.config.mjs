@@ -138,6 +138,12 @@ export default defineConfig({
                                     directory: "guides/observability",
                                 },
                             },
+                            {
+                                label: "Memory",
+                                autogenerate: {
+                                    directory: "guides/memory",
+                                },
+                            },
                         ],
                     },
                     {

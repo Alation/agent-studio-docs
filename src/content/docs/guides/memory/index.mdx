@@ -1,0 +1,233 @@
+---
+title: Memory
+description: "How TARS remembers context across sessions — from in-flight thread state to a persistent wiki that learns from real corrections."
+sidebar:
+  order: 0
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components'
+
+Every TARS session starts fresh.
+But across sessions, TARS accumulates knowledge — channel context, tenant quirks, behavioral corrections from the people who use it.
+This page explains how that memory works, where it lives, and how it decays.
+
+## Four layers of memory
+
+Memory in TARS is not a single store.
+It's four distinct layers, each with a different scope, lifetime, and authority.
+
+<CardGrid>
+  <Card title="Hard rules" icon="seti:lock">
+    **`CLAUDE.md` + skills**
+
+    Permanent behavioral constraints and procedural how-tos.
+    Set by the engineering team.
+    Never overridden.
+  </Card>
+  <Card title="Channel config" icon="setting">
+    **Redis — `channel-context:<id>`**
+
+    Intentional audience context set by channel admins.
+    Tenant lists, SMEs, repo scope.
+    Changed via `/tars configure`.
+  </Card>
+  <Card title="Session context" icon="random">
+    **Redis — active session**
+
+    The live thread: tool call history, prior turns, current task state.
+    Lasts exactly as long as the session.
+    Wiped on `End session`.
+  </Card>
+  <Card title="Learned corrections" icon="pencil">
+    **Git — `config/learning/wiki/`**
+
+    Corrections TARS learned from real sessions.
+    LLM-maintained Markdown files.
+    Recalled at hydration time.
+  </Card>
+</CardGrid>
+
+### Authority hierarchy
+
+When layers conflict, the higher layer always wins:
+
+```
+CLAUDE.md  >  Skills  >  Channel config  >  Learned corrections
+```
+
+A wiki correction can never override a hard rule in `CLAUDE.md`.
+It can only add directional context — "in this channel, check celery logs before Grafana."
+
+---
+
+## The learning wiki
+
+The learning wiki is the most novel layer — the one that grows over time.
+It's a directory of Markdown files in this repo, maintained entirely by TARS itself.
+
+```
+config/learning/wiki/
+├── SCHEMA.md          ← author conventions for the LLM
+├── index.md           ← entry point: one-liner per page
+├── log.md             ← append-only record of every ingest
+└── global/
+    └── behavior.md    ← cross-session behavioral corrections
+```
+
+As users teach TARS, new pages are created automatically:
+
+```
+config/learning/wiki/
+├── domains/
+│   └── data-quality.md      ← "check celery logs before Grafana"
+├── channels/
+│   └── C09ATEVPBC2.md       ← corrections for #dq-eng
+└── tenants/
+    └── prod-enterprise-use1.md   ← quirks for a specific customer
+```
+
+### How a correction flows in
+
+```
+User: "you should've checked celery logs first"
+  → Classifier: intent = learn
+  → Core: skips worker, fires runIngest in background
+  → Haiku reads current wiki pages + correction
+  → Haiku returns updated page contents as JSON
+  → Core commits each changed file directly to main
+  → log.md appended
+```
+
+The user sees an ack in ~2 seconds.
+The wiki update happens silently in the background.
+No PR. No approval. No deploy.
+
+<Aside type="note">
+Corrections commit directly to `main` using the worker's GitHub App token.
+The next session picks up the update immediately — no restart needed.
+</Aside>
+
+### How corrections are recalled
+
+At hydration time, Core fetches pages relevant to the current session:
+
+| Page type | When it's injected |
+|---|---|
+| `global/` | Every session, always |
+| `domains/<name>.md` | When classifier extracts a matching candidate repo |
+| `channels/<id>.md` | When the message comes from that channel |
+| `tenants/<cluster>.md` | When a matching tenant hint is extracted |
+
+The wiki fetch runs in parallel with Jira enrichment and skills catalog lookup, inside the 1500ms hydration budget.
+On follow-up turns it's skipped entirely — the session already has context from turn one.
+
+Injected pages appear in the blueprint as a `## Learned corrections` section, after skills:
+
+```
+# Pre-hydrated context
+## Artifacts extracted
+## Candidate repos
+## Suggested skills
+## Learned corrections    ← wiki pages land here
+```
+
+### What the LLM is allowed to write
+
+The `SCHEMA.md` file instructs Haiku on what belongs in the wiki.
+Key rules:
+
+- Write observations, not steps — "check X before Y" not "Step 1: open X"
+- Never contradict `CLAUDE.md` — the wiki is advisory, not authoritative
+- Channel corrections go to `channels/<id>.md`
+- Domain corrections go to the most specific matching `domains/` page
+- Cross-cutting behavioral rules go to `global/behavior.md`
+- If a correction contradicts an existing page, flag both with `## ⚠️ Contradiction flagged`
+
+Path traversal is blocked — Haiku's output is validated against
+`^(global|domains|channels|tenants)/[\w.-]+\.md$` before any write.
+
+---
+
+## Teaching TARS
+
+You don't need a special command.
+Just say what TARS got wrong.
+
+Every response has a subtle footer:
+
+> _Wrong direction? Just tell me and I'll remember it._
+
+When TARS sees a correction in natural language — "you should've started with X", "next time check Y first", "that's not the right approach for Z" — the classifier returns `intent = learn` and the ingest flow kicks off automatically.
+
+<Aside type="tip" title="What makes a good correction">
+Be specific about direction, not about steps.
+"For DQ monitor failures, check the celery worker logs before looking at Grafana" teaches TARS something durable.
+"Click the Grafana button then scroll down" belongs in a runbook, not the wiki.
+</Aside>
+
+---
+
+## How we test it
+
+### Unit tests
+
+The pure functions are tested in isolation:
+
+| Function | What's tested |
+|---|---|
+| `parseIndexMd` | Parses the `index.md` table format correctly |
+| `selectRelevantPages` | Always includes global; matches channels, domains, tenants by stem |
+| `renderWikiSection` | Strips frontmatter, joins pages with separator, handles empty input |
+| `buildIngestPrompt` | Includes correction text, channel ID, existing page content, SCHEMA rules |
+| `parseIngestResponse` | Returns `[]` for malformed JSON; filters non-array responses |
+| `isValidWikiPath` | Accepts valid paths; rejects path traversal and unknown sections |
+
+### Integration signals
+
+Because the ingest job calls Bedrock and commits to GitHub, end-to-end testing happens in production with real sessions.
+Two CloudWatch events mark whether the loop is closing:
+
+| Event | Meaning |
+|---|---|
+| `wiki_correction_saved` | A correction was successfully ingested and committed |
+| `wiki_page_injected` | Wiki pages were recalled and injected at hydration time |
+
+If `wiki_correction_saved` fires but `wiki_page_injected` never follows for the same channel, the recall path is broken.
+If neither fires despite users sending corrections, the classifier isn't routing to `learn` intent.
+
+### The repeat-correction metric
+
+The most meaningful signal: does the same correction get submitted twice?
+
+If a user corrects TARS on Monday and makes the same correction again on Wednesday, the loop didn't close — either the write failed, or the recall logic didn't match, or the blueprint section was ignored.
+
+Track this with:
+
+```
+filter event = "wiki_correction_saved"
+| stats count() by channel, userId
+| sort count desc
+```
+
+Channels with high repeat-correction rates are where to investigate first.
+
+---
+
+## Decay and contradiction
+
+The wiki has no TTL.
+Corrections are permanent until explicitly removed or contradicted.
+
+The lint pass (planned) will periodically scan for:
+- Pages that contradict each other — both get flagged, a GitHub issue is opened for human resolution
+- Orphan pages — pages no longer referenced from `index.md`
+- Stale claims — corrections that reference code paths that no longer exist
+
+Until the lint pass ships, corrections accumulate.
+Humans can edit `config/learning/wiki/` directly in the repo to resolve flagged contradictions.
+
+<Aside type="caution" title="The wiki is not a runbook">
+It's for directional corrections that shape *how* TARS approaches problems.
+Detailed step-by-step procedures belong in skills, not the wiki.
+The SCHEMA enforces this — Haiku is instructed to reject procedural content.
+</Aside>
