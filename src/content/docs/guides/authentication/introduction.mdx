@@ -1,8 +1,16 @@
 ---
 title: Introduction
-description: Explains the two modes of authentication available in Alation Agent Studio.
+description: Explains the modes of authentication available in Alation Agent Studio.
 ---
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Alation AI Studio supports multiple authentication modes — both for accessing Alation resources (MCP server, REST APIs) and for agents connecting to external data sources.
+
+<LinkCard
+  title="Agent Authentication to Data Sources"
+  description="How agents authenticate when executing SQL queries or calling external APIs, including user-level access control"
+  href="../agent-datasource-auth/">
+</LinkCard>
 
 Resources (MCP server, REST APIs) in Alation AI Studio support two modes of OAuth 2.0 authentication: user-initiated and machine-to-machine.
 
