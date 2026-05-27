@@ -153,12 +153,12 @@ export default defineConfig({
                         items: ["sdk/using-the-sdk"],
                     },
                     {
-                        label: "Releases",
+                        label: "Release Notes",
                         link: "/releases/overview",
                         icon: "document",
                         items: [
                             {
-                                label: "Releases",
+                                label: "Release Notes",
                                 autogenerate: { directory: "releases" },
                             },
                         ],
