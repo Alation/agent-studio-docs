@@ -154,11 +154,13 @@ export default defineConfig({
                     },
                     {
                         label: "Releases",
-                        link: "/releases",
+                        link: "/releases/overview",
                         icon: "document",
                         items: [
-                            "releases/overview",
-                            "releases/customer-impact",
+                            {
+                                label: "Releases",
+                                autogenerate: { directory: "releases" },
+                            },
                         ],
                     },
                     {
