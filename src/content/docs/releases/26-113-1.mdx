@@ -7,30 +7,40 @@ import { Aside, Badge } from '@astrojs/starlight/components'
 
 **Release Date:** 2026-05-27
 
+**Version Range:** 26.80.3 → 26.113.1
+
 ## Highlights
 
-- Introduced a new scheduling feature for agents, allowing more flexible and precise control over execution times.
-- Enhanced performance for large-scale data processing, reducing execution times significantly.
-- Resolved critical bugs to improve overall stability and reliability.
+- Added Data Quality (DQ) standards recommendation capabilities to help enforce data governance policies.
+- Introduced scheduled chats with the `run_chat` workflow tool for automated agent interactions.
+- Enhanced Secure Cloud diagnostics with agent infrastructure health checks and knowledge base queries.
 
 ## What's New
 
 ### Features
 
-- **Agent Scheduling:** You can now schedule agents to run at specific times or intervals directly within Agent Studio. This feature provides greater flexibility and control over your workflows.
-- **Customizable Notifications:** Added the ability to configure notifications for agent execution statuses, so you can stay informed about successes, failures, or other key events.
+- **Data Quality Standards:** New `fetch_dq_standards` tool enables agents to retrieve and recommend data quality standards from the DQ Manager, helping enforce governance policies.
+- **Scheduled Chats:** You can now schedule automated chat sessions using the `run_chat` workflow tool for recurring agent interactions.
+- **Secure Cloud Diagnostics:** Added agent infrastructure health diagnostics with active ping checks and decision matrix support.
+- **Lineage Creation Skill:** New skill for creating lineage with discovery references.
+- **Search Result Assets:** Added search result asset type for improved catalog search.
+- **Navigate UI Capability:** Agents can now trigger UI navigation actions.
+- **Asset Content Tool:** New `get_asset_content` tool for retrieving unstructured data from catalog assets.
 
 ### Improvements
 
-- **Performance Enhancements:** Optimized the execution engine to handle larger datasets more efficiently, resulting in faster processing times for complex workflows.
-- **UI Enhancements:** Improved the user interface for managing agent configurations, making it more intuitive and user-friendly.
-- **Search Functionality:** Enhanced the search capabilities within Agent Studio, enabling quicker access to agents and workflows.
+- **Codemode Enhancements:** Migrated filter fields and values to skills architecture for better modularity.
+- **Output Constraints:** Alamigo agent now supports output constraints in prompts for more controlled responses.
+- **BI Object Handling:** Consolidated BI object type handling into `CatalogObjectType` for consistency.
+- **Data Product Queries:** Data product query agent now accepts version parameters.
 
 ### Bug Fixes
 
-- Fixed an issue where agent execution logs were not displaying correctly in certain cases.
-- Resolved a problem that caused occasional timeouts when running multiple agents simultaneously.
-- Addressed a bug where custom scripts were not saving properly under specific conditions.
+- Fixed SMTP tool to treat empty string sensitivity labels as None.
+- Fixed tool sync TTL cleanup to run on its own cadence.
+- Fixed metadata listing to prefer listed versions and drop unlisted products from recent data products.
+- Fixed data quality tool column type normalization and JSON decode error handling.
+- Fixed various migration chain issues.
 
 ### Breaking Changes
 
