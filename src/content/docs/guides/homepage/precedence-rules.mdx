@@ -1,0 +1,171 @@
+---
+title: Homepage Precedence Rules
+description: "How Alation determines which homepage a user sees based on group assignments, feature flags, and preference settings."
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components'
+
+When a user logs in, Alation resolves which homepage to display using a priority chain based on group assignments, admin configuration, and user preferences.
+This guide explains the resolution logic so you can predict exactly which homepage any user will see.
+
+<Aside type="note">
+This page covers the server-side resolution logic.
+For homepage content editing (banners, tiles, action links), see **Admin > Customize > Homepages** in your Alation instance.
+</Aside>
+
+## Key concepts
+
+Before diving into precedence, understand these building blocks:
+
+| Concept | Description |
+|---------|-------------|
+| **Custom homepage** | An admin-created page with its own content, banner, and action links. Stored as a `CustomPage` record in the database. |
+| **Default homepage** | The built-in homepage (ID 1). Always enabled, cannot be deleted, and cannot have groups assigned to it. Serves as the catch-all fallback. |
+| **Group assignment** | Each custom homepage is mapped to one or more Alation groups. A group can only be assigned to **one** enabled homepage at a time. |
+| **User preference** | In legacy mode, users can mark one of their accessible homepages as their preferred landing page. |
+| **Admin-assigned mode** | The current default behavior where admins control which homepage each group sees, with no user override. |
+
+## How resolution works
+
+Alation checks two things in order: which mode is active (controlled by a feature flag), then applies that mode's logic.
+
+### Admin-assigned mode (default)
+
+This is the active mode when `enable_admin_assigned_homepage` is On (the current default).
+
+<Steps>
+
+1. **Find eligible pages**
+
+   Alation queries all enabled, non-deleted homepages that are mapped to at least one of the user's groups.
+
+2. **Pick the most recently updated**
+
+   Among the eligible pages, the one with the most recent `ts_updated` timestamp wins.
+
+3. **Fall back to default**
+
+   If no eligible page exists (user has no groups, or their groups aren't mapped to any homepage), Alation serves the default homepage.
+
+</Steps>
+
+<Aside type="caution" title="Multi-group users">
+If a user belongs to multiple groups that are each assigned to different homepages, they see whichever homepage was **most recently updated** — not the one from their "primary" group.
+There is no group priority or weighting.
+</Aside>
+
+### Legacy user-preference mode
+
+This mode activates when `enable_admin_assigned_homepage` is Off.
+
+<Steps>
+
+1. **Find accessible pages**
+
+   Alation queries all enabled, non-deleted homepages mapped to the user's groups.
+
+2. **Check for a user preference**
+
+   If the user has marked one of those pages as their preferred homepage, serve that page.
+
+3. **Fall back to default**
+
+   If no preference is set or the preferred page is no longer accessible, serve the default homepage.
+
+</Steps>
+
+<Aside type="tip">
+In legacy mode, users can toggle their preferred homepage from the user menu.
+This option is hidden when admin-assigned mode is active.
+</Aside>
+
+### Fallback chain (both modes)
+
+If the primary resolution fails, Alation uses this fallback order:
+
+1. The page marked `is_default_homepage = True`
+2. The page with ID 1 (original system default)
+
+## Group assignment rules
+
+Group-to-homepage mapping is **exclusive** — a group can only be active on one enabled homepage at a time.
+
+| Rule | Behavior |
+|------|----------|
+| Assign a group already linked elsewhere | Admin is prompted to "force exclusive" — the old page loses that group automatically |
+| Remove all groups from a page | The page is auto-disabled (cannot be enabled with zero groups) |
+| Default homepage | Cannot have groups assigned — it catches all users not covered by other pages |
+| Multiple groups on one page | Allowed — all users in any of those groups see this page |
+
+<Aside type="caution" title="Force exclusive can surprise you">
+If another admin assigns your page's group to their new homepage using force-exclusive, your page loses that group silently.
+Check the homepage list in **Admin > Customize > Homepages** to verify group assignments after changes.
+</Aside>
+
+## New user and onboarding routing
+
+| Scenario | Homepage served |
+|----------|----------------|
+| New user not added to any group | Default homepage |
+| New user added to a group linked to a homepage | That homepage, on next login |
+| New user added to multiple groups with different homepages | Most recently updated homepage (admin-assigned mode) |
+| User removed from all groups | Default homepage |
+
+## Validating your changes
+
+After modifying homepage assignments, verify the result:
+
+<Steps>
+
+1. **Check group assignments**
+
+   Navigate to **Admin > Customize > Homepages**.
+   Confirm the correct groups appear under your target homepage.
+
+2. **Verify user counts**
+
+   On the homepage list, check the user count column.
+   The default homepage count equals total users minus users covered by other active homepages.
+
+3. **Test as a target user**
+
+   Log in as (or impersonate) a user in the target group.
+   Confirm they see the expected homepage.
+
+4. **Check multi-group scenarios**
+
+   For users in multiple groups, identify which of their assigned homepages has the most recent `ts_updated`.
+   That page should render.
+
+</Steps>
+
+## Common pitfalls
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| "My homepage disappeared" | Another admin used force-exclusive on your page's group | Re-assign the group on **Admin > Customize > Homepages** |
+| Multi-group user sees wrong page | Resolution uses `ts_updated`, not group priority | Edit the desired homepage (even a trivial change) to bump its timestamp |
+| Homepage not showing after enable | Page has zero groups assigned | Assign at least one group before enabling |
+| User still sees old homepage after group change | Browser cache or session not refreshed | Have the user log out and back in |
+
+## Feature flags reference
+
+| Flag | Default | Editable in UI | Notes |
+|------|---------|----------------|-------|
+| `enable_admin_assigned_homepage` | On | Not yet (planned) | Controls which resolution mode is active. The primary flag for this feature. |
+| `enable_homepage_2020` | On | Feature Config page | Enables the modern homepage experience. |
+| `open_lhn_on_app_load` | Off | Feature Config page | Auto-expands the left navigation panel on page load. |
+| `enable_fed_catalog` | Off | Feature Config page | Enables domain-tailored homepages. |
+| `use_legacy_homepage_json` | Off | No | **Deprecated.** Requires uwsgi restart. Bypasses the database entirely and reads from a flat JSON file. Do not enable unless directed by Alation Support. |
+| `enable_governance_home_page_redesign` | On | No | License-gated. Automatically active for licensed customers. |
+| `DEV_enable_empty_home_page_elements` | Off | No | Internal development flag. No admin value. |
+
+<Aside type="caution" title="Changing feature flags">
+Flags not marked as "Editable in UI" require `alation_conf` access on the server.
+Always coordinate with your Alation administrator before modifying flags directly.
+</Aside>
+
+## Related resources
+
+- **Admin > Customize > Homepages** — manage homepage content and group assignments
+- **Admin > Feature Configuration** — toggle self-service feature flags
