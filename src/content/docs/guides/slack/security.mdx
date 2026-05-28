@@ -23,7 +23,7 @@ Each user connects individually. See [Setup](/agent-studio-docs/guides/slack/set
 
 ### Can the assistant expose data you shouldn't see?
 
-No. The assistant can only return data you already have access to in Alation. Every request runs under your personal token, so Alation's RBAC applies in full: catalog visibility, data product access, and agent publish/draft status all behave the same as in Agent Studio.
+No. The assistant can only return data you already have access to in Alation. Every request runs under your personal token, so Alation's RBAC applies in full: catalog visibility, data product access, and agent publish/draft status all behave the same as in Agent Studio. See [Roles and Permissions](/agent-studio-docs/guides/access-controls/roles-and-permissions) for the full role hierarchy.
 
 ### Channel surface area risk
 
@@ -48,7 +48,7 @@ Some data products require SSO authentication (for example, Databricks token-bas
 
 ### What leaves Alation
 
-Agent responses, which may include query results or analysis, are sent to Slack and shown in your DM or channel thread. These are governed by your Slack workspace's data retention and security policies.
+Agent responses, which may include query results or analysis, are sent to Slack and shown in your DM or channel thread. These are governed by your Slack workspace's data retention and security policies. For a broader view of how the plugin handles data and LLM calls, see [Agent Skills Security](/agent-studio-docs/agent-skills/security).
 
 If your admin has enabled file downloads, generated files (CSVs, charts) are also uploaded to Slack.
 
