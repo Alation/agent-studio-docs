@@ -1,22 +1,50 @@
 ---
 title: SQL Execution Tool
-description: Execute SQL against a data warehouse using a data product..
+description: Run a read-only SQL query against a data product.
 ---
+
+import { Aside } from '@astrojs/starlight/components';
 
 # SQL Execution Tool
 
-This tool can be used to run queries against a data product.
-Note that mutating queries (`UPDATE`, `DELETE`, etc.) are not allowed.
-The data product must have a SQL compatible data source associated with it.
+This tool runs a SQL query against the database behind a data product and returns the result as a table. It is the workhorse behind agents like [Query](/agent-studio-docs/reference/agents/query), [Data Product Query](/agent-studio-docs/reference/agents/data-product-query), and [Analytics Agent](/agent-studio-docs/reference/agents/analytics-agent).
 
-## Example Usage
+Queries are read-only. Mutating statements (`UPDATE`, `DELETE`, `INSERT`, and so on) are not allowed. The data product must be backed by a SQL-compatible data source.
 
-```json
+## When to use it
+
+Add this tool to any agent that needs to answer questions from data by running queries. Pair it with [Get Data Schema](/agent-studio-docs/reference/tools/get-data-schema-tool) so the agent can learn the available tables and columns first.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `data_product_id` | Yes | string | User input | The data product to query against. |
+| `sql` | Yes | string | Agent determined | The query to run. |
+| `result_table_name` | Yes | string | Agent determined | A short, descriptive name for the result table. |
+| `data_product_version` | No | string | Fixed or User input | A specific version of the data product. |
+| `pre_exec_sql` | No | string | Fixed | SQL to run before the main query, e.g. to set session context. |
+| `auth_id` | No | string | Fixed or User input | The authentication credentials to use for the query. |
+
+<Aside type="note">
+`data_product_id` is a good fit for **User input** so callers choose what to query, while `sql` and `result_table_name` are normally **Agent determined** — the agent writes the query from the question. See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters).
+</Aside>
+
+## Example usage
+
+```jsonc
 {
   "data_product_id": "my-data-product",
-  "sql": "SELECT 1;",  // Query to execute.
-  "result_table_name": "select_one",  // Name to describe the tabular results of the query.
-  "pre_exec_sql": "",  // Optional, SQL to execute before sampling tables. Useful for setting session-level context data in a DB.
-  "auth_id": "string",  // Optional
+  "sql": "SELECT region, SUM(amount) FROM sales GROUP BY region;",
+  "result_table_name": "sales_by_region"
 }
 ```
+
+## Output
+
+The query result as a table. Very large results may have rows or columns trimmed.
+
+## See also
+
+- [Get Data Schema Tool](/agent-studio-docs/reference/tools/get-data-schema-tool)
+- [Query agent](/agent-studio-docs/reference/agents/query)

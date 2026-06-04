@@ -1,0 +1,52 @@
+---
+title: Generate Chart Tool
+description: Generate a chart from a SQL query or a saved dataset.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Generate Chart Tool
+
+This tool produces a chart (a visualization) from tabular data. It backs the out-of-the-box [Chart Generation](/agent-studio-docs/reference/agents/chart-generation) and [Analytics Agent](/agent-studio-docs/reference/agents/analytics-agent) agents.
+
+There are two variants of the tool. Both let the agent describe the chart it wants and return a rendered visualization.
+
+- **Generate Chart from SQL** — runs a SQL query against a data product, then charts the result. Use this when the data still needs to be queried.
+- **Generate Chart** — charts data from a dataset that was already produced earlier in the run (a saved CSV asset). Use this when the data is already in hand.
+
+## When to use it
+
+Add this tool to an agent that should answer a question with a visualization rather than a table. Pair **Generate Chart from SQL** with a data product; pair **Generate Chart** with a tool that produces a dataset first.
+
+## Parameters — Generate Chart from SQL
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `data_product_id` | Yes | string | User input | The data product to query for the chart's data. |
+| `sql` | Yes | string | Agent determined | The query that produces the table to chart. |
+| `chart_code_snippet` | Yes | string | Agent determined | The chart definition the agent generates from the result. |
+| `image_title` | Yes | string | Agent determined | A short title shown on the chart. |
+
+## Parameters — Generate Chart
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `asset_id` | Yes | string | Agent determined | The saved dataset (CSV asset) to chart. |
+| `chart_grammar` | No | object | Agent determined | The preferred way to describe a chart: a structured specification of intent and encoding. |
+| `chart_code_snippet` | No | string | Agent determined | A fallback for complex charts the structured form cannot express. |
+| `image_title` | No | string | Agent determined | A title for the chart. Required when using `chart_code_snippet`. |
+
+<Aside type="note">
+The chart definition and SQL are **Agent determined** in normal use — the agent writes them from the question. The data source (`data_product_id`) is a good candidate for **User input** so the caller chooses what to chart.
+</Aside>
+
+See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters) for what the scope column means.
+
+## Output
+
+A rendered chart returned as an image asset, alongside the data used to build it.
+
+## See also
+
+- [Chart Generation agent](/agent-studio-docs/reference/agents/chart-generation)
+- [Analytics Agent](/agent-studio-docs/reference/agents/analytics-agent)

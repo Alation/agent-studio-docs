@@ -1,0 +1,41 @@
+---
+title: Native Data Quality Advisor
+description: An agent that recommends data quality checks and helps author reusable DQ skills.
+---
+
+The Native Data Quality Advisor is a conversational agent that helps you decide which data quality checks to apply to your data, and helps you build reusable data quality skills. It works in two modes.
+
+- **Recommendation mode** — given a table and its columns, it proposes appropriate data quality checks for each column.
+- **Skill authoring mode** — it helps you create, refine, and test reusable data quality skills through conversation.
+
+## How it works
+
+- In recommendation mode, the agent reads the table and column information you supply and outputs structured checks keyed by column.
+- In skill authoring mode, the agent asks clarifying questions before generating or refining skill content, drawing on a catalog of data quality rules, domain skills, and standards.
+
+## Input parameters
+
+Required:
+
+- `message` (string): What you want help with (e.g., "recommend quality checks for this table" or "help me build a freshness skill").
+
+Optional:
+
+- `table_id` (string): A table to use as initial context, e.g. `"table.25"`.
+- `skill_ids` (list): Restrict the agent to specific skills, useful for testing one skill in isolation.
+- `skill_content` (string): Existing skill content you want the agent to improve.
+
+## Available tools
+
+The agent draws on Alation's data quality knowledge through internal tools that load the rules catalog, domain-specific skills, and data quality standards. These are configured on the agent by default.
+
+## Behavior notes
+
+- In recommendation mode the agent outputs checks immediately rather than holding a conversation.
+- In skill authoring mode it asks clarifying questions first.
+- It loads the rules, skills, and standards catalogs once per session rather than re-fetching them repeatedly.
+
+## See also
+
+- [Get Data Quality Tool](/agent-studio-docs/reference/tools/get-data-quality-tool)
+- [Get Data Quality Scores Tool](/agent-studio-docs/reference/tools/get-dq-scores-tool)

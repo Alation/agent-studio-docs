@@ -1,36 +1,48 @@
 ---
 title: Search Catalog Tool
-description: Search the catalog.
+description: Search the Alation Data Catalog for objects and assets.
 ---
 
-## Search Catalog Tool
+import { Aside } from '@astrojs/starlight/components';
 
-This tool can be used to search for objects & assets within the Alation Data Catalog.
-Types of objects include: tables, schemas, columns, articles, and glossary terms.
-`filters` should only be used for custom fields, and should follow the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature.
+# Search Catalog Tool
 
-### Example usage
+This tool searches the Alation Data Catalog for objects and assets — tables, schemas, columns, articles, glossary terms, and more. It is the primary discovery tool behind the [Catalog Search](/agent-studio-docs/reference/agents/catalog-search) agent.
 
-```json
+## When to use it
+
+Add this tool to an agent that needs to find catalog objects from a natural language query. Combine it with [Get Search Filter Fields](/agent-studio-docs/reference/tools/get-search-filter-fields-tool) and [Get Search Filter Values](/agent-studio-docs/reference/tools/get-search-filter-values-tool) to narrow results with filters.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `search_term` | Yes | string | Agent determined | The text to search for. |
+| `object_types` | No | list of strings | Agent determined | Restrict results to types such as `table`, `column`, `schema`, `article`, `bi_field`, `glossary_term`. |
+| `filters` | No | list of objects | Fixed or Agent determined | Filter on custom fields. Use the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature. |
+| `limit` | No | integer (default `20`) | Fixed | Maximum number of results. |
+| `ranges` | No | list of date ranges | Agent determined | Limit results to a date range. |
+| `starred` | No | boolean | User input | Only objects the user has starred. |
+| `watching` | No | boolean | User input | Only objects the user is watching. |
+| `recent` | No | boolean | User input | Only recently accessed objects. |
+| `domain_ids` | No | list of strings | Fixed or User input | Scope the search to specific domains. |
+
+<Aside type="note">
+The `starred`, `watching`, `recent`, and `domain_ids` parameters scope search to a user's context. See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters) for what the scope column means.
+</Aside>
+
+## Example usage
+
+```jsonc
 {
   "search_term": "Agriculture",
-  "object_types": [
-    "table"
-  ],
-  "filters": [
-    {
-      "filter_id": 0,
-      "filter_values": [
-        "foo",
-        "bar"
-      ]
-    }
-  ],
+  "object_types": ["table"],
   "limit": 20
 }
 ```
 
-### See also
+## See also
 
-- [Get Search Filter Values Tool](/agent-studio-docs/reference/tools/get-search-filter-values-tool)
 - [Get Search Filter Fields Tool](/agent-studio-docs/reference/tools/get-search-filter-fields-tool)
+- [Get Search Filter Values Tool](/agent-studio-docs/reference/tools/get-search-filter-values-tool)
+- [Get Data Quality Scores Tool](/agent-studio-docs/reference/tools/get-dq-scores-tool)

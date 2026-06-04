@@ -1,19 +1,34 @@
 ---
 title: Get Data Sources Tool
-description: Get data sources from the catalog.
+description: List the data sources available in the catalog.
 ---
+
+import { Aside } from '@astrojs/starlight/components';
 
 # Get Data Sources Tool
 
-This tool fetches data sources from the Alation Data Catalog.
-Results may be limited based on the current user's access.
+This tool lists the data sources in the Alation Data Catalog. Results are limited to the data sources the current user can access.
+
+## When to use it
+
+Add this tool to an agent that needs to know which data sources exist, for example before checking data quality against one of them.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `limit` | No | integer (default `100`) | Fixed | Maximum number of data sources to return. |
+
+<Aside type="note">
+See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters) for what the scope column means.
+</Aside>
 
 ## Example usage
 
 ```jsonc
 {
   "limit": 100
-}    
+}
 ```
 
 ## See also

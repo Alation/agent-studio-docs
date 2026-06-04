@@ -1,17 +1,32 @@
 ---
 title: Get Search Filter Fields Tool
-description: Get fields to use for filtering catalog search results.
+description: Find fields that can be used to filter catalog search results.
 ---
+
+import { Aside } from '@astrojs/starlight/components';
 
 # Get Search Filter Fields Tool
 
-This tool can be used to find all possible fields which can be used for searching the Alation Data Catalog.
-All possible filters will be searched, but only the ones which are the most semantically similar to the original search term will be returned.
-The amount of results can be controlled through a parameter.
+This tool finds the fields you can filter on when searching the catalog. It scans all available filters and returns the ones most semantically similar to your search term, so an agent can discover useful filters before applying them.
+
+## When to use it
+
+Use this as the first step in a filtered search: find a relevant field here, then look up its values with the [Get Search Filter Values Tool](/agent-studio-docs/reference/tools/get-search-filter-values-tool), then pass the filter to the [Search Catalog Tool](/agent-studio-docs/reference/tools/search-catalog-tool).
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `search_term` | Yes | string | Agent determined | The topic to find relevant filter fields for. |
+| `limit` | No | integer (default `10`) | Fixed | Maximum number of fields to return. |
+
+<Aside type="note">
+See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters) for what the scope column means.
+</Aside>
 
 ## Example usage
 
-```json
+```jsonc
 {
   "search_term": "compliance",
   "limit": 10
