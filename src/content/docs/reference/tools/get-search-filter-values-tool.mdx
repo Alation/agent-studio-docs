@@ -1,25 +1,42 @@
 ---
 title: Get Search Filter Values Tool
-description: Get values to use for filtering catalog search results.
+description: Find values for a field to filter catalog search results.
 ---
+
+import { Aside } from '@astrojs/starlight/components';
 
 # Get Search Filter Values Tool
 
-This tool can be used to find particular values for a given field, which can be used to filter results from searching the Alation Data Catalog.
-Use the search term to help narrow down results by semantically searching.
-To search for fields which can be used for filtering, use the `get_search_filter_fields` tool.
+This tool finds the values available for a given filter field, which you can then use to filter catalog search results. Use the search term to narrow the values semantically. To find the field in the first place, use the [Get Search Filter Fields Tool](/agent-studio-docs/reference/tools/get-search-filter-fields-tool).
+
+## When to use it
+
+Use this after you have a field ID, to discover which values are worth filtering on before calling the [Search Catalog Tool](/agent-studio-docs/reference/tools/search-catalog-tool).
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `field_id` | Yes | integer or string | Agent determined | The field to fetch values for. |
+| `search_term` | Yes | string | Agent determined | Narrows the returned values semantically. |
+| `limit` | No | integer (default `10`) | Fixed | Maximum number of values to return. |
+| `is_builtin` | No | boolean (default `false`) | Fixed | Whether the field is a built-in field rather than a custom field. |
+
+<Aside type="note">
+See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters) for what the scope column means.
+</Aside>
 
 ## Example usage
 
-```json
+```jsonc
 {
   "field_id": 0,
   "search_term": "governance",
   "limit": 10
-}  
+}
 ```
 
 ## See also
 
-- [Get Search Filter Fields](/agent-studio-docs/reference/tools/get-search-filter-fields-tool)
+- [Get Search Filter Fields Tool](/agent-studio-docs/reference/tools/get-search-filter-fields-tool)
 - [Search Catalog Tool](/agent-studio-docs/reference/tools/search-catalog-tool)

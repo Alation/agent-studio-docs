@@ -1,0 +1,46 @@
+---
+title: Data Marketplace Query
+description: An agent that discovers data products in a marketplace and queries them.
+---
+
+The Data Marketplace Query agent answers data questions by first finding the right data product in a marketplace, then querying it. It discovers relevant data products, runs SQL against them, and returns structured results along with the products it used.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Searches the marketplace for data products relevant to the question.
+2. Reads the schema of the chosen data product to understand its tables and columns.
+3. Generates and runs SQL to answer the question.
+4. Optionally generates a chart from the results.
+5. Returns the answer together with the data products it drew on.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The data question.
+
+Optional:
+
+- `marketplace_id` (string): The marketplace to search. If omitted, the default marketplace is used. Pin this as a **Fixed** value if every run should target the same marketplace.
+- `auth_id` (string): The authentication credentials to use for queries.
+
+## Available tools
+
+- **[Data Product Search](/agent-studio-docs/reference/tools/data-product-search)**: Finds relevant data products in the marketplace.
+- **[Get Data Schema](/agent-studio-docs/reference/tools/get-data-schema-tool)**: Reads a data product's schema.
+- **[SQL Execution](/agent-studio-docs/reference/tools/sql-execution-tool)**: Runs the query.
+- **[Generate Chart](/agent-studio-docs/reference/tools/generate-chart-tool)**: Visualizes the result.
+
+## Comparison with Data Product Query
+
+- **Data Marketplace Query** (this agent) starts without a known data product. It searches the marketplace, picks a product, then queries it.
+- **[Data Product Query](/agent-studio-docs/reference/agents/data-product-query)** assumes you already know which data product to query and takes its ID as input.
+
+Use Data Marketplace Query for open-ended questions across a marketplace; use Data Product Query when the data product is already chosen.
+
+## See also
+
+- [Data Product Query](/agent-studio-docs/reference/agents/data-product-query)
+- [Analytics Agent](/agent-studio-docs/reference/agents/analytics-agent)

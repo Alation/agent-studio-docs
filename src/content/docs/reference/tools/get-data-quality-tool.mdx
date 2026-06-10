@@ -1,0 +1,64 @@
+---
+title: Get Data Quality Tool
+description: Check the data quality of tables or a SQL query.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Get Data Quality Tool
+
+This tool checks the data quality of one or more catalog tables, or of the tables referenced by a SQL query. Use it to answer "is this data reliable?" before trusting a result. It looks at trust flags, data quality scores, and deprecation warnings, and returns an overall verdict with the specific issues found.
+
+## When to use it
+
+Add this tool to an agent that should validate data before presenting an answer, or that responds to explicit requests like "check data quality" or "is this table trustworthy?"
+
+You provide **either** a list of table IDs **or** a SQL query. When you provide a SQL query, you also need to tell the tool which data source it runs against.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `table_ids` | One of these two | list of integers (max 30) | Agent determined | The tables to check, e.g. `[123, 456]`. |
+| `sql_query` | One of these two | string | Agent determined | A query whose referenced tables should be checked. |
+| `ds_id` | With `sql_query` | integer | User input | The Alation data source ID the query runs against (preferred). |
+| `db_uri` | With `sql_query` | string | Fixed or User input | A database URI, as an alternative to `ds_id`. |
+| `dq_score_threshold` | No | integer 0–100 (default `70`) | Fixed | Tables scoring below this are flagged. Higher is stricter. |
+| `output_format` | No | `"json"` (default) or `"yaml_markdown"` | Fixed | `yaml_markdown` is more compact when checking many tables. |
+| `default_schema_name` | No | string | Fixed | Default schema for unqualified table names in the query, e.g. `"public"`. |
+| `bypassed_dq_sources` | No | list of strings | Fixed | Quality sources to skip, e.g. `["trust_flags"]`. |
+
+<Aside type="note">
+Valid combinations are: (1) `table_ids` alone, (2) `sql_query` + `ds_id`, or (3) `sql_query` + `db_uri`.
+</Aside>
+
+See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters) for what the scope column means.
+
+## Example usage
+
+Check specific tables with a stricter threshold:
+
+```jsonc
+{
+  "table_ids": [123, 456],
+  "dq_score_threshold": 80
+}
+```
+
+Check the tables referenced by a query:
+
+```jsonc
+{
+  "sql_query": "SELECT * FROM orders WHERE order_date > '2024-01-01'",
+  "ds_id": 5
+}
+```
+
+## Output
+
+An overall status — `HIGH DATA QUALITY`, `LOW DATA QUALITY`, or `UNKNOWN DATA QUALITY` — plus the list of tables that failed checks and any tables where quality could not be determined. If any one table has issues, the overall status is `LOW`.
+
+## See also
+
+- [Get Data Quality Scores Tool](/agent-studio-docs/reference/tools/get-dq-scores-tool)
+- [Native Data Quality Advisor](/agent-studio-docs/reference/agents/native-data-quality-advisor)

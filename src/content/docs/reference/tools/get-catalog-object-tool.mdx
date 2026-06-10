@@ -1,18 +1,40 @@
 ---
 title: Get Catalog Object Tool
-description: Get an object from the catalog.
+description: Retrieve a single object's details from the Alation Data Catalog.
 ---
+
+import { Aside } from '@astrojs/starlight/components';
 
 # Get Catalog Object Tool
 
-This tool can be used to fetch an object's information from the Alation Data Catalog.
-Supported object types are: `schema`, `table`, and `column`.
+This tool fetches the details of one object in the Alation Data Catalog by its type and ID. Use it when an agent already knows which object it needs and wants its full metadata.
+
+## When to use it
+
+Add this tool to an agent that resolves an object through search and then needs the object's details. For broad discovery, use the [Search Catalog Tool](/agent-studio-docs/reference/tools/search-catalog-tool) instead.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `object_type` | Yes | string | Agent determined | The type of object to fetch (see supported types below). |
+| `object_id` | Yes | integer | Agent determined | The numeric ID of the object. |
+
+**Supported object types:** `schema`, `table`, `column`, `bi_report`, `bi_folder`, `bi_datasource`, `bi_report_column`, `bi_datasource_column`.
+
+<Aside type="note">
+This list now includes BI object types. Earlier versions of this tool supported only `schema`, `table`, and `column`. See [Configuring tool parameters](/agent-studio-docs/reference/tools/introduction/#configuring-tool-parameters) for what the scope column means.
+</Aside>
 
 ## Example usage
 
-```json
+```jsonc
 {
-  "object_type": "schema",
-  "object_id": 0
+  "object_type": "table",
+  "object_id": 123
 }
 ```
+
+## See also
+
+- [Search Catalog Tool](/agent-studio-docs/reference/tools/search-catalog-tool)

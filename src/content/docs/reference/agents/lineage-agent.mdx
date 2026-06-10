@@ -1,0 +1,43 @@
+---
+title: Lineage Agent
+description: An agent for answering data lineage questions and creating lineage documentation.
+---
+
+The Lineage Agent answers questions about data lineage and, when asked, writes the answer up as catalog documentation. It can trace what feeds a table or column (upstream), what depends on it (downstream), and how individual columns are transformed along the way.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Finds the object the user is asking about by searching the catalog.
+2. For tables, checks whether lineage documentation already exists and answers from it before regenerating anything.
+3. Chooses the right approach based on the question:
+   - For "what feeds / what depends on this?" questions, it fetches the lineage graph.
+   - For "how is this column calculated?" questions, it analyzes the upstream SQL to trace column-level transformations.
+4. When explicitly asked to save documentation, it creates a catalog document and links it back to the table.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The lineage question or documentation request.
+
+## Available tools
+
+- **[Get Lineage](/agent-studio-docs/reference/tools/get-lineage-tool)**: Fetches the upstream or downstream lineage graph for a table or column.
+- **[Generate Lineage Documentation](/agent-studio-docs/reference/tools/generate-lineage-documentation-tool)**: Analyzes column-level transformations for a table and optionally writes them into a document.
+- **Get Search Context**: Finds the table or column the user named.
+- **Get Filter Context**: Retrieves the content of an existing lineage document.
+- **Get Document Templates**: Looks up templates when creating a document.
+- **Update Catalog Object**: Links a generated document back to the table.
+
+## Behavior notes
+
+- For column-level lineage, the agent traces from the columns themselves (object type `attribute`), not from the table.
+- It answers from existing documentation first and does not regenerate lineage that is already documented.
+- It only creates or saves documentation when you explicitly ask it to, and will confirm the target folder and document hub first.
+
+## See also
+
+- [Using the Lineage Agent](/agent-studio-docs/guides/lineage/using-lineage-agent)
+- [Get Lineage Tool](/agent-studio-docs/reference/tools/get-lineage-tool)
