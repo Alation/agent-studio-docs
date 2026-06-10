@@ -1,0 +1,77 @@
+---
+title: Catalog Search
+description: A user-facing catalog search agent with data quality and lineage integration.
+---
+
+The Catalog Search agent searches the Alation data catalog using natural language, applying intelligent filters and surfacing data quality scores and lineage context where relevant.
+
+## Model
+
+- **Model**: Bedrock Sonnet 4.5
+- **Reasoning mode**: Default
+
+## How it works
+
+The agent follows an 8-step workflow:
+
+1. Identifies search intent and extracts search terms from the user's question
+2. Selects the appropriate object type(s) to search (tables, columns, schemas, dashboards, etc.)
+3. Discovers available filter fields for the selected object type
+4. Resolves filter values from the user's question
+5. Computes date ranges if the question references relative time periods
+6. Executes the catalog search with the assembled query and filters
+7. Applies classification flags from `search_filters` (starred, watching, recent) if provided
+8. Formats and returns results, including data quality scores and lineage when relevant
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language search query
+
+Optional:
+
+- `search_filters` (object): Pre-configured classification flags applied to the search. Not visible to the agent model — injected from the calling context. Supported flags:
+  - `starred` (boolean): Restrict results to objects the user has starred
+  - `watching` (boolean): Restrict results to objects the user is watching
+  - `recent` (boolean): Restrict results to recently accessed objects
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` summarizing the search results.
+
+## Available tools
+
+The agent is configured with 6 tools:
+
+### Search filter fields
+
+Identifies available filter fields for the selected object type.
+
+### Search filter values
+
+Resolves valid values for a specific filter field.
+
+### Search catalog
+
+Executes the catalog search with the assembled search term, object type, and filters.
+
+### Get object fields
+
+Retrieves field-level metadata for a specific catalog object.
+
+### Get DQ scores
+
+Retrieves data quality scores for catalog objects returned in search results.
+
+### Lineage
+
+Retrieves lineage information for catalog objects to surface upstream and downstream dependencies.
+
+## Behavior notes
+
+- **Intelligent object type matching**: The agent infers the most likely object type from the user's question rather than requiring explicit specification.
+- **DQ and lineage on demand**: Data quality scores and lineage context are surfaced when relevant to the query, not for every result.
+- **Classification flags**: `starred`, `watching`, and `recent` filters are applied transparently from `search_filters` when provided — users do not need to specify them in the message.
+- **Distinct from Catalog Context Search**: Catalog Search is user-facing and handles full search intent resolution. [Catalog Context Search](/reference/agents/catalog-context-search/) is a lower-level helper used as a tool by other agents.

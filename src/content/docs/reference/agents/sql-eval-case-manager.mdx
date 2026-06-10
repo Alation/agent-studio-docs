@@ -1,0 +1,117 @@
+---
+title: SQL Eval Case Manager
+description: Manages SQL evaluation sets — creating, validating, and auditing question/SQL pairs for data products.
+---
+
+The SQL Eval Case Manager builds and maintains SQL evaluation sets for data products.
+It can create individual evaluation cases, generate batches of cases targeting coverage gaps, and audit existing sets for quality and correctness.
+
+## Model
+
+- **Model**: Bedrock Sonnet 4.6
+- **Reasoning mode**: Default
+
+## How it works
+
+The agent supports three workflows:
+
+**Create individual case**
+1. Checks for duplicates via a short AND keyword search against the existing evaluation set
+2. Optionally generates SQL by running the target SQL agent
+3. Validates the question and SQL against 7 quality criteria
+4. Creates the case if all criteria pass; discards it if not
+
+**Bulk generation**
+1. Retrieves the existing evaluation set to analyze current coverage
+2. Identifies underrepresented SQL patterns across the complexity categories below
+3. Explores the data schema and sample values to understand business context
+4. Creates up to 5 new cases per run, each validated individually
+5. Reports which cases were created and which were skipped
+
+**Audit existing cases**
+1. Retrieves all cases in the evaluation set
+2. Reviews each for SQL correctness, question clarity, duplicates, and contradictions
+3. Reports findings or applies fixes depending on the request
+
+## Input parameters
+
+Required:
+
+- `message` (string): The request to send to the agent (e.g., "Create an evaluation case for monthly revenue by region", "Generate 5 new cases", "Audit existing cases")
+- `agent_config_id` (string): The ID of the SQL agent to run evaluations against
+- `data_product_id` (string): The ID of the data product to manage evaluation cases for
+
+Optional:
+
+- `data_product_version` (string): The version of the data product to use. Defaults to the latest version if not provided.
+- `agent_input_payload` (object): Custom input parameters to pass to the sub-agent when running evaluation cases.
+
+## Output format
+
+The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
+The final message, assuming no errors, is a `string` summarizing what was created, skipped, or found during the audit.
+
+## Available tools
+
+### Get data schema
+
+Retrieves schema information for the data product, including tables and columns.
+
+### Get SQL evaluation set
+
+Retrieves all existing question/SQL pairs in the evaluation set. Used for dedup checks and coverage analysis.
+
+### Get SQL evaluation case
+
+Retrieves the details of a specific evaluation case by ID.
+
+### Run SQL agent
+
+Executes the target SQL agent against the data product to generate or validate SQL for a given question.
+
+### Run SQL evaluation case
+
+Runs a specific evaluation case against the SQL agent to check correctness.
+
+### Create SQL evaluation case
+
+Creates a new question/SQL pair in the evaluation set after validation passes.
+
+### Update SQL evaluation case
+
+Modifies the question or SQL of an existing evaluation case.
+
+### Delete SQL evaluation case
+
+Removes an evaluation case from the set.
+
+## Validation criteria
+
+Before saving a new case, the agent validates it against 7 criteria:
+
+| Criterion | Description |
+|---|---|
+| Answerable | The question can be answered from the available data |
+| Specific | The question asks for a concrete metric or fact, not something vague or open-ended |
+| Non-empty result | The SQL query returns at least one row |
+| Temporally stable | The question does not depend on a specific date that would make it stale over time |
+| Minimal | The SQL is no more complex than the question requires |
+| Consistent | The question and SQL agree on what is being measured |
+| Reproducible | The SQL returns the same result across multiple runs |
+
+## SQL complexity categories
+
+When generating cases in bulk, the agent targets coverage across these categories:
+
+- **Complex filters**: Questions requiring multi-condition WHERE clauses
+- **Joins**: Questions spanning multiple tables
+- **Column transformations**: Questions requiring computed or derived values
+- **Business jargon**: Questions using domain terminology mapped to schema columns
+- **Complex operators**: Questions using aggregations, window functions, or subqueries
+
+## Behavior notes
+
+- **Dedup check**: Before creating a case, the agent performs a short AND keyword search against existing questions to avoid near-duplicates
+- **Bulk limit**: No more than 5 cases are created per bulk generation run
+- **Validation gate**: Cases that fail any of the 7 criteria are discarded, not saved with a warning
+- **Deferred tools**: This agent uses deferred tool execution for long-running operations
