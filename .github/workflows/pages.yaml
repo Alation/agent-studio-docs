@@ -48,6 +48,7 @@ jobs:
               uses: withastro/action@v6
               with:
                   path: .
+                  node-version: 22
     deploy:
         needs: build
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

@@ -25,6 +25,9 @@
     "starlight-sidebar-topics": "^0.6.2",
     "tailwindcss": "^4.3.0"
   },
+  "engines": {
+    "node": ">=22"
+  },
   "packageManager": "pnpm@10.17.1",
   "pnpm": {
     "onlyBuiltDependencies": [
