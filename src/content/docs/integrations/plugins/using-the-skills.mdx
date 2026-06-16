@@ -1,0 +1,54 @@
+---
+title: Using the Skills
+description: "What each Alation skill does, example prompts, and how the skills combine into workflows."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Once you've [installed the plugin and connected it](/agent-studio-docs/integrations/plugins/overview/), you work with Alation by asking in natural language.
+Your tool picks the right skill from your request — you describe what you want, and the skill translates it into the right Alation API calls, handling errors, pagination, and multi-step workflows.
+
+## The skills
+
+Each skill bundles everything it needs: instructions, command schemas, and (on non-Claude platforms) the Alation CLI itself.
+
+| Skill | What it does |
+|-------|--------------|
+| `setup` | Configures credentials and authenticates against your Alation instance |
+| `ask` | Queries data products, chats with Agent Studio agents, and invokes tools |
+| `explore` | Searches and browses the catalog, data products, and marketplaces |
+| `curate` | Manages data products, publishes to marketplaces, enriches metadata |
+| `configure` | Creates and manages agents, tools, LLMs, and data source connections |
+| `automate` | Builds, runs, and schedules recurring workflows |
+
+You don't invoke skills by name — just describe the task, and the agent routes to the right one.
+
+## Example prompts
+
+Explore and ask:
+
+- *"What marketing data do we have?"*
+- *"Search the catalog for anything related to customer orders."*
+- *"What was our total revenue last quarter?"*
+
+Curate:
+
+- *"Add a description to the customer orders data product."*
+- *"Publish the finance data product to the marketplace."*
+
+Configure and automate:
+
+- *"Create an agent that can answer questions about our finance data."*
+- *"Send me a summary of last week's sales every Monday."*
+
+## Combining skills
+
+Most real tasks chain skills, and the agent moves between them on its own:
+
+- **Find, then ask**: `explore` locates the right data product, then `ask` queries it.
+- **Curate at scale**: `explore` finds objects missing descriptions, then `curate` enriches them.
+- **Build, then schedule**: `configure` creates an agent, then `automate` runs it on a cadence.
+
+<Aside type="tip">
+The same skills behave identically across tools, so a workflow you build in Claude Code works the same in Codex or Gemini CLI.
+</Aside>

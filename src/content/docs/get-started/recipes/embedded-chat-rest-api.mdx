@@ -1,0 +1,93 @@
+---
+title: Embed Chat-With-Data in Your Application
+description: "Power your own product or internal app with Agent Studio agents over the streaming REST API, including multi-tenant session context."
+titleIcon: api
+titleIconAccent: blue
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+
+Your application's users want to ask questions of your data without leaving your product.
+This recipe calls a published agent from your backend over the streaming REST API.
+The pattern runs in production inside a customer-facing analytics product handling more than 150,000 calls a month.
+
+<div class="recipe-cost not-content">
+  <div class="recipe-cost__main">
+    <span class="recipe-cost__label">Estimated cost</span>
+    <span class="recipe-cost__figure">0.5–0.75<span class="recipe-cost__acu">ACU</span><span class="recipe-cost__per">per question</span></span>
+  </div>
+  <p class="recipe-cost__note">Two to three metered actions per question. At high volume this dominates your ACU spend, so model it against expected question volume. <a href="/agent-studio-docs/security/observability/usage/#how-consumption-is-priced">At 0.25 ACU per metered action</a>; confirm actual spend on the <a href="/agent-studio-docs/security/observability/usage/">Usage page</a>.</p>
+</div>
+
+## What you'll use
+
+<div class="uses-grid not-content">
+  <a class="uses-card" href="/agent-studio-docs/build/agents/query/">
+    <span class="uses-card__name">Custom SQL agent</span>
+    <span class="uses-card__purpose">Answers questions over a data product</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/security/authentication/machine-to-machine/">
+    <span class="uses-card__name">Machine-to-machine OAuth</span>
+    <span class="uses-card__purpose">Authenticates your backend</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/integrations/rest-api/auth/">
+    <span class="uses-card__name">Streaming endpoint</span>
+    <span class="uses-card__purpose">Streams agent responses to your app</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/evals/sql-evaluations/">
+    <span class="uses-card__name">Evaluations</span>
+    <span class="uses-card__purpose">Keeps accuracy measurable</span>
+  </a>
+</div>
+
+## Build it
+
+<Steps>
+
+1. **Build and publish a custom SQL agent**
+
+   Clone the Query or Data Product Query agent and scope it to one data product.
+   Teams that compared head-to-head found a tuned custom agent answers more accurately than the default agent.
+
+2. **Put semantics in metadata, not the prompt**
+
+   When users say "UK" but the data says "United Kingdom", add synonyms and definitions to the catalog and data product metadata.
+   One team analyzed 500 real user questions and found metadata fixes outperformed prompt fixes every time.
+
+3. **Authenticate machine-to-machine**
+
+   Create an [M2M OAuth client](/agent-studio-docs/security/authentication/machine-to-machine/) and request a JWT with the client credentials grant.
+   Assign the client the minimum role that can call the AI APIs.
+
+4. **Call the streaming endpoint**
+
+   POST the user's message to `/ai/api/v1/chats/agent/{id}/stream` with the bearer token and stream the response into your UI.
+   See [REST API authentication](/agent-studio-docs/integrations/rest-api/auth/) for the token request and a full example.
+
+5. **Scope multi-tenant sessions**
+
+   If one agent serves many of your customers, use `pre_exec_sql` to set per-session context (such as a subscriber ID) before each query, and pass `marketplace_id` where applicable.
+
+6. **Add evaluations before launch**
+
+   Build an eval set with at least 10 human-validated question/SQL pairs and re-run it whenever you change the agent or its metadata.
+
+</Steps>
+
+## Gotchas
+
+- Cloning an agent copies tool parameter bindings as they were; re-check bindings such as `allow_fallback_auth` before pointing production traffic at a clone.
+- The JWT's role claims decide API access — a token with the wrong role gets `403`, not a helpful error.
+- Chart-generating agents respond slowly enough to hit client timeouts (Microsoft Teams cuts off around 45 seconds); prefer text answers in latency-sensitive surfaces.
+
+## Variations
+
+- Return generated SQL instead of answers, so your application (or the user) executes it under its own controls.
+  Prompt the agent to output SQL and present only that field from the streamed response.
+- Call stored procedures by wrapping them in a custom agent prompt.
+
+## Related
+
+- [REST API authentication](/agent-studio-docs/integrations/rest-api/auth/)
+- [SQL evaluations](/agent-studio-docs/build/evals/sql-evaluations/)
+- [Known limitations](/agent-studio-docs/get-started/recipes/known-limitations/)

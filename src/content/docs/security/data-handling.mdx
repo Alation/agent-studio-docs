@@ -1,0 +1,65 @@
+---
+title: Data Handling and Compliance
+description: "What data reaches the LLM, where chat data is stored, how long it is retained, and the compliance posture Agent Studio inherits."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Access control decides *who* can reach data; this page covers what happens to the data itself: what reaches a language model, where conversation data lives, how long it is kept, and the compliance posture behind it.
+
+## Core principles
+
+These rules hold across all Alation AI services:
+
+- Customer data is never used to train foundation models.
+- Customer content is processed only to provide the service and is never shared with model providers beyond that.
+- Customer data is encrypted in transit and at rest.
+- AI features inherit the security and compliance posture of the Alation Cloud Service.
+- AI features are opt-in, and customers can disable them at any time.
+
+## LLM infrastructure
+
+Agent Studio reaches language models through three paths, all under no-training commitments:
+
+| Path | Models | Data commitments |
+|------|--------|------------------|
+| Amazon Bedrock | Anthropic and other foundation models | Bedrock does not store or log prompts or responses, and customer data is not used for training |
+| OpenAI Enterprise API | OpenAI models | Contractually barred from training on customer content; content deleted within 30 days of termination |
+| [Bring your own model](/agent-studio-docs/build/models/byom-setup/) | Your endpoints (Bedrock, Azure OpenAI, OpenAI, Anthropic, Google Vertex AI, or OpenAI-compatible) | Governed by your own provider agreement |
+
+Bedrock's automated abuse detection also screens for prompt injection, jailbreaking, and other adversarial inputs, with no human review of inputs or outputs.
+
+## What reaches the LLM
+
+During an Agent Studio chat, the model receives:
+
+- The chat title and the user's messages
+- Agent responses, which can include earlier messages and tool outputs
+- Tool outputs, which can contain data retrieved from your connected sources (for example, rows returned by the SQL Execution tool the user is permitted to run)
+
+Catalog metadata sent as context (names, descriptions, tags, lineage, linked SQL) is scoped to what the requesting user is allowed to see, as described in the [request lifecycle](/agent-studio-docs/security/request-lifecycle/).
+
+## Storage, logging, and retention
+
+| What | Where | Retention |
+|------|-------|-----------|
+| Chat data (messages, responses, tool outputs) | Postgres, encrypted with the customer's encryption key | Until deleted |
+| Application logs (LLM requests/responses for debugging) | Alation-hosted observability tooling | 30 days |
+
+Logs can contain user inputs and data that appeared in tool outputs.
+Admins can review activity through [interaction logs](/agent-studio-docs/security/observability/logs/) and [usage](/agent-studio-docs/security/observability/usage/).
+
+## Compliance
+
+Agent Studio inherits the Alation Cloud Service compliance posture:
+
+- SOC 2 Type II
+- ISO 27001 / 27701
+- HIPAA
+
+Regional availability of AI features follows Amazon Bedrock and OpenAI model availability in your region.
+
+<Aside type="tip" title="Security review materials">
+For SOC 2 reports, penetration test summaries, the full AI services security overview, and questionnaire support (HECVAT/CAIQ), contact your Alation account team.
+Detailed materials are available under NDA.
+</Aside>

@@ -1,0 +1,101 @@
+---
+title: Best Practices
+description: "Alation's guidance for building and deploying agents: design practices, workflow patterns, error handling, and the production governance checklist."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+This page condenses what has worked — and what has failed — in real Agent Studio deployments.
+Each practice links to the recipe or reference page that carries the evidence, and the guidance applies to every delivery channel: the web UI, Slack, MCP clients, and the REST API.
+
+## The practices
+
+| # | Practice | The receipts |
+|---|----------|--------------|
+| 1 | Start with the defaults: clone the closest [built-in agent](/agent-studio-docs/build/agents/default-agents/) and use [built-in tools](/agent-studio-docs/build/tools/default-tools/) before building custom | The [typical build path](/agent-studio-docs/build/overview/#a-typical-build-path) |
+| 2 | Put semantics in catalog and data-product metadata, not in the prompt | A team analyzed 500 real user questions: [metadata fixes outperformed prompt fixes every time](/agent-studio-docs/get-started/recipes/embedded-chat-rest-api/) |
+| 3 | Scope tightly: one data product per agent, domain-scoped context | A [domain-scoped agent reached 100% on its eval set](/agent-studio-docs/get-started/recipes/copilot-scoped-catalog-context/); unscoped agents over the whole catalog rarely get close. Multi-data-product agents answer [noticeably less reliably](/agent-studio-docs/get-started/recipes/known-limitations/) |
+| 4 | Don't ship without a documented evaluation run: at least 10 human-validated pairs, target >90% accuracy, re-run on every metadata or prompt change | [Evaluations](/agent-studio-docs/build/evals/sql-evaluations/), proven in the [embedded chat recipe](/agent-studio-docs/get-started/recipes/embedded-chat-rest-api/) |
+| 5 | Keep a human approval step in any agent that writes to the catalog | An early bulk-update run [applied every change without review](/agent-studio-docs/get-started/recipes/bulk-trust-flags/) because the prompt didn't require confirmation |
+| 6 | Deliver into the channel your users already work in | [Integrations overview](/agent-studio-docs/integrations/overview/); the [Copilot/Teams recipe](/agent-studio-docs/get-started/recipes/copilot-scoped-catalog-context/) exists because business users live in Teams, not the catalog |
+| 7 | Understand metering before scaling: most agents make 2–3 tool calls per request | [Tool calls and metering](/agent-studio-docs/get-started/key-concepts/#tool-calls-actions-and-usage-metering) and the [usage page](/agent-studio-docs/security/observability/usage/) |
+| 8 | Publish deliberately, and curate what each client sees with [custom MCP servers](/agent-studio-docs/integrations/mcp/using-the-mcp-server/#curate-with-custom-mcp-servers) | Fixed parameter bindings pin tools to a domain or data product, server-side |
+| 9 | Match the agent pattern to the job | Query-style agents for [data questions](/agent-studio-docs/get-started/recipes/embedded-chat-rest-api/), context search for [metadata questions](/agent-studio-docs/get-started/recipes/catalog-context-search/), custom agents with write tools for [curation](/agent-studio-docs/get-started/recipes/bulk-trust-flags/) |
+| 10 | Use the [Python SDK](/agent-studio-docs/integrations/sdk/using-the-sdk/) only when you need to build in your own environment; most teams need the hosted path | [Hosted vs. local at a glance](/agent-studio-docs/integrations/mcp/using-the-mcp-server/#at-a-glance) |
+
+## Workflow patterns
+
+Every agent interaction follows the same loop, whatever the channel: the request arrives, the LLM reasons over its prompt and tool list, calls tools, and synthesizes a governed response.
+The patterns differ in how much orchestration sits on top of that loop.
+
+### Single agent, narrow task
+
+Point lookups: a business term, a data product definition, a certification status.
+One or two tool calls.
+
+### Single agent, multi-tool chain
+
+The most common production pattern: search the catalog, fetch the data product, run a query, summarize.
+Most agents make 2–3 tool calls per request; the highest observed for a single request is 10.
+Write the prompt to tell the agent when to stop calling tools and answer.
+Production-proven in the [embedded chat recipe](/agent-studio-docs/get-started/recipes/embedded-chat-rest-api/) at more than 150,000 calls a month.
+
+### Multi-agent (hierarchical)
+
+A parent agent routes sub-tasks to specialized child agents [published as tools](/agent-studio-docs/integrations/mcp/using-the-mcp-server/#publish-an-agent-to-mcp).
+Modular and reusable, but every child agent's tool calls are metered individually, so action counts and latency stack with each level — estimate before you build deep hierarchies.
+
+### Agentic pipeline (no human in the loop)
+
+A flow or external orchestrator triggers agents on a schedule or event.
+Production-proven in the [scheduled alerts recipe](/agent-studio-docs/get-started/recipes/scheduled-alert-emails/), where parameterized flows email dozens of suppliers weekly.
+For pipelines that write to the catalog, practice 5 is non-negotiable: gate the writes on review.
+
+| Pattern | Best for | Watch out for |
+|---------|----------|---------------|
+| Single agent, narrow task | Lookups and point queries | Not suitable for multi-step reasoning |
+| Single agent, multi-tool | Most production use cases | Tool-call count — monitor [usage](/agent-studio-docs/security/observability/usage/) |
+| Multi-agent hierarchical | Complex, modular workflows | Metered per child agent; latency and actions stack per level |
+| Agentic pipeline | Automated curation, monitoring, scheduled tasks | Review gates for catalog writes; [failure notification is email-only](/agent-studio-docs/get-started/recipes/known-limitations/) |
+
+## Design for cost
+
+Agent design is a cost decision. Each metered action — an LLM call or an Alation base-tool call — is [0.25 ACU](/agent-studio-docs/security/observability/usage/#how-consumption-is-priced), so a workflow's cost is roughly:
+
+```
+actions per run  ×  0.25 ACU  ×  runs
+```
+
+Three things multiply that total, so account for them when you design:
+
+- **Agent depth** — a multi-agent hierarchy meters every child agent's calls; actions stack with each level.
+- **Fan-out and frequency** — a scheduled flow run per segment costs segments × runs per period.
+- **Per-row loops** — an agent that acts on each object in a set multiplies by the row count.
+
+Two things keep cost down: scope each agent to the [smallest tool set](#the-practices) it needs (fewer stray calls), and remember that **custom HTTP and SMTP tools are not metered** — only the Alation base-tool calls underneath them are. Always confirm real spend on the [Usage page](/agent-studio-docs/security/observability/usage/) rather than trusting the estimate.
+
+## Error handling and resilience
+
+- Define fallback behavior in the prompt: what the agent should do when a tool returns nothing.
+  The [scheduled alerts recipe](/agent-studio-docs/get-started/recipes/scheduled-alert-emails/) is the canonical example — "If none, reply NO ALERT" — instead of letting the agent invent an answer.
+- Use trust signals in the agent's decision logic: the [Copilot scoping recipe](/agent-studio-docs/get-started/recipes/copilot-scoped-catalog-context/) excludes deprecated objects with a `flag_types` filter so the agent can't recommend them.
+- Put retry logic in the orchestration layer (n8n, the SDK), not in the prompt — the LLM should not make retry decisions.
+- Every tool call is logged; review [interaction logs](/agent-studio-docs/security/observability/logs/) and capture traces in external pipelines.
+
+## Production governance checklist
+
+| Area | Confirm before production |
+|------|---------------------------|
+| Knowledge | Underlying catalog data is accurate, certified, and in the right domain |
+| Evaluation | A documented [evaluation run](/agent-studio-docs/build/evals/sql-evaluations/) passed with >90% accuracy on representative queries |
+| Tools | The agent carries only the tools its task requires — and if you cloned the agent, [re-check the copied tool bindings](/agent-studio-docs/get-started/recipes/known-limitations/) |
+| Prompts | Scope, constraints, and error behavior are explicit — including the [approval step for catalog writes](/agent-studio-docs/get-started/recipes/bulk-trust-flags/) |
+| Access | The agent inherits [Alation access controls](/agent-studio-docs/security/identity-and-permissions/); no permission bypass |
+| Metering | Expected actions per request estimated against the [2–3 call baseline](/agent-studio-docs/get-started/key-concepts/#tool-calls-actions-and-usage-metering) and approved |
+| Logging | Tool-call logs retained per your policy |
+| Curation writes | A review or approval step gates catalog updates — [agents without one apply every change they decide on](/agent-studio-docs/get-started/recipes/known-limitations/) |
+
+<Aside type="tip" title="Why ground agents in Alation?">
+An agent working from raw, unverified context will hallucinate, and nothing governs what it reaches.
+Grounding in the Knowledge Layer is what makes an agent's answers explainable and auditable.
+</Aside>

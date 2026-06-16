@@ -1,0 +1,45 @@
+---
+title: Claude Cowork
+description: "Install the Alation plugin in Claude Cowork."
+titleIcon: claude
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Install the Alation plugin in Claude Cowork and work with your catalog in natural language.
+
+## Prerequisites
+
+- Python 3.10+ on the machine running the agent.
+- An [OAuth client registered on your Alation instance](/agent-studio-docs/integrations/plugins/overview/#connect-to-your-alation-instance) (a one-time, per-instance step).
+
+## Install
+
+<Steps>
+
+1. Go to **Customize** in the sidebar.
+2. Click the **+** next to **Personal Plugins** and select **Add marketplace**.
+3. Add the marketplace by URL: `https://github.com/Alation/alation-plugins`
+4. Install **Alation**.
+
+</Steps>
+
+<Aside type="tip" title="Install from a zip instead">
+Download `alation.zip` from the [latest release](https://github.com/Alation/alation-plugins/releases/latest), then **Customize → + → Upload plugin** and drop in the file.
+</Aside>
+
+## Authenticate
+
+Ask Cowork to set up the Alation plugin — this runs the `setup` skill.
+It prompts for your instance **base URL** and the **Client ID** from the OAuth client, then opens a browser to log in.
+
+<Aside type="note" title="The redirect page won't load">
+After you log in, the redirect page stays blank — that's expected in Cowork.
+Copy its full URL and paste it back into the chat so Cowork can finish authenticating.
+</Aside>
+
+You only [register the OAuth client](/agent-studio-docs/integrations/plugins/overview/#connect-to-your-alation-instance) once per instance.
+
+## Next
+
+See [the skills and what to ask](/agent-studio-docs/integrations/plugins/using-the-skills/) to start working with your catalog.

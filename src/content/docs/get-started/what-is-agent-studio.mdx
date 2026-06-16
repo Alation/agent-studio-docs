@@ -1,0 +1,84 @@
+---
+title: What is Agent Studio?
+description: "Agent Studio is an AI platform that empowers users to rapidly create AI agents using the trusted context already available in Alation."
+---
+
+import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import SlackIcon from '../../../assets/diagram-icons/slack.svg';
+import SnowflakeIcon from '../../../assets/diagram-icons/snowflake.svg';
+import VsCodeIcon from '../../../assets/diagram-icons/vscode.svg';
+import ClaudeIcon from '@lobehub/icons-static-svg/icons/claude-color.svg';
+import OpenAIIcon from '@lobehub/icons-static-svg/icons/openai.svg';
+import CopilotIcon from '@lobehub/icons-static-svg/icons/copilot-color.svg';
+import CursorIcon from '@lobehub/icons-static-svg/icons/cursor.svg';
+import GeminiIcon from '@lobehub/icons-static-svg/icons/gemini-color.svg';
+import N8nIcon from '@lobehub/icons-static-svg/icons/n8n-color.svg';
+
+Agent Studio lets you build AI agents grounded in the trusted context already in Alation: your catalog, your data products, and your databases.
+
+Enterprise agents usually fail for one reason: they lack the right context.
+Knowledge is fragmented across systems, definitions conflict or go stale, and keeping agents accurate by hand doesn't scale.
+Agent Studio fixes this by grounding every agent in the [Alation Knowledge Layer](/agent-studio-docs/get-started/key-concepts/#what-is-the-alation-knowledge-layer), the continuously maintained metadata your organization already trusts.
+
+## What you get
+
+<CardGrid>
+	<Card title="Governed tools" icon="setting">
+		Callable actions built on your catalog, data products, and databases.
+		Use the [built-in tools](/agent-studio-docs/build/tools/default-tools/) in Alation or in any MCP-capable platform.
+	</Card>
+	<Card title="Agents, no code required" icon="rocket">
+		[Pre-built agents](/agent-studio-docs/build/agents/default-agents/) for common catalog tasks, or clone one and make it yours in the web UI.
+	</Card>
+	<Card title="Evaluations built in" icon="approve-check">
+		Measure accuracy with [evaluation sets](/agent-studio-docs/build/evals/sql-evaluations/) before you ship — and keep measuring after.
+	</Card>
+	<Card title="Deploy anywhere" icon="puzzle">
+		Publish what you build via [MCP, REST, Slack, or the SDK](/agent-studio-docs/integrations/overview/).
+		Get what you need from Alation, then use it where the work happens.
+	</Card>
+</CardGrid>
+
+## Works where your team already works
+
+<div class="logo-pills not-content">
+	<a class="logo-pill" href="/agent-studio-docs/integrations/mcp-clients/claude/"><ClaudeIcon width={18} height={18} aria-hidden="true" /> Claude</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/mcp-clients/chatgpt/"><OpenAIIcon width={18} height={18} aria-hidden="true" /> ChatGPT</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/mcp-clients/copilotstudio/"><CopilotIcon width={18} height={18} aria-hidden="true" /> Microsoft Copilot</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/slack/setup/"><SlackIcon width={18} height={18} aria-hidden="true" /> Slack</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/mcp-clients/cursor/"><CursorIcon width={18} height={18} aria-hidden="true" /> Cursor</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/mcp-clients/vscode/"><VsCodeIcon width={18} height={18} aria-hidden="true" /> VS Code</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/plugins/overview/"><GeminiIcon width={18} height={18} aria-hidden="true" /> Gemini CLI</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/mcp-clients/n8n/"><N8nIcon width={18} height={18} aria-hidden="true" /> n8n</a>
+	<a class="logo-pill" href="/agent-studio-docs/integrations/mcp-clients/snowflake/"><SnowflakeIcon width={18} height={18} aria-hidden="true" /> Snowflake</a>
+</div>
+
+Inside Alation, the Agent Studio web UI is where you create, test, evaluate, and publish — no code required.
+Outside Alation, the same tools and agents are available over [MCP](/agent-studio-docs/integrations/mcp/quick-start/), the [REST API](/agent-studio-docs/integrations/rest-api/auth/), and the [Python SDK](/agent-studio-docs/integrations/sdk/using-the-sdk/), so you don't have to move your agent platform to benefit from its context.
+
+## Who is it for?
+
+Everyone is a builder, but the entry points differ.
+Business analysts run and customize agents in the UI.
+Data analysts and stewards iterate in the UI and operationalize over MCP or the SDK.
+AI developers consume tools and agents from MCP, REST, and Python in their existing platforms.
+
+<Aside type="note" title="Enabling Agent Studio">
+An Alation admin can turn it on under **Settings > Feature Configuration**: toggle Agent Studio on and click **Save**.
+It appears in the left icon rail of the New User Experience.
+</Aside>
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="Key concepts"
+    description="LLMs, tools, MCP, agents, and the Knowledge Layer in five minutes."
+    href="/agent-studio-docs/get-started/key-concepts/"
+  />
+  <LinkCard
+    title="Recipes"
+    description="Map your use case to the right building blocks, then follow a curated walkthrough."
+    href="/agent-studio-docs/get-started/recipes/"
+  />
+</CardGrid>

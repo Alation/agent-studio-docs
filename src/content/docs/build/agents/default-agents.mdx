@@ -1,0 +1,41 @@
+---
+title: List of Default Agents
+description: A list of out-of-the-box agents available in Agent Studio.
+sidebar:
+  order: 2
+---
+
+export const EXCLUDED_AGENT_PAGE_IDS = [
+  'build/agents/overview',
+  'build/agents/publishing-agents',
+  'build/agents/default-agents',
+];
+
+import { getCollection } from 'astro:content';
+
+export async function getAgentsList() {
+  const agents = await getCollection('docs', (entry) => {
+    if (!entry.id) return false;
+    return entry.id.startsWith('build/agents') && !EXCLUDED_AGENT_PAGE_IDS.includes(entry.id);
+  });
+  
+  return agents.sort((a, b) => a.data.title.localeCompare(b.data.title));
+}
+
+export const agents = await getAgentsList();
+
+Alation provides out-of-the-box agents for common tasks: searching catalog objects, answering questions from dashboards and data products, generating charts, and more.
+Each has a sensible default prompt and tool configuration, and all are available via MCP and REST.
+
+Use them as-is, or clone one and adjust its prompt and tools when your use case needs more precision.
+
+The following agents are available out-of-the-box:
+
+<ul>
+{agents.map(agent => (
+  <li>
+    <a href={`/agent-studio-docs/${agent.id}/`}>{agent.data.title}</a>
+    {agent.data.description && ` - ${agent.data.description}`}
+  </li>
+))}
+</ul>

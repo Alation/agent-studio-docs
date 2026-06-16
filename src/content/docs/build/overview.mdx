@@ -1,0 +1,24 @@
+---
+title: Build Overview
+description: "The Agent Studio building blocks—tools, agents, flows, schedules, evaluations, and models—and the order to assemble them in."
+---
+
+Everything you build in Agent Studio is assembled from a small set of blocks.
+
+| Block | What it does | Start here |
+|-------|--------------|------------|
+| Tools | Actions grounded in your catalog, data products, and databases | [Tools overview](/agent-studio-docs/build/tools/overview/) |
+| Agents | LLM + prompt + tools, combined to complete a task | [Agents overview](/agent-studio-docs/build/agents/overview/) |
+| Flows | Multi-step processes chaining agents and tools | [Flows overview](/agent-studio-docs/build/flows/overview/) |
+| Schedules | Flows that run on a cadence, without anyone asking | [Scheduling flows](/agent-studio-docs/build/schedules/scheduling-flows/) |
+| Evals | Q&A sets that measure agent accuracy before and after launch | [SQL evaluations](/agent-studio-docs/build/evals/sql-evaluations/) |
+| Models | The LLM behind your agents: OpenAI, Anthropic, or your own | [LLM configuration](/agent-studio-docs/build/models/llm-configuration/) |
+
+## A typical build path
+
+1. Check whether the [built-in tools](/agent-studio-docs/build/tools/default-tools/) cover your data sources; [create custom tools](/agent-studio-docs/build/tools/creating-custom-tools/) for anything they don't.
+2. Clone the closest [built-in agent](/agent-studio-docs/build/agents/default-agents/) and adjust its prompt and tools.
+3. Build an [evaluation set](/agent-studio-docs/build/evals/sql-evaluations/) from real user questions and iterate until accuracy holds.
+4. If the task is multi-step or recurring, wrap the agent in a [flow](/agent-studio-docs/build/flows/overview/) and [schedule it](/agent-studio-docs/build/schedules/scheduling-flows/).
+5. Publish, then pick a channel in [Integrations](/agent-studio-docs/integrations/overview/).
+   Every built-in tool call is metered — see [usage and metering](/agent-studio-docs/security/observability/usage/).

@@ -1,0 +1,84 @@
+---
+title: Request lifecycle
+description: What happens at each hop when a user asks an agent a question, and which identity is carried on the wire.
+sidebar:
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Security reviews usually start with the same question: when a user asks an agent something, whose identity is used at each step?
+This page answers it by tracing one request from the question to the warehouse read, hop by hop.
+To follow the same flow visually, use the [interactive authorization explorer](/agent-studio-docs/security/authorization-explorer/).
+
+## The hops, step by step
+
+### 1. Entry point
+
+The user asks a question through a channel: the Agent Studio web app, Slack, an MCP client, or the plugin. Each channel checks the request's origin before anything runs:
+
+| Channel | Origin check |
+|---------|--------------|
+| Web app | Alation session validation |
+| Slack | Cryptographic request-signature verification |
+| MCP clients | Per-user OAuth (authorization code + PKCE) |
+| Plugins | Per-user OAuth + PKCE from the on-device CLI |
+
+A chat channel starts with only its own user identifier — a Slack user ID, an OAuth subject — and learns who the person is in Alation from the account link completed at setup.
+The web app already has the signed-in Alation session.
+
+### 2. Per-user Alation token
+
+The channel attaches the user's personal Alation access token to the request and sends it to the Agent Studio runtime. This token was issued when the user linked their Alation account through a browser OAuth 2.0 (PKCE) flow.
+
+There is no shared service identity on this path; each request carries the token of the person who made it. If the token has expired, the channel refreshes it and retries once. A real permission denial (`403`) reaches the user as an error — the channel never retries around it.
+
+### 3. Identity validation and catalog context
+
+The Agent Studio runtime validates the incoming token and resolves the user, their role, and their tenant. When the agent needs catalog metadata or context, the runtime calls Alation Core with the same user token, forwarded as-is.
+
+Alation Core applies the user's role and permission grants when it returns catalog context, so the agent only ever receives metadata the user is entitled to see.
+
+### 4. Data-product access check
+
+When a tool reaches into a data product, the runtime calls the Data Products service, again with the same user identity. That service independently re-checks that the user has view or query permission on the specific data product before returning anything. Restricted products that the user has no grant for are hidden entirely.
+
+### 5. Credential resolution
+
+Before querying a warehouse, the runtime resolves which stored credential to use for this user and this data product. Resolution prefers the user's own active credential, and only falls back to a shared service account if your administrator has enabled that option for the data product.
+
+See [Identity and permissions](/agent-studio-docs/security/identity-and-permissions/#warehouse-credentials) for the full resolution order and what changes when a shared service account is used.
+
+### 6–7. Warehouse query
+
+The Query Service executes the query against the warehouse using the resolved stored credential; the user's Alation token never reaches the warehouse. The warehouse authenticates that credential's principal and enforces its native row, column, and object-level access controls.
+
+<Aside type="caution" title="The one identity translation">
+Hops 1–5 all carry the *same* end-user identity. At the warehouse, the user's Alation token is replaced by a stored credential. By default that credential is the user's own, so warehouse-native security still applies per user. If a shared service account is enabled and selected for a data product, the warehouse sees one shared principal for all users of that product, and per-user attribution at the warehouse is lost (Alation still records who ran the query). Confirm whether any data product uses a shared service account before relying on warehouse-native per-user controls.
+</Aside>
+
+## Identity at each hop
+
+| # | Hop | Identity known | Credential on the wire |
+|---|-----|----------------|------------------------|
+| 1 | User → entry point | Channel's own identity (session, Slack user ID, OAuth subject) | Channel-native check: session, signed request, or OAuth handshake |
+| 2 | Entry point → Agent Studio runtime | Alation user | Per-user Alation access token |
+| 3 | Runtime → Alation Core | Same Alation user | Same user token, forwarded |
+| 4 | Runtime → Data Products | Same Alation user | Same user token, forwarded |
+| 5 | Credential resolution | Same Alation user | — (resolves a stored `auth_id`) |
+| 6 | Runtime → Query Service | Translated | Stored credential (`auth_id`) |
+| 7 | Query Service → warehouse | Warehouse principal | User-own (default) or shared service account |
+
+Hops 1–5 preserve identity end to end. Hop 6 is the single identity-translation point.
+
+## AI governance and the language model
+
+Authorization is enforced around the language model, not inside it. Agent visibility, data-product permission checks, and warehouse credentials decide what a request can reach, and the model cannot widen that scope: tools are fixed per agent by the author, and every data access is re-checked against the user's permissions downstream.
+
+There are no model-side controls today — no prompt-injection filtering, output moderation, or model policy engine. If your security review requires them in addition to access control, raise this with your Alation account team to confirm current capabilities for your deployment.
+
+## Related pages
+
+- [Identity and permissions](/agent-studio-docs/security/identity-and-permissions/) — the role, credential, and grant model behind these checks.
+- [Authentication](/agent-studio-docs/security/identity-and-permissions/#how-you-authenticate-changes-what-you-see) — how the per-user and machine-to-machine tokens are issued.
+- [Slack security](/agent-studio-docs/security/channels/slack/) and [plugin security](/agent-studio-docs/security/channels/plugins/) — this lifecycle applied to each channel.

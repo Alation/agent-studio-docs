@@ -1,0 +1,92 @@
+---
+title: Send Scheduled Data Alerts by Email
+description: "Monitor a data product for a business condition and email stakeholders on a schedule, like a weekly stock-depletion alert."
+titleIcon: calendar
+titleIconAccent: amber
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+
+A team needs to know when a business condition fires: inventory running low, bookings falling behind target, sales dropping week over week.
+This recipe builds an agent that checks a data product on a schedule and emails the right people only when there's something to say.
+It runs in production today at a manufacturer, where parameterized variants of one flow send weekly depletion alerts to dozens of suppliers and staff.
+
+<div class="recipe-cost not-content">
+  <div class="recipe-cost__main">
+    <span class="recipe-cost__label">Estimated cost</span>
+    <span class="recipe-cost__figure">0.25<span class="recipe-cost__acu">ACU</span><span class="recipe-cost__per">per run</span></span>
+  </div>
+  <p class="recipe-cost__note">One metered action per run (the SQL Execution tool call); the SMTP send uses a custom tool and isn't metered. About 13 ACU/week across 50 weekly flows. <a href="/agent-studio-docs/security/observability/usage/#how-consumption-is-priced">At 0.25 ACU per metered action</a>; confirm actual spend on the <a href="/agent-studio-docs/security/observability/usage/">Usage page</a>.</p>
+</div>
+
+## What you'll use
+
+<div class="uses-grid not-content">
+  <a class="uses-card" href="/agent-studio-docs/get-started/key-concepts/#what-is-a-data-product">
+    <span class="uses-card__name">Data product</span>
+    <span class="uses-card__purpose">The governed dataset to monitor</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/tools/sql-execution-tool/">
+    <span class="uses-card__name">SQL Execution tool</span>
+    <span class="uses-card__purpose">An agent evaluates the business condition</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/tools/creating-custom-tools/">
+    <span class="uses-card__name">SMTP tool</span>
+    <span class="uses-card__purpose">Sends the alert email</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/schedules/scheduling-flows/">
+    <span class="uses-card__name">Flow + schedule</span>
+    <span class="uses-card__purpose">Runs the check automatically</span>
+  </a>
+</div>
+
+## Prerequisites
+
+- A published data product over the source you want to monitor.
+- [Warehouse credentials configured](/agent-studio-docs/security/authentication/machine-to-machine/#configuring-data-warehouse-credentials) for scheduled (non-interactive) runs.
+- SMTP server details for the email tool.
+
+## Build it
+
+<Steps>
+
+1. **Create the agent**
+
+   Write the prompt around the condition, not the query: "Identify SKUs with fewer than 14 days of stock remaining. If none, reply NO ALERT."
+   Add the SQL Execution tool scoped to your data product.
+
+2. **Add the SMTP tool**
+
+   Configure recipients (To, CC, and BCC are all supported), subject, and body.
+   Ask for an HTML body if the email contains tables.
+   Charts can be embedded inline with `<img src="cid:asset_id" />` using the asset ID from the chart tool, or passed as attachments.
+
+3. **Wrap it in a flow**
+
+   Chain the check step and the email step, with the email conditional on the check finding something.
+   For per-segment alerts (per supplier, per region), create one parameterized flow per segment rather than one giant prompt.
+
+4. **Schedule it**
+
+   Set the cadence on the flow's Schedule tab, for example Mondays at 10:00.
+
+</Steps>
+
+## Gotchas
+
+- For Microsoft 365, configure the SMTP tool with OAuth 2.0 client credentials (XOAUTH2) rather than basic auth.
+  Basic auth works for providers that still allow it.
+- Inline images must be PNG; other formats go as attachments.
+- Keep failure notifications on (`notify_on_failure` is on by default) and review [interaction logs](/agent-studio-docs/security/observability/logs/) periodically.
+- Verify the run history after daylight-saving transitions.
+- To deliver into Slack without the Slack integration, email the channel's Slack email address.
+
+## Variations
+
+- Weekly digest instead of threshold alert: summarize the metric every run instead of replying NO ALERT.
+- Relative conditions: "alert me when sales drop more than 5% week over week."
+
+## Related
+
+- [Scheduling flows](/agent-studio-docs/build/schedules/scheduling-flows/)
+- [Known limitations](/agent-studio-docs/get-started/recipes/known-limitations/)

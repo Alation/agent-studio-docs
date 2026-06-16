@@ -1,0 +1,163 @@
+---
+title: Architecture Overview
+description: "How Agent Studio is put together: the entry channels, the runtime, the Alation Knowledge Layer, and the systems it talks to."
+---
+
+import { Aside, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+This page shows how Agent Studio is put together: where requests enter, what the runtime is responsible for, and which systems it talks to.
+It is written for architects and platform teams evaluating Agent Studio for an enterprise deployment.
+
+For the identity and permission checks applied along these paths, see the [Security section](/agent-studio-docs/security/overview/).
+
+## System architecture
+
+Agent Studio sits between the channels your users already work in and the systems that hold your data.
+Every channel converges on the same runtime, so agents behave the same way regardless of where they are invoked from.
+
+```d2 title="Agent Studio system architecture"
+...@../../../assets/d2/style
+direction: right
+
+user: User {
+  shape: c4-person
+  class: person
+}
+
+channels: Entry points {
+  class: zone
+  slack: Slack {class: card; icon: ../../../assets/diagram-icons/slack.svg}
+  web: Web UI {class: card; icon: ../../../assets/diagram-icons/globe.svg}
+  mcp: MCP clients {class: card; icon: ../../../assets/diagram-icons/modelcontextprotocol.svg}
+  rest: REST API {class: card; icon: ../../../assets/diagram-icons/api.svg}
+  plugins: Plugins {class: card; icon: ../../../assets/diagram-icons/puzzle.svg}
+}
+
+studio: Agent Studio runtime {
+  class: hero
+  agents: Agents {class: card; icon: ../../../assets/diagram-icons/robot.svg}
+  tools: Tools {class: card; icon: ../../../assets/diagram-icons/gear.svg}
+  flows: Flows & schedules {class: card; icon: ../../../assets/diagram-icons/flow.svg}
+  evals: Evaluations {class: card; icon: ../../../assets/diagram-icons/check.svg}
+}
+
+akl: Alation Knowledge Layer {
+  class: bluezone
+  catalog: Data Catalog {class: bluecard; icon: ../../../assets/diagram-icons/catalog.svg}
+  dp: Data Products {class: bluecard; icon: ../../../assets/diagram-icons/catalog.svg}
+}
+
+llm: LLM providers\n(OpenAI, Anthropic, BYOM) {
+  class: purplecard
+  icon: ../../../assets/diagram-icons/sparkles.svg
+}
+
+wh: Customer warehouses {
+  class: zone
+  sf: Snowflake {shape: cylinder; class: bluecard; icon: ../../../assets/diagram-icons/snowflake.svg}
+  dbx: Databricks {shape: cylinder; class: bluecard; icon: ../../../assets/diagram-icons/databricks.svg}
+}
+
+user -> channels: {class: flow}
+channels -> studio: User questions\n(per-user identity) {class: flow; style.animated: true}
+studio -> akl: Governed context\nand permissions {class: flow; style.animated: true}
+studio <-> llm: Reasoning {class: flow; style.animated: true}
+studio -> wh: SQL via stored\ncredentials {class: flow; style.animated: true}
+studio -> channels: Answers {class: okflow; style.animated: true}
+```
+
+Three properties of this layout matter for an enterprise review:
+
+1. **One runtime, many channels.**
+   Slack, MCP clients, the web UI, plugins, and the REST API all call the same agents and tools, so access rules are defined once and enforced everywhere.
+2. **The Knowledge Layer is the grounding source.**
+   Agents retrieve catalog context and data product definitions through tools, which means responses inherit the governance already applied in Alation.
+3. **Warehouse access is mediated.**
+   Agents never hold raw database credentials.
+   Queries run through stored connection credentials that Alation resolves per user and per data product.
+
+## The layers, bottom to top
+
+| Layer | What it provides | Where it is documented |
+|-------|------------------|------------------------|
+| Alation Knowledge Layer | Trusted catalog metadata and data products that ground every agent | [Key concepts](/agent-studio-docs/get-started/key-concepts/#what-is-the-alation-knowledge-layer) |
+| LLMs | Reasoning over user intent; OpenAI, Anthropic, or your own model | [Models](/agent-studio-docs/build/models/llm-configuration/) |
+| Tools | Actions an agent can take: search the catalog, run SQL, generate charts | [Tools](/agent-studio-docs/build/tools/overview/) |
+| Agents | LLM + prompt + tools, composed to complete a task | [Agents](/agent-studio-docs/build/agents/overview/) |
+| Flows and schedules | Multi-step orchestration and recurring runs | [Flows](/agent-studio-docs/build/flows/overview/) |
+| Channels | Slack, plugins, MCP, REST API, SDK | [Integrations](/agent-studio-docs/integrations/overview/) |
+
+## Deployment models
+
+Agent Studio runs in two deployment models.
+
+### Alation Cloud (default)
+
+The Agent Studio runtime runs in Alation's cloud alongside your Alation instance.
+Requests from your users reach Alation over TLS, and warehouse queries are executed through the same connections your catalog already uses.
+
+### Zero Data
+
+In a Zero Data deployment, customer data never passes through Alation's cloud.
+The runtime runs on a [k3s](https://k3s.io/)-based agent inside your environment, next to your databases and your LLM endpoint, and reaches back to Alation's cloud only for catalog metadata and session context over an mTLS tunnel.
+
+```d2 title="Deployment models compared"
+...@../../../assets/d2/style
+direction: right
+
+saas: Alation Cloud deployment {
+  class: zone
+  browser: User {shape: c4-person; class: person}
+  cloud: Alation Cloud {
+    class: card
+    studio: Agent Studio runtime {class: hero}
+  }
+  wh: Customer warehouse {shape: cylinder; class: bluecard; icon: ../../../assets/diagram-icons/snowflake.svg}
+
+  browser -> cloud.studio: TLS {class: flow}
+  cloud.studio -> wh: stored credentials {class: flow}
+}
+
+zd: Zero Data deployment {
+  class: zone
+  browser: User {shape: c4-person; class: person}
+  env: Customer environment {
+    class: bluezone
+    agent: Agent Studio runtime\n(on Alation Agent) {class: hero}
+    db: Customer DB {shape: cylinder; class: bluecard}
+    llm: LLM endpoint {class: purplecard; icon: ../../../assets/diagram-icons/sparkles.svg}
+
+    agent -> db: {class: flow}
+    agent <-> llm: {class: flow}
+  }
+  cloud: Alation Cloud {class: card}
+
+  browser -> env.agent: {class: flow}
+  env.agent <-> cloud: metadata only, mTLS {class: flow; style.stroke-dash: 3}
+}
+```
+
+Choose Zero Data when your security policy requires that query results and LLM traffic stay inside your network boundary.
+
+<CardGrid>
+  <LinkCard
+    title="Zero Data overview"
+    description="The Zero Data topology in detail, including the in-environment components."
+    href="/agent-studio-docs/architecture/zero-data/overview/"
+  />
+  <LinkCard
+    title="Zero Data infrastructure requirements"
+    description="The PostgreSQL, Redis, and LLM endpoints you provision before installing."
+    href="/agent-studio-docs/architecture/zero-data/infrastructure/"
+  />
+</CardGrid>
+
+## Where identity is enforced
+
+Every hop in the diagrams above re-checks the caller's identity.
+The [Security section](/agent-studio-docs/security/overview/) traces a single request end to end and documents the one place where identity is translated (the warehouse hop).
+
+<Aside type="tip" title="For security reviews">
+Start with the [request lifecycle](/agent-studio-docs/security/request-lifecycle/) page.
+It answers the most common security-review question, "whose identity is used at each step?", with a hop-by-hop diagram.
+</Aside>

@@ -1,0 +1,81 @@
+---
+// Custom title that renders a brand/category icon beside the page title
+// when the page sets `titleIcon` in frontmatter. Falls back to the default
+// title-only rendering otherwise.
+
+// Brand icons (multi-color, render in their own colors)
+import claude from '@lobehub/icons-static-svg/icons/claude-color.svg';
+import claudecode from '@lobehub/icons-static-svg/icons/claudecode-color.svg';
+import codex from '@lobehub/icons-static-svg/icons/codex-color.svg';
+import copilot from '@lobehub/icons-static-svg/icons/copilot-color.svg';
+import cursor from '@lobehub/icons-static-svg/icons/cursor.svg';
+import geminicli from '@lobehub/icons-static-svg/icons/geminicli-color.svg';
+import n8n from '@lobehub/icons-static-svg/icons/n8n-color.svg';
+import openai from '@lobehub/icons-static-svg/icons/openai.svg';
+import snowflakeBrand from '@lobehub/icons-static-svg/icons/snowflake-color.svg';
+import librechat from '../assets/diagram-icons/librechat.svg';
+import vscode from '../assets/diagram-icons/vscode.svg';
+import snowflake from '../assets/diagram-icons/snowflake.svg';
+// Monochrome icons (tinted with the page accent)
+import calendar from '../assets/diagram-icons/calendar.svg';
+import api from '../assets/diagram-icons/api.svg';
+import catalog from '../assets/diagram-icons/catalog.svg';
+import check from '../assets/diagram-icons/check.svg';
+import chart from '../assets/diagram-icons/chart.svg';
+import flow from '../assets/diagram-icons/flow.svg';
+
+const ICONS: Record<string, any> = {
+	claude, claudecode, codex, copilot, cursor, geminicli, n8n, openai,
+	'snowflake-brand': snowflakeBrand, librechat, vscode, snowflake,
+	calendar, api, catalog, check, chart, flow,
+};
+
+const ACCENTS: Record<string, string> = {
+	blue: '#3b82f6', purple: '#8b5cf6', green: '#22c55e',
+	amber: '#f59e0b', cyan: '#06b6d4', rose: '#f43f5e',
+};
+
+const { title, titleIcon, titleIconAccent } = Astro.locals.starlightRoute.entry.data as {
+	title: string;
+	titleIcon?: string;
+	titleIconAccent?: string;
+};
+
+const Icon = titleIcon ? ICONS[titleIcon] : undefined;
+const accent = titleIconAccent ? ACCENTS[titleIconAccent] : undefined;
+---
+
+<h1 id="_top" class={Icon ? 'has-title-icon' : undefined}>
+	{Icon && (
+		<span class="title-icon" style={accent ? `color:${accent}` : undefined}>
+			<Icon width={36} height={36} aria-hidden="true" />
+		</span>
+	)}
+	<span>{title}</span>
+</h1>
+
+<style>
+	@layer starlight.core {
+		h1 {
+			margin-top: 1rem;
+			font-size: var(--sl-text-h1);
+			line-height: var(--sl-line-height-headings);
+			font-weight: 600;
+			color: var(--sl-color-white);
+		}
+	}
+	h1.has-title-icon {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+	.title-icon {
+		display: inline-grid;
+		place-items: center;
+		flex-shrink: 0;
+	}
+	.title-icon :global(svg) {
+		width: clamp(1.6rem, 1em, 2.25rem);
+		height: clamp(1.6rem, 1em, 2.25rem);
+	}
+</style>

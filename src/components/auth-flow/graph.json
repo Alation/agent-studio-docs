@@ -1,0 +1,547 @@
+{
+  "metadata": {
+    "version": "1.6.0-demo",
+    "description": "How authorization works for Alation Agent Studio: identity from the integration through to data in the warehouse."
+  },
+  "presentation": {
+    "_doc": "Presentation layer for auth_flow_explorer.html. The HTML renders ONLY from here + the model arrays above; it holds no content of its own. min_level: 0=exec 1=user 2=legal 3=security (additive). Move-verbatim from the former HTML constants.",
+    "personas": [
+      {
+        "id": "exec",
+        "label": "Executive",
+        "depth": 0,
+        "blurb": "the shape & the one identity break"
+      },
+      {
+        "id": "user",
+        "label": "User",
+        "depth": 1,
+        "blurb": "what each role can actually do"
+      },
+      {
+        "id": "legal",
+        "label": "Legal",
+        "depth": 2,
+        "blurb": "data residency and governance"
+      },
+      {
+        "id": "security",
+        "label": "Security",
+        "depth": 3,
+        "blurb": "LLM hosting and the auth model"
+      }
+    ],
+    "platforms": [
+      {
+        "id": "slack",
+        "logo": "slack",
+        "label": "Slack",
+        "default": true,
+        "reaches": [
+          "agent"
+        ],
+        "blurb": "Slack verifies the request signature, exchanges a per-user OAuth token, and goes through a published agent. It does not call tools or the API directly."
+      },
+      {
+        "id": "plugin",
+        "logo": "claude",
+        "label": "Claude / Codex plugin",
+        "reaches": [
+          "agent",
+          "tool",
+          "api"
+        ],
+        "blurb": "The on-device plugin runs per-user OAuth and can take any of three paths: chat with a published agent, invoke a tool directly, or call the REST API. All carry the same per-user token."
+      },
+      {
+        "id": "mcp",
+        "logo": "mcp",
+        "label": "MCP",
+        "reaches": [
+          "agent",
+          "tool",
+          "api"
+        ],
+        "blurb": "An MCP client can take any of three paths over /ai/mcp: a published agent (surfaced as a tool), a tool directly, or the API. The same per-user token is verified and carried downstream."
+      }
+    ],
+    "dp_support": {
+      "doc_ref": "https://docs.alation.com/en/latest/DataProductsandMarketplace/ManageDataProducts/DataSourcesInDataProducts.html",
+      "rule": "Each person who uses Data Product Chat or an agent connects with their own account on the underlying database, and needs read access to the relevant tables.",
+      "sources": [
+        {
+          "id": "snowflake",
+          "label": "Snowflake",
+          "methods": [
+            "Snowflake SSO (OAuth 2.0)",
+            "Key pair"
+          ]
+        },
+        {
+          "id": "bigquery",
+          "label": "Google BigQuery",
+          "methods": [
+            "Service account JSON key"
+          ]
+        },
+        {
+          "id": "redshift",
+          "label": "Amazon Redshift",
+          "methods": [
+            "Basic (username / password)"
+          ]
+        },
+        {
+          "id": "databricks",
+          "label": "Databricks Unity Catalog",
+          "methods": [
+            "Personal Access Token (PAT)"
+          ]
+        },
+        {
+          "id": "postgres",
+          "label": "PostgreSQL",
+          "methods": [
+            "Basic (username / password)"
+          ]
+        },
+        {
+          "id": "sqlserver",
+          "label": "SQL Server",
+          "methods": [
+            "Basic (username / password)"
+          ]
+        },
+        {
+          "id": "saphana",
+          "label": "SAP HANA",
+          "methods": [
+            "Database or LDAP credentials"
+          ]
+        },
+        {
+          "id": "teradata",
+          "label": "Teradata",
+          "methods": [
+            "Database or LDAP credentials"
+          ]
+        }
+      ],
+      "decision": {
+        "title": "Which identity runs the query?",
+        "intro": "Agents and Chat with Data work the same way.",
+        "steps": [
+          {
+            "id": "own",
+            "q": "Has this person connected their own account for the data product?",
+            "yes": "outcome_user",
+            "no": "sa_mode",
+            "note": "Set up in the Data Products UI, where the user connects their own account to the data product."
+          },
+          {
+            "id": "sa_mode",
+            "q": "Has an admin enabled a shared connection account for this data product?",
+            "yes": "outcome_sa",
+            "no": "outcome_fail",
+            "note": "An optional setup an admin turns on; it is not the default."
+          }
+        ],
+        "outcomes": {
+          "outcome_user": {
+            "kind": "good",
+            "label": "Runs as the person's own account",
+            "body": "The query runs as that person on the database, so the warehouse applies their own access rights to the results. This is the default."
+          },
+          "outcome_sa": {
+            "kind": "warn",
+            "label": "Runs as a shared connection account",
+            "body": "Everyone querying this data product connects with one shared account that an admin set up. Used only when that option is turned on."
+          },
+          "outcome_fail": {
+            "kind": "stop",
+            "label": "The query doesn't run",
+            "body": "If the person has not connected their own account and no shared account is set up, the query simply doesn't run — it never borrows someone else's access."
+          }
+        }
+      }
+    },
+    "roles": [
+      "Viewer",
+      "Explorer",
+      "Steward",
+      "Composer",
+      "Source Admin",
+      "Catalog Admin",
+      "Server Admin"
+    ],
+    "role_tiers": {
+      "viewer_license": [
+        "Viewer",
+        "Explorer"
+      ],
+      "builders": [
+        "Steward",
+        "Composer",
+        "Source Admin",
+        "Catalog Admin",
+        "Server Admin"
+      ],
+      "admins": [
+        "Catalog Admin",
+        "Server Admin"
+      ]
+    },
+    "signin": [
+      {
+        "v": "U2M — SSO / interactive",
+        "note": "per-user; what every Agent Studio integration uses",
+        "min_level": 0
+      }
+    ],
+    "nodes": {
+      "frontdoor": {
+        "icon": "Boxes",
+        "wrap": "bg-gray-900",
+        "color": "text-white",
+        "min_level": 0,
+        "title": "Incoming request",
+        "sub": "pick the platform the request comes from",
+        "plain": "A request comes in from a supported platform and runs through a per-user OAuth flow, so every later step acts as that specific person. The platform decides where the request can enter: at a published agent, or directly at tools and APIs.",
+        "know": "All platforms share the same per-user OAuth. What differs is the entry point: Slack always goes through a published agent, while the plugin and MCP can also invoke tools or APIs directly, skipping the agent wrapper.",
+        "tech": [
+          {
+            "k": "One identity model",
+            "g": "Every platform carries a per-user Alation OAuth token; none uses a shared bot identity on the data path.",
+            "j": "U2M OAuth (Authorization-Code + PKCE), per-user bearer to /ai/api/v1/chats or /ai/mcp."
+          }
+        ]
+      },
+      "signin": {
+        "icon": "KeyRound",
+        "wrap": "bg-orange-100",
+        "color": "text-orange-500",
+        "min_level": 0,
+        "title": "Signs in as themselves",
+        "sub": "Their own Alation account, not a shared bot",
+        "plain": "The person connects their own Alation account, so every later step acts as that specific person.",
+        "know": "Their real Alation identity now travels with the request.",
+        "tech": [
+          {
+            "k": "Personal sign-in",
+            "g": "A one-time browser login links the Slack user to their Alation account.",
+            "j": "OAuth Authorization-Code + PKCE; a per-user token is minted and replayed downstream."
+          }
+        ]
+      },
+      "agent": {
+        "icon": "Bot",
+        "wrap": "bg-violet-100",
+        "color": "text-violet-600",
+        "min_level": 0,
+        "title": "AI agent (Agent Studio)",
+        "sub": "the entry point, a published agent",
+        "plain": "The whole conversation runs inside an AI agent built in Agent Studio. The agent is the entry point: the person talks to it, and it decides which of its tools to call.",
+        "know": "The first authorization question: is this person allowed to use this agent at all?",
+        "tech": [
+          {
+            "k": "Agent discovery",
+            "g": "Published agents are visible to everyone; drafts only to their author. Role is NOT a threshold here.",
+            "j": "Visibility filter on the agent's published status and owner."
+          }
+        ],
+        "facets": [
+          {
+            "min_level": 3,
+            "label": "Which LLM runs the agent",
+            "body": "By default the agent runs on an Alation-hosted AWS Bedrock model (Claude Sonnet/Opus/Haiku), routed by AWS region. Tenants can Bring Your Own Model: a per-feature or per-agent override falls back to a tenant default, then to the Alation default. BYOM supports Bedrock and OpenAI / Anthropic / OpenAI-compatible providers via API key + base URL. LLM credentials are encrypted at rest."
+          }
+        ]
+      },
+      "tools": {
+        "icon": "Wrench",
+        "wrap": "bg-gray-100",
+        "color": "text-gray-600",
+        "min_level": 0,
+        "title": "The agent’s tools",
+        "sub": "a fixed set chosen by the agent’s author",
+        "plain": "Each agent carries a fixed set of tools picked by its author. It can only call those; it can’t invent new powers at runtime.",
+        "know": "Tools come in two kinds, and they reach data in two very different ways (see the split below).",
+        "tech": [
+          {
+            "k": "Tool visibility",
+            "g": "Tools inherit the parent agent’s visibility — there is no extra per-user data-permission check at the tool layer itself.",
+            "j": "Tool authorization checks the parent agent's visibility; there are no extra scopes at the tool layer."
+          }
+        ]
+      },
+      "tool_cat": {
+        "icon": "BookOpen",
+        "wrap": "bg-blue-100",
+        "color": "text-blue-600",
+        "min_level": 0,
+        "title": "Reads data in Alation",
+        "sub": "metadata, lineage, samples",
+        "plain": "This kind of tool reads data that lives inside Alation itself: table & column descriptions, lineage, glossary terms, and sample values stored in the catalog.",
+        "know": "It never touches the warehouse. What comes back is governed by your catalog permissions and your role.",
+        "tech": [
+          {
+            "k": "Catalog read",
+            "g": "Returns catalog context scoped to the caller’s grants.",
+            "j": "user-scoped context API."
+          }
+        ]
+      },
+      "tool_dp": {
+        "icon": "Package",
+        "wrap": "bg-purple-100",
+        "color": "text-purple-600",
+        "min_level": 0,
+        "title": "Queries a data product",
+        "sub": "a governed gateway to the warehouse",
+        "plain": "This kind of tool answers questions that need real data by going through a data product: a governed, published query interface over a warehouse table.",
+        "know": "The data product must be shared with you (or granted) first. Only then is the query sent onward to the warehouse."
+      },
+      "warehouse": {
+        "icon": "Database",
+        "wrap": "bg-green-100",
+        "color": "text-green-600",
+        "min_level": 0,
+        "title": "Runs the query on the warehouse",
+        "plain": "The approved query runs against the real warehouse (Snowflake, BigQuery, …) and rows come back.",
+        "know": "Which rows/columns you get depends on which credential the warehouse sees, set at the ⚠ boundary just above.",
+        "tech": [
+          {
+            "k": "Precedence (in core)",
+            "g": "own ACTIVE → shared ACTIVE → own any-status → shared any-status → None. A broken own credential does NOT silently fall through to the shared SA.",
+            "j": "Fixed credential-resolution order, enforced server-side."
+          }
+        ]
+      }
+    },
+    "infra": [
+      {
+        "id": "bedrock",
+        "icon": "Cloud",
+        "min_level": 2,
+        "verified": true,
+        "label": "AWS Bedrock",
+        "sub": "region-routed Claude inference",
+        "plain": "The agent's default model runs on Alation-hosted AWS Bedrock (Claude), with the region chosen per request — and it hard-fails in production if the region is unset, to honor data residency."
+      },
+      {
+        "id": "irsa",
+        "icon": "KeyRound",
+        "min_level": 3,
+        "verified": true,
+        "label": "AWS STS / IAM roles",
+        "sub": "no static keys on the default path",
+        "plain": "Bedrock and S3 access use workload IAM roles via AWS STS, so no static AWS keys are stored on the default path."
+      },
+      {
+        "id": "encryption",
+        "icon": "ShieldCheck",
+        "min_level": 2,
+        "verified": true,
+        "label": "Envelope encryption",
+        "sub": "per-tenant secret encryption",
+        "plain": "LLM/BYOM credentials, OAuth secrets, and chat content are encrypted at rest with per-tenant envelope encryption."
+      },
+      {
+        "id": "token_service",
+        "icon": "KeyRound",
+        "min_level": 3,
+        "verified": true,
+        "label": "Token service",
+        "sub": "short-lived end-user JWT",
+        "plain": "Mints a short-lived (15-minute) JWT carrying the end-user's identity, used by the Zero-Data gateway."
+      },
+      {
+        "id": "iam",
+        "icon": "UserCheck",
+        "min_level": 2,
+        "verified": true,
+        "label": "Session validation",
+        "sub": "browser session checks",
+        "plain": "On the browser path, the user's session is validated and resolved to their tenant identity."
+      },
+      {
+        "id": "fc_cred",
+        "icon": "ArrowRightLeft",
+        "min_level": 1,
+        "verified": true,
+        "label": "Credential resolution",
+        "sub": "pick the warehouse credential",
+        "plain": "Resolves which stored warehouse credential runs a query for this person and data product."
+      }
+    ],
+    "bounds": [
+      {
+        "id": "b0",
+        "tone": "ok",
+        "min_level": 0,
+        "label": "Is it really from Slack?",
+        "title": "Boundary · message authenticity",
+        "plain": "We confirm the message genuinely came from Slack and wasn’t forged or replayed.",
+        "tech": [
+          {
+            "k": "How",
+            "g": "Slack signs every request; we check that signature before doing anything.",
+            "j": "HMAC signature verified with the app signing secret."
+          }
+        ]
+      },
+      {
+        "id": "b1",
+        "tone": "ok",
+        "min_level": 0,
+        "label": "Proven identity travels",
+        "title": "Boundary · verified identity is carried",
+        "plain": "The person’s verified Alation identity is passed to every internal service; nothing acts on their behalf using a shared account.",
+        "tech": [
+          {
+            "k": "How",
+            "g": "A signed identity token is checked at each service and forwarded on.",
+            "j": "Tenant JWT verified via JWKS at each service and forwarded downstream."
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "tone": "warn",
+        "min_level": 0,
+        "label": "⚠ Identity changes hands",
+        "title": "Boundary · the warehouse sees a different identity",
+        "plain": "Here the person’s Alation login stops. The warehouse is reached with a stored database credential; the Alation token is not forwarded to the warehouse.",
+        "tech": [
+          {
+            "k": "How",
+            "g": "Alation looks up the best stored credential for this person + data product and connects with that.",
+            "j": "Stored-credential lookup prefers the user's own credential; a shared service account must be enabled per data product by an admin."
+          }
+        ]
+      }
+    ],
+    "caps": {
+      "agent": [
+        {
+          "id": "use",
+          "icon": "Eye",
+          "label": "Use a published agent",
+          "roles": [
+            "Viewer",
+            "Explorer",
+            "Steward",
+            "Composer",
+            "Source Admin",
+            "Catalog Admin",
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Any signed-in user can run agents that have been published."
+        },
+        {
+          "id": "draft",
+          "icon": "PencilLine",
+          "label": "Create / edit a draft agent",
+          "roles": [
+            "Steward",
+            "Composer",
+            "Source Admin",
+            "Catalog Admin",
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Authoring needs a Creator-tier license. Viewers & Explorers cannot build agents — only use them."
+        },
+        {
+          "id": "publish",
+          "icon": "UploadCloud",
+          "label": "Publish an agent for others",
+          "roles": [
+            "Steward",
+            "Composer",
+            "Source Admin",
+            "Catalog Admin",
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Moving an agent from draft → published is a builder capability; consumers can’t publish."
+        }
+      ],
+      "tools": [
+        {
+          "id": "run",
+          "icon": "Wrench",
+          "label": "Run the agent’s tools",
+          "roles": [
+            "Viewer",
+            "Explorer",
+            "Steward",
+            "Composer",
+            "Source Admin",
+            "Catalog Admin",
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Tools are fixed by the author; anyone who can use the agent can run them."
+        },
+        {
+          "id": "config",
+          "icon": "PencilLine",
+          "label": "Choose / configure tools",
+          "roles": [
+            "Steward",
+            "Composer",
+            "Source Admin",
+            "Catalog Admin",
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Only the agent’s author (a builder) decides which tools the agent carries."
+        }
+      ],
+      "dp": [
+        {
+          "id": "view",
+          "icon": "Eye",
+          "label": "View / query (granted)",
+          "roles": [
+            "Viewer",
+            "Explorer",
+            "Steward",
+            "Composer",
+            "Source Admin",
+            "Catalog Admin",
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Anyone can be granted access to a data product per-object — independent of their global role."
+        },
+        {
+          "id": "manage",
+          "icon": "PencilLine",
+          "label": "Manage product (Product Admin)",
+          "roles": [
+            "Steward",
+            "Composer",
+            "Source Admin",
+            "Catalog Admin",
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Editing a data product needs a per-object Product Admin grant — typically held by builders."
+        },
+        {
+          "id": "admin_full",
+          "icon": "Lock",
+          "label": "Full access as Server Admin",
+          "roles": [
+            "Server Admin"
+          ],
+          "min_level": 1,
+          "why": "Server Admin has full access to data products; other roles get access through an explicit grant."
+        }
+      ]
+    }
+  }
+}

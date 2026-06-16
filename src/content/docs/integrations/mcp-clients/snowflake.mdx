@@ -1,0 +1,143 @@
+---
+title: Snowflake Cortex Agents
+description: "Connect the Alation MCP server to Snowflake as an MCP connector, so Cortex Agents can use trusted catalog context."
+titleIcon: snowflake
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import toolsAndConnectors from '../../../../assets/img/guides/mcp-client-setup/snowflake/01-agents-settings-tools-and-connectors.png';
+import addConnectorModal from '../../../../assets/img/guides/mcp-client-setup/snowflake/02-add-mcp-connector-modal.png';
+import agentsPage from '../../../../assets/img/guides/mcp-client-setup/snowflake/03-agents-page.png';
+import mcpConnectorsTab from '../../../../assets/img/guides/mcp-client-setup/snowflake/04-agent-mcp-connectors-tab.png';
+import connectorInChat from '../../../../assets/img/guides/mcp-client-setup/snowflake/05-connector-in-chat.png';
+import connectorConnected from '../../../../assets/img/guides/mcp-client-setup/snowflake/06-connector-connected.png';
+
+Connect the Alation-hosted MCP server to Snowflake as an MCP connector, then attach it to a Cortex Agent so the agent can ground its answers in your catalog.
+
+<Aside type="note">
+This connector calls Alation's MCP server from Snowflake.
+To go the other direction and call Agent Studio agents from SQL over the REST API, see the [Snowflake recipe](/agent-studio-docs/get-started/recipes/snowflake-agent/).
+</Aside>
+
+## Prerequisites
+
+- Permission in Snowflake to create an MCP connector.
+- **Server Admin** access to your Alation instance to create the OAuth client.
+
+## Creating the OAuth client
+
+The connector authenticates with [user-initiated OAuth](/agent-studio-docs/security/authentication/user-initiated-auth/).
+Snowflake needs two redirect URIs registered on the client:
+
+1. The static URI: `https://identity.snowflake.com/oauth2/callback`
+2. Your deployment's Snowsight URI: run `SELECT SYSTEM$ALLOWLIST();` in Snowflake and find the `SNOWSIGHT_DEPLOYMENT` entry that starts with `apps-api`. Prefix it with `https://`.
+
+Create the OAuth client in the Alation UI following the [user-initiated OAuth guide](/agent-studio-docs/security/authentication/user-initiated-auth/), add both redirect URIs, and copy the **Client ID** and **Client Secret**.
+
+## Adding the MCP connector in Snowsight
+
+<Steps>
+
+1. **Open Tools and Connectors**
+
+   Log into Snowsight, select **AI & ML » Agents** from the left navigation, click **Settings**, and choose **Tools and Connectors**.
+
+   <Image src={toolsAndConnectors} alt="Snowsight Agents settings showing the Tools and connectors list with an Alation MCP server connector enabled" style="max-width: 100%; height: auto;" />
+
+2. **Add a custom connector**
+
+   Click **Add Custom** to open the **Add MCP Connector** modal.
+
+   <Image src={addConnectorModal} alt="Add MCP Connector modal with fields for location, name, description, server URL, OAuth client, and endpoints" style="max-width: 70%; height: auto;" />
+
+3. **Fill in the connector**
+
+   | Field | Value |
+   |-------|-------|
+   | Location | The database and schema where the connector should be available |
+   | Name / Description | A clear name and a description that tells the agent what the server provides |
+   | API Integration | **Standard OAuth** |
+   | Server URL | `https://your-alation-instance.alationcloud.com/ai/mcp/` — the trailing slash is required |
+   | OAuth Client ID / Secret | From the OAuth client you created |
+   | Authorization endpoint | `https://your-alation-instance.alationcloud.com/oauth/v1/authorize/` |
+   | Token endpoint | `https://your-alation-instance.alationcloud.com/oauth/v1/token/` |
+   | Scopes | `openid` |
+
+4. **Add it**
+
+   Click **Add**.
+   The connector appears under **Connectors** with status **Enabled** — authentication happens later, per user, when the connector is first used.
+
+</Steps>
+
+<details>
+<summary>Alternative: create the connector with SQL</summary>
+
+An MCP connector is an API integration linked to an external MCP server object:
+
+```sql
+-- Create the API integration with the OAuth configuration
+CREATE API INTEGRATION alation_mcp_integration
+  API_PROVIDER = external_mcp
+  API_ALLOWED_PREFIXES = ('https://your-alation-instance.alationcloud.com/ai/mcp/')
+  API_USER_AUTHENTICATION = (
+    TYPE = OAUTH2
+    OAUTH_CLIENT_ID = '<client-id>'
+    OAUTH_CLIENT_SECRET = '<client-secret>'
+    OAUTH_TOKEN_ENDPOINT = 'https://your-alation-instance.alationcloud.com/oauth/v1/token'
+    OAUTH_CLIENT_AUTH_METHOD = CLIENT_SECRET_BASIC
+    OAUTH_AUTHORIZATION_ENDPOINT = 'https://your-alation-instance.alationcloud.com/oauth/v1/authorize'
+    OAUTH_ALLOWED_SCOPES = ('openid')
+    OAUTH_REFRESH_TOKEN_VALIDITY = 86400
+  )
+  ENABLED = TRUE;
+
+-- Create the external MCP server in the target database
+USE DATABASE <your-database>;
+CREATE EXTERNAL MCP SERVER alation_mcp_server
+  WITH DISPLAY_NAME = 'Alation MCP server'
+  URL = 'https://your-alation-instance.alationcloud.com/ai/mcp/'
+  API_INTEGRATION = alation_mcp_integration;
+```
+
+The connector then shows up in **Settings » Tools and Connectors** like one created in the UI.
+
+</details>
+
+## Adding the connector to a Cortex Agent
+
+<Steps>
+
+1. **Open your agent**
+
+   From **AI & ML » Agents**, create a new agent or select an existing one and click **Edit**.
+
+   <Image src={agentsPage} alt="Snowsight Agents page with the Create agent button" style="max-width: 100%; height: auto;" />
+
+2. **Attach the connector**
+
+   On the **MCP Connectors** tab, find the Alation connector and click **Add to agent**.
+
+   <Image src={mcpConnectorsTab} alt="Agent MCP Connectors tab listing the Alation MCP server with an Add to agent button" style="max-width: 80%; height: auto;" />
+
+3. **Connect as yourself**
+
+   In the agent's chat window, click the **+** button; the Alation connector appears in the Connectors list.
+   Click **Connect** and sign in to your Alation instance in the browser window that opens (username/password or SSO).
+
+   <Image src={connectorInChat} alt="Agent chat window showing the Alation MCP server in the Connectors list with a Connect button" style="max-width: 70%; height: auto;" />
+
+4. **Verify**
+
+   A green check appears against the connector once authentication succeeds.
+   Because each user connects individually, every request to Alation runs with [that user's own permissions](/agent-studio-docs/security/identity-and-permissions/).
+
+   <Image src={connectorConnected} alt="Connectors list showing a green check against the Alation MCP server" style="max-width: 70%; height: auto;" />
+
+</Steps>
+
+## Related
+
+- [Using the MCP server](/agent-studio-docs/integrations/mcp/using-the-mcp-server/) — what the connector exposes, example prompts, and custom MCP servers with curated tool sets.
+- [Query Agent Studio from Snowflake](/agent-studio-docs/get-started/recipes/snowflake-agent/) — the reverse direction, calling agents from SQL over REST.

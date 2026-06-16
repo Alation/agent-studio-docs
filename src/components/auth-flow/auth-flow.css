@@ -1,0 +1,136 @@
+/*
+ * Styles for the embedded authorization-flow explorer.
+ * Tailwind v4 utilities WITHOUT preflight, so Starlight's global styles are untouched.
+ * A mini-preflight scoped to .afx-root (in the lower `base` layer) supplies the
+ * border/box-sizing defaults the utilities rely on.
+ */
+@layer theme, base, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@layer base {
+	.afx-root :where(*, *::before, *::after) {
+		box-sizing: border-box;
+		border-width: 0;
+		border-style: solid;
+		border-color: #e5e7eb;
+	}
+	.afx-root :where(button) {
+		background: none;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+		padding: 0;
+	}
+	.afx-root :where(h1, h2, p) {
+		margin: 0;
+	}
+}
+
+/* explorer chrome: flush with the page in light mode (transparent canvas,
+   faint dots, no border); a light surface in dark mode so the light-styled
+   cards and labels stay readable. */
+.afx-root.grid-bg {
+	background-color: transparent;
+	background-image: radial-gradient(var(--sl-color-gray-6) 1px, transparent 1.4px);
+	background-size: 22px 22px;
+	background-position: -1px -1px;
+}
+[data-theme='dark'] .afx-root.grid-bg {
+	background-color: #fcfcfd;
+	background-image: radial-gradient(rgba(17, 24, 39, 0.1) 1px, transparent 1.4px);
+}
+
+.pop-in {
+	animation: afxPopIn 0.15s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@keyframes afxPopIn {
+	from {
+		opacity: 0;
+		transform: translateY(4px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+.pulse {
+	animation: afxPulse 2.2s ease-in-out infinite;
+}
+@keyframes afxPulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+	}
+	50% {
+		box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.12);
+	}
+}
+.flash {
+	animation: afxFlash 0.5s ease;
+}
+@keyframes afxFlash {
+	0% {
+		background-color: #fef9c3;
+	}
+	100% {
+		background-color: transparent;
+	}
+}
+
+/* zoomable canvas viewport */
+.afx-viewport {
+	position: relative;
+	height: max(34rem, calc(100vh - 16rem));
+	overflow: hidden;
+	touch-action: none;
+	cursor: grab;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.afx-viewport:active {
+	cursor: grabbing;
+}
+
+.afx-zoom-content {
+	width: max-content;
+	transform-origin: 0 0;
+}
+
+.afx-zoom-controls {
+	position: absolute;
+	top: 0.6rem;
+	right: 0.6rem;
+	z-index: 30;
+	display: flex;
+	align-items: center;
+	gap: 0.15rem;
+	padding: 0.2rem 0.35rem;
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 0.5rem;
+	box-shadow: 0 2px 8px -4px rgba(17, 24, 39, 0.25);
+	font-size: 12px;
+	color: #374151;
+	cursor: default;
+}
+
+.afx-zoom-controls span {
+	min-width: 2.6em;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+}
+
+.afx-zoom-controls button {
+	width: 1.6rem;
+	height: 1.6rem;
+	display: grid;
+	place-items: center;
+	border-radius: 0.35rem;
+	font-size: 13px;
+}
+
+.afx-zoom-controls button:hover {
+	background: #f3f4f6;
+}

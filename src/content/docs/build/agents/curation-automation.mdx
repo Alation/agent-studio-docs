@@ -1,0 +1,31 @@
+---
+title: Curation Automation
+description: An agent that generates metadata for catalog objects at scale.
+---
+
+The Curation Automation agent generates metadata for objects in the data catalog. Given an object and its context, it produces suggested metadata such as titles, descriptions, and field values that stewards can review and apply.
+
+## How it works
+
+You pass the agent an object along with the context needed to describe it. The agent returns structured metadata suggestions. Unlike the interactive [Curation](/agent-studio-docs/build/agents/curation) agent, this agent is built for automated, high-volume metadata generation: it produces structured output rather than holding a conversation, which makes it suited to batch curation workflows.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The request, including the object context the agent should describe.
+
+## Output format
+
+The agent returns structured metadata suggestions, with confidence information, rather than free-form text. This makes the output straightforward to review and apply programmatically.
+
+## Comparison with Curation
+
+- **Curation Automation** (this agent) generates metadata as structured output for automated workflows. It does not call catalog tools itself.
+- **[Curation](/agent-studio-docs/build/agents/curation)** is interactive: it searches the catalog, proposes enrichments, and can write them back with your confirmation.
+
+Use Curation Automation when you are curating many objects through a pipeline; use Curation for hands-on enrichment.
+
+## See also
+
+- [Curation](/agent-studio-docs/build/agents/curation)

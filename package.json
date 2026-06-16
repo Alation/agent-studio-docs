@@ -10,13 +10,20 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/react": "^5.0.7",
     "@astrojs/starlight": "^0.37.7",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@lobehub/icons-static-svg": "^1.91.0",
+    "@tailwindcss/vite": "^4.3.0",
     "astro": "^5.18.1",
     "astro-d2": "^0.8.1",
+    "lucide-react": "^0.468.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "sharp": "^0.34.5",
     "starlight-image-zoom": "^0.13.2",
-    "starlight-sidebar-topics": "^0.6.2"
+    "starlight-sidebar-topics": "^0.6.2",
+    "tailwindcss": "^4.3.0"
   },
   "packageManager": "pnpm@10.17.1",
   "pnpm": {

@@ -1,0 +1,96 @@
+---
+title: Integrations Overview
+description: "The channels for using Agent Studio agents and tools: Slack, plugins, MCP clients, the REST API, and the Python SDK."
+---
+
+import SlackIcon from '../../../assets/diagram-icons/slack.svg';
+import SnowflakeIcon from '../../../assets/diagram-icons/snowflake.svg';
+import VsCodeIcon from '../../../assets/diagram-icons/vscode.svg';
+import LibreChatIcon from '../../../assets/diagram-icons/librechat.svg';
+import ApiIcon from '../../../assets/diagram-icons/api.svg';
+import TerminalIcon from '../../../assets/diagram-icons/terminal.svg';
+import McpIcon from '@lobehub/icons-static-svg/icons/mcp.svg';
+import ClaudeCode from '@lobehub/icons-static-svg/icons/claudecode-color.svg';
+import ClaudeIcon from '@lobehub/icons-static-svg/icons/claude-color.svg';
+import OpenAIIcon from '@lobehub/icons-static-svg/icons/openai.svg';
+import CopilotIcon from '@lobehub/icons-static-svg/icons/copilot-color.svg';
+import CursorIcon from '@lobehub/icons-static-svg/icons/cursor.svg';
+import N8nIcon from '@lobehub/icons-static-svg/icons/n8n-color.svg';
+
+Building an agent is half the job.
+This section covers the other half: putting agents and tools where your users already work.
+
+All channels call the same runtime with the same per-user permission checks, so choosing a channel is a user-experience decision, not a security trade-off.
+See the [Architecture overview](/agent-studio-docs/architecture/overview/) for how the channels converge.
+
+Every channel authenticates in one of two OAuth modes: [user-initiated](/agent-studio-docs/security/authentication/user-initiated-auth/) (the request runs as the signed-in person, with their permissions) or [machine-to-machine](/agent-studio-docs/security/authentication/machine-to-machine/) (the request runs with the role assigned to the OAuth client).
+[How you authenticate changes what you see](/agent-studio-docs/security/identity-and-permissions/#how-you-authenticate-changes-what-you-see) explains the difference.
+Whichever channel you choose, built-in tool calls count toward the same [usage metering](/agent-studio-docs/security/observability/usage/).
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/integrations/slack/setup/">
+    <span class="channel-card-head"><SlackIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Slack</span><span class="channel-card-via">Native app</span></span>
+    <span class="channel-card-desc">Business users asking questions where they already chat.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/plugins/overview/">
+    <span class="channel-card-head"><ClaudeCode width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Plugins</span><span class="channel-card-via">Agent Skills</span></span>
+    <span class="channel-card-desc">Developers using Claude Code, Gemini CLI, Codex, and similar tools.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/claude/">
+    <span class="channel-card-head"><ClaudeIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Claude</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Alation context and agents in Claude Desktop and Web.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/chatgpt/">
+    <span class="channel-card-head"><OpenAIIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">ChatGPT</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Alation context in ChatGPT via connectors.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/copilotstudio/">
+    <span class="channel-card-head"><CopilotIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Copilot Studio</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Publishing agents into M365 Copilot and Teams.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/cursor/">
+    <span class="channel-card-head"><CursorIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Cursor</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Catalog context while you code.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/vscode/">
+    <span class="channel-card-head"><VsCodeIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">VS Code</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Catalog context in VS Code chat.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/librechat/">
+    <span class="channel-card-head"><LibreChatIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">LibreChat</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Self-hosted chat UI over Alation tools and agents.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/n8n/">
+    <span class="channel-card-head"><N8nIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">n8n</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Workflow automation calling Alation tools.</span>
+    <span class="channel-card-auth">User-initiated or machine-to-machine OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp-clients/snowflake/">
+    <span class="channel-card-head"><SnowflakeIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Snowflake Cortex</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Alation context in Cortex Agents via an MCP connector.</span>
+    <span class="channel-card-auth">User-initiated OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/mcp/quick-start/">
+    <span class="channel-card-head"><McpIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Any MCP client</span><span class="channel-card-via">MCP</span></span>
+    <span class="channel-card-desc">Anything that speaks the Model Context Protocol.</span>
+    <span class="channel-card-auth">User-initiated or machine-to-machine OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/rest-api/auth/">
+    <span class="channel-card-head"><ApiIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">REST API</span><span class="channel-card-via">HTTP</span></span>
+    <span class="channel-card-desc">Calling agents from your own applications and pipelines.</span>
+    <span class="channel-card-auth">Machine-to-machine OAuth</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/integrations/sdk/using-the-sdk/">
+    <span class="channel-card-head"><TerminalIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Python SDK</span><span class="channel-card-via">Python</span></span>
+    <span class="channel-card-desc">Embedding Alation tools in your own agent stack.</span>
+    <span class="channel-card-auth">Machine-to-machine OAuth</span>
+  </a>
+</div>

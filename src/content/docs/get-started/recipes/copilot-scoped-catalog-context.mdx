@@ -1,0 +1,78 @@
+---
+title: Scoped Catalog Context in Microsoft Copilot and Teams
+description: "Publish a tightly scoped catalog-context agent into M365 Copilot and Teams, where scoping is what makes the accuracy."
+titleIcon: copilot
+titleIconAccent: purple
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+
+Business users live in Teams, not in the catalog.
+This recipe publishes a catalog-context agent into Microsoft Copilot and Teams, scoped to one domain's glossary and tables.
+The scoping is the recipe: a tightly scoped agent at one enterprise reached 100% on its evaluation set and was demoed by the CEO from a phone; unscoped agents over the whole catalog rarely get close.
+
+<div class="recipe-cost not-content">
+  <div class="recipe-cost__main">
+    <span class="recipe-cost__label">Estimated cost</span>
+    <span class="recipe-cost__figure">0.5–0.75<span class="recipe-cost__acu">ACU</span><span class="recipe-cost__per">per question</span></span>
+  </div>
+  <p class="recipe-cost__note">Two to three metered actions. Tight scoping also trims stray tool calls per question. <a href="/agent-studio-docs/security/observability/usage/#how-consumption-is-priced">At 0.25 ACU per metered action</a>; confirm actual spend on the <a href="/agent-studio-docs/security/observability/usage/">Usage page</a>.</p>
+</div>
+
+## What you'll use
+
+<div class="uses-grid not-content">
+  <a class="uses-card" href="/agent-studio-docs/build/agents/catalog-context-search/">
+    <span class="uses-card__name">Catalog Context Search agent</span>
+    <span class="uses-card__purpose">The base agent to clone</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/tools/get-search-filter-fields-tool/">
+    <span class="uses-card__name">Search filter tools</span>
+    <span class="uses-card__purpose">Constrain search with a custom base_signature</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/integrations/mcp-clients/copilotstudio/">
+    <span class="uses-card__name">Copilot Studio MCP</span>
+    <span class="uses-card__purpose">Publishes the agent into M365</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/evals/sql-evaluations/">
+    <span class="uses-card__name">Evaluations</span>
+    <span class="uses-card__purpose">Proves the scoping worked</span>
+  </a>
+</div>
+
+## Build it
+
+<Steps>
+
+1. **Pick the scope**
+
+   One domain, its glossary, and on the order of 100 tables.
+   Smaller scope means better answers; you can always add a second agent for another domain.
+
+2. **Clone and constrain the agent**
+
+   Clone Catalog Context Search.
+   Configure its search tools with a custom `base_signature` restricted to your Domain, so the agent physically can't wander into unrelated metadata.
+   The same filter can exclude deprecated objects via `flag_types`.
+
+3. **Evaluate before publishing**
+
+   Build an eval set from the questions the target team actually asks, and iterate on metadata until it passes.
+
+4. **Publish via Copilot Studio**
+
+   Follow the [Copilot Studio setup guide](/agent-studio-docs/integrations/mcp-clients/copilotstudio/) to connect the agent over MCP, then publish to Teams.
+
+</Steps>
+
+## Gotchas
+
+- Chart rendering doesn't work in Copilot/Teams; keep the agent's answers textual.
+- Viewer-role users see agent-building affordances in Alation they can't use — set expectations or hide the entry point in your rollout comms.
+- Evaluations involving cross-database SQL can loop when run against the Alation Analytics connector; pin the agent to the domain's primary data source.
+
+## Related
+
+- [Microsoft Copilot Studio setup](/agent-studio-docs/integrations/mcp-clients/copilotstudio/)
+- [Find duplicate and stale BI reports](/agent-studio-docs/get-started/recipes/bi-report-rationalization/)
+- [Known limitations](/agent-studio-docs/get-started/recipes/known-limitations/)

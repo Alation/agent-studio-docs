@@ -1,0 +1,39 @@
+---
+title: List of Default Tools
+description: The default tools available in Agent Studio.
+sidebar:
+  order: 2
+---
+
+import { getCollection } from 'astro:content';
+
+export const EXCLUDED_TOOL_PAGE_IDS = [
+  'build/tools/overview',
+  'build/tools/configuring-tools',
+  'build/tools/creating-custom-tools',
+  'build/tools/default-tools',
+];
+
+export async function getToolsList() {
+  const tools = await getCollection('docs', (entry) => {
+    if (!entry.id) return false;
+    return entry.id.startsWith('build/tools') && !EXCLUDED_TOOL_PAGE_IDS.includes(entry.id);
+  });
+  
+  return tools.sort((a, b) => a.data.title.localeCompare(b.data.title));
+}
+
+export const tools = await getToolsList();
+
+The complete list of Alation-provided tools is available in your Agent Studio Tools page `https://your-instance.alationcloud.com/app/studio/tools`.
+
+Here are some of frequently used tools:
+
+<ul>
+{tools.map(tool => (
+  <li>
+    <a href={`/agent-studio-docs/${tool.id}/`}>{tool.data.title}</a>
+    {tool.data.description && ` - ${tool.data.description}`}
+  </li>
+))}
+</ul>

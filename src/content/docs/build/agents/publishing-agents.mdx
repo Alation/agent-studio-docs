@@ -1,0 +1,82 @@
+---
+title: Publishing Agents
+description: "Publish or unpublish an agent in the UI or via the API, find draft agents, and understand what changes when you do."
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components'
+
+A new agent starts as a **draft**: visible only to you and admin-tier roles.
+Publishing makes it visible and usable for everyone.
+For the full visibility model and permission matrices, see [identity and permissions](/agent-studio-docs/security/identity-and-permissions/#permission-matrices).
+
+## Publish or unpublish in the UI
+
+<Steps>
+1. **Open your agent** in Agent Studio.
+
+2. **Locate the publish controls** in the top-right corner of the agent page.
+   - Draft agents show a **Publish** button.
+   - Published agents show a **Published** badge and an **Unpublish** button.
+
+   ![Draft agent with Publish button](../../../../assets/img/guides/access-controls/agent-publish-button.png)
+
+   ![Published agent with Unpublish button](../../../../assets/img/guides/access-controls/agent-published-status.png)
+
+3. **Click the button** to toggle the published status.
+   - **Publish** makes the agent visible to all users.
+   - **Unpublish** returns it to draft, hiding it from non-admin users.
+</Steps>
+
+<Aside type="caution">
+If you unpublish an agent that others are using, they lose access immediately.
+The agent remains visible only in your Draft tab and to admin-tier roles.
+</Aside>
+
+## Finding draft agents
+
+Your draft agents appear in the **Draft** tab when browsing agents.
+Other users' drafts are not visible to you unless you are a Server Admin or Catalog Admin.
+
+![Agent browse view with Draft tab](../../../../assets/img/guides/access-controls/agent-browse-draft-tab.png)
+
+<Aside type="tip" title="Can't find your custom agents?">
+Custom agents created before the publish/draft feature was introduced are now in draft status.
+Check the **Draft** tab, and publish them to make them visible to other users again.
+</Aside>
+
+## Publishing via the API (alternative)
+
+You can also change an agent's published status programmatically with a `PATCH` request:
+
+<Tabs>
+<TabItem label="Bearer token">
+```bash
+curl -X PATCH 'https://<your-tenant>.alationcloud.com/ai/api/v1/config/agent/<agent-id>' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <your-oauth-token>' \
+  -d '{"published_status": "published"}'
+```
+</TabItem>
+<TabItem label="curl (session)">
+```bash
+curl -X PATCH 'https://<your-tenant>.alationcloud.com/ai/api/v1/config/agent/<agent-id>' \
+  -H 'Content-Type: application/json' \
+  -H 'x-csrftoken: <your-csrf-token>' \
+  -H 'Cookie: sessionid=<your-session-id>; csrftoken=<your-csrf-token>' \
+  -d '{"published_status": "published"}'
+```
+</TabItem>
+</Tabs>
+
+To unpublish, send `{"published_status": "draft"}`.
+
+The agent ID is in the URL when viewing the agent (`/app/studio/agents/a/<agent-id>`), or list your agents with `GET /ai/api/v1/config/agent`.
+
+**Who can change published status:** standard roles and above, for their own agents.
+Only Server Admin can change other users' agents.
+Viewer and Explorer roles cannot publish (they cannot edit agents at all).
+
+## Related
+
+- [Identity and permissions](/agent-studio-docs/security/identity-and-permissions/#permission-matrices) — the visibility model and full permission matrices.
+- [Publish an agent to MCP](/agent-studio-docs/integrations/mcp/using-the-mcp-server/#publish-an-agent-to-mcp) — expose the published agent as a tool for MCP clients and other agents.
