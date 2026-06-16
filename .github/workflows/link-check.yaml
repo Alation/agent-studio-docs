@@ -54,9 +54,10 @@ jobs:
               uses: lycheeverse/lychee-action@v2
               with:
                   fail: true
-                  # Note: --exclude skips checking URLs matching the pattern (for new pages not yet deployed)
-                  # Remove exclusions once pages are live
-                  args: --accept "100..=103,200..=299,403,418,429" --cache-exclude-status 401 --remap '/dist/agent-studio-docs /dist' --root-dir="${{ github.workspace }}/dist" --cache --max-cache-age 3d --exclude "alation.github.io/agent-studio-docs/guides/flows" --exclude "alation.github.io/agent-studio-docs/guides/observability" --exclude "alation.github.io/agent-studio-docs/releases/" "dist/**/*.html"
+                  # The first remap points the site's own absolute URLs (canonical/og tags
+                  # and cross-page links) at the local build instead of the live site, so
+                  # PRs that add or move pages don't fail on not-yet-deployed URLs.
+                  args: --accept "100..=103,200..=299,403,418,429" --cache-exclude-status 401 --remap 'https://alation\.github\.io/agent-studio-docs file://${{ github.workspace }}/dist' --remap '/dist/agent-studio-docs /dist' --root-dir="${{ github.workspace }}/dist" --cache --max-cache-age 3d --exclude-path "dist/404.html" "dist/**/*.html"
                   jobSummary: true
                   format: markdown
                   workingDirectory: .

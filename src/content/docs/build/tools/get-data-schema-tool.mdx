@@ -1,0 +1,45 @@
+---
+title: Get Data Schema Tool
+description: Retrieve the schema and sample data for the tables in a data product.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Get Data Schema Tool
+
+This tool returns the schema — tables, columns, and sample values — for a data product. Agents use it to understand what data is available before doing heavier work such as running queries.
+
+## When to use it
+
+Add this tool to a querying agent so it can discover the data product's structure first, then write accurate SQL. It pairs naturally with the [SQL Execution Tool](/agent-studio-docs/build/tools/sql-execution-tool).
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `data_product_id` | Yes | string | User input | The data product to inspect. |
+| `query` | No | string | Agent determined | A search phrase to semantically match sample column values, useful for large schemas. |
+| `data_product_version` | No | string | Fixed or User input | A specific version of the data product. |
+| `pre_exec_sql` | No | string | Fixed | SQL to run before sampling tables, e.g. to set session context. |
+| `auth_id` | No | string | Fixed or User input | The authentication credentials to use. |
+
+<Aside type="note">
+See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
+</Aside>
+
+## Example usage
+
+```jsonc
+{
+  "data_product_id": "my-data-product",
+  "query": "customer email"
+}
+```
+
+## Output
+
+Metadata and sample column values for the tables in the data product.
+
+## See also
+
+- [SQL Execution Tool](/agent-studio-docs/build/tools/sql-execution-tool)

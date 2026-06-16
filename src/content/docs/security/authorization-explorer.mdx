@@ -1,0 +1,16 @@
+---
+title: Interactive Authorization Explorer
+description: "Click through the Agent Studio authorization graph hop by hop: every identity, token, and permission check from the entry point to the warehouse."
+tableOfContents: false
+---
+
+import AuthFlowExplorer from '../../../components/auth-flow/AuthFlowExplorer.jsx';
+
+<style set:html={`:root { --sl-content-width: 82rem; }`}></style>
+
+This explorer walks the full authorization graph: pick the platform a request comes from, choose who's asking, and follow the request hop by hop with the identity, token, and permission check at each step.
+It covers the same model as the [request lifecycle](/agent-studio-docs/security/request-lifecycle/), in a form you can click through during a security review.
+
+<div class="not-content">
+  <AuthFlowExplorer client:load />
+</div>

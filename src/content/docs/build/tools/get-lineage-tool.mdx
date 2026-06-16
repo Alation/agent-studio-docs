@@ -1,0 +1,72 @@
+---
+title: Get Lineage Tool
+description: Retrieve upstream or downstream data lineage for catalog objects.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Get Lineage Tool
+
+This tool retrieves data lineage for a catalog object: the chain of objects that feed into it (**upstream**) or that depend on it (**downstream**). Use it to answer questions like "what feeds into this table?", "what breaks if I change this column?", or "where does this report's data come from?"
+
+## When to use it
+
+Add this tool to an agent that needs to reason about data flow, dependencies, or impact analysis. It powers the out-of-the-box [Lineage Agent](/agent-studio-docs/build/agents/lineage-agent).
+
+You give it a starting object and a direction, and it returns the connected graph.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `direction` | Yes | `"upstream"` or `"downstream"` | Agent determined | `upstream` returns sources (inputs); `downstream` returns destinations (outputs). |
+| `otype` | Yes | string | Agent determined | The object type of the starting point, e.g. `"table"` or `"attribute"`. For **column-level** lineage use `"attribute"`, not `"table"`. |
+| `root_node_ids` | Yes | list of IDs | Agent determined | The object IDs to trace from. All must be the same `otype`, e.g. `[123, 456]`. |
+| `allowed_otypes` | No | list of strings | Agent determined | Filters which object types appear in the *returned* graph. Does not change the starting point. |
+| `max_depth` | No | integer (default `10`) | Fixed | How many levels deep to traverse. |
+| `limit` | No | integer (default `1000`, max `1000`) | Fixed | Maximum number of nodes returned. |
+| `excluded_schema_ids` | No | list of integers | Fixed or User input | Schema IDs to exclude from results, e.g. test schemas. |
+| `show_temporal_objects` | No | boolean (default `false`) | Fixed | Include temporary objects in the graph. |
+| `design_time` | No | `1`, `2`, or `3` (default `3`) | Fixed | `3` for both design- and run-time, `1` for design-time only, `2` for run-time only. |
+| `time_from` / `time_to` | No | timestamp string | User input | Limit lineage to a time window, format `YYYY-MM-DDTHH:MM:SS`. |
+| `processing_mode` | No | `"complete"` or `"chunked"` | Fixed | `complete` (default, recommended) returns the whole graph; `chunked` returns it in batches. |
+
+<Aside type="note">
+For **column-level** lineage, start from the columns themselves: set `otype="attribute"` and pass attribute IDs in `root_node_ids`. Starting from a table (`otype="table"`) and filtering with `allowed_otypes=["attribute"]` does **not** produce column lineage.
+</Aside>
+
+See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
+
+## Example usage
+
+Find the tables that feed a single table:
+
+```jsonc
+{
+  "otype": "table",
+  "root_node_ids": [123],
+  "direction": "upstream",
+  "allowed_otypes": ["table"]
+}
+```
+
+Column-level lineage for specific columns (note `otype` is `attribute`):
+
+```jsonc
+{
+  "otype": "attribute",
+  "root_node_ids": [1024, 1089, 1104],
+  "direction": "upstream",
+  "allowed_otypes": ["attribute"]
+}
+```
+
+## Output
+
+A JSON object with a `graph` (the connected objects and their relationships), the `direction` traversed, and `pagination` details when results are chunked.
+
+## See also
+
+- [Lineage Agent](/agent-studio-docs/build/agents/lineage-agent)
+- [Generate Lineage Documentation Tool](/agent-studio-docs/build/tools/generate-lineage-documentation-tool)
+- [Using the Lineage Agent](/agent-studio-docs/get-started/recipes/document-lineage)

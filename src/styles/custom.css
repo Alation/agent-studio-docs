@@ -86,63 +86,337 @@
 	font-size: var(--sl-text-code);
 }
 
+/* Tables: full-width cards with generous padding */
 .sl-markdown-content table {
-	margin: 15px 0;
+	display: table;
+	width: 100%;
+	margin: 1.25rem 0;
 	border-collapse: separate;
-	max-width: fit-content;
-	margin-inline: auto;
-	width: auto;
-	padding: 0;
+	border-spacing: 0;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.75rem;
+	overflow: hidden;
+	font-size: var(--sl-text-sm);
 }
 
-.sl-markdown-content table :is(th:first-child, td:first-child) {
-	padding: 2px 4px;
-}
-
-.sl-markdown-content :is(th:last-child, td:last-child):not(:where(.not-content *)) {
-	padding: 2px 4px;
-}
-
-.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
-	border-bottom: none;
-	vertical-align: baseline;
-}
-
-.sl-markdown-content table code {
-	background-color: inherit;
+.sl-markdown-content table :is(th, td):not(:where(.not-content *)) {
+	padding: 0.625rem 1rem;
 	border: none;
+	vertical-align: top;
+	text-align: left;
 }
 
-.sl-markdown-content table> :is(thead, tbody)>tr> :is(th, td) {
-	padding: 3px 6px;
+.sl-markdown-content table>thead>tr>th {
+	background-color: var(--sl-color-gray-6);
+	color: var(--sl-color-white);
+	font-weight: 600;
+	font-size: var(--sl-text-xs);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	border-bottom: 1px solid var(--sl-color-gray-5);
 }
 
-.sl-markdown-content table>thead>tr> :is(th, td) {
-	background-color: var(--sl-color-gray-5);
-	border-top: 2px solid var(--sl-color-gray-3);
+.sl-markdown-content table>tbody>tr> :is(th, td) {
+	border-bottom: 1px solid var(--sl-color-gray-5);
+	background-color: var(--sl-color-black);
 }
 
 .sl-markdown-content table>tbody>tr:last-child> :is(th, td) {
-	border-bottom: 2px solid var(--sl-color-gray-3);
+	border-bottom: none;
 }
 
-.sl-markdown-content table tr {
+.sl-markdown-content table>tbody>tr:hover> :is(th, td) {
 	background-color: var(--sl-color-gray-6);
 }
 
-.sl-markdown-content table tr:nth-child(2n) {
-	background-color: var(--sl-color-black);
+.sl-markdown-content table code {
+	background-color: var(--sl-color-gray-6);
+	border: none;
+}
+
+/* Inline brand icons inside prose and tables */
+.sl-markdown-content svg[data-brand-icon] {
+	display: inline-block;
+	vertical-align: -0.2em;
+	margin-right: 0.15rem;
 }
 
 .card {
 	border-radius: 0.5rem;
 }
 
-aside {
+/* Asides: keep Starlight's sizing; slim the accent bar, add a hairline
+   border in the variant color, and round the corners. */
+.starlight-aside {
+	border: 1px solid;
+	border-inline-start-width: 3px;
 	border-radius: 0.5rem;
+}
+
+.starlight-aside--note {
+	border-color: color-mix(in srgb, var(--sl-color-blue) 30%, transparent);
+	border-inline-start-color: var(--sl-color-blue);
+}
+
+.starlight-aside--tip {
+	border-color: color-mix(in srgb, var(--sl-color-purple) 30%, transparent);
+	border-inline-start-color: var(--sl-color-purple);
+}
+
+.starlight-aside--caution {
+	border-color: color-mix(in srgb, var(--sl-color-orange) 30%, transparent);
+	border-inline-start-color: var(--sl-color-orange);
+}
+
+.starlight-aside--danger {
+	border-color: color-mix(in srgb, var(--sl-color-red) 30%, transparent);
+	border-inline-start-color: var(--sl-color-red);
 }
 
 starlight-image-zoom-zoomable img {
 	margin-left: auto;
 	margin-right: auto;
+}
+/* Channel cards on the Integrations overview */
+.channel-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+	gap: 0.75rem;
+	margin-top: 1.25rem;
+}
+
+a.channel-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	padding: 0.9rem 1rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.75rem;
+	text-decoration: none;
+	color: var(--sl-color-white);
+	background: var(--sl-color-bg);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+a.channel-card:hover {
+	border-color: var(--sl-color-accent);
+	box-shadow: 0 2px 12px -6px var(--sl-color-accent-low);
+}
+
+.channel-card-head {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+}
+
+.channel-card-head svg,
+.channel-card-head img {
+	flex-shrink: 0;
+}
+
+.channel-card-name {
+	font-weight: 600;
+	font-size: var(--sl-text-base);
+}
+
+.channel-card-via {
+	margin-left: auto;
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--sl-color-gray-3);
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 999px;
+	padding: 0.1rem 0.5rem;
+	white-space: nowrap;
+}
+
+.channel-card-desc {
+	font-size: var(--sl-text-sm);
+	color: var(--sl-color-gray-2);
+	line-height: 1.45;
+}
+
+.channel-card-auth {
+	margin-top: auto;
+	font-size: 0.75rem;
+	color: var(--sl-color-gray-3);
+}
+
+/* Logo pills: compact "works with" strip on landing pages */
+.logo-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 1rem;
+}
+
+a.logo-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.4rem 0.85rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 999px;
+	text-decoration: none;
+	color: var(--sl-color-white);
+	font-size: var(--sl-text-sm);
+	font-weight: 500;
+	background: var(--sl-color-bg);
+	transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+a.logo-pill:hover {
+	border-color: var(--sl-color-accent);
+	transform: translateY(-1px);
+}
+
+
+/* Recipe top summary: cost box + component cards */
+.recipe-cost {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	gap: 0.5rem 1.4rem;
+	margin: 1.5rem 0;
+	padding: 1.1rem 1.35rem;
+	border: 1px solid color-mix(in srgb, var(--sl-color-accent) 35%, var(--sl-color-gray-5));
+	border-radius: 0.8rem;
+	background: color-mix(in srgb, var(--sl-color-accent) 7%, var(--sl-color-bg));
+}
+
+.recipe-cost__main {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding-inline-end: 1.4rem;
+	border-inline-end: 1px solid color-mix(in srgb, var(--sl-color-accent) 22%, transparent);
+}
+
+.recipe-cost__label {
+	font-size: var(--sl-text-xs);
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--sl-color-accent-high);
+}
+
+.recipe-cost__figure {
+	display: flex;
+	align-items: baseline;
+	gap: 0.3rem;
+	font-size: 2rem;
+	font-weight: 700;
+	line-height: 1.05;
+	color: var(--sl-color-white);
+	white-space: nowrap;
+}
+
+.recipe-cost__acu {
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--sl-color-accent-high);
+}
+
+.recipe-cost__per {
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: var(--sl-color-gray-3);
+}
+
+.recipe-cost__note {
+	margin: 0;
+	font-size: var(--sl-text-sm);
+	color: var(--sl-color-gray-2);
+	line-height: 1.5;
+}
+
+.recipe-cost__note a {
+	color: var(--sl-color-text-accent);
+}
+
+@media (max-width: 36rem) {
+	.recipe-cost {
+		grid-template-columns: 1fr;
+	}
+	.recipe-cost__main {
+		flex-direction: row;
+		align-items: baseline;
+		gap: 0.5rem;
+		padding-inline-end: 0;
+		padding-bottom: 0.6rem;
+		border-inline-end: none;
+		border-bottom: 1px solid color-mix(in srgb, var(--sl-color-accent) 22%, transparent);
+	}
+}
+
+.uses-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+	gap: 0.8rem;
+	margin-top: 1.25rem;
+}
+
+a.uses-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	padding: 1rem 1.1rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.75rem;
+	background: var(--sl-color-bg);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	text-decoration: none;
+	color: var(--sl-color-white);
+	transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+/* persistent corner arrow that brightens on hover */
+a.uses-card::after {
+	content: "↗";
+	position: absolute;
+	top: 0.85rem;
+	inset-inline-end: 0.95rem;
+	font-size: 0.8rem;
+	color: var(--sl-color-gray-4);
+	transition: color 0.18s ease, transform 0.18s ease;
+}
+
+a.uses-card:hover {
+	border-color: var(--sl-color-accent);
+	box-shadow: 0 8px 22px -12px var(--sl-color-accent-low);
+	transform: translateY(-2px);
+}
+
+a.uses-card:hover::after {
+	color: var(--sl-color-accent-high);
+	transform: translate(0.1rem, -0.1rem);
+}
+
+.uses-card__name {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding-inline-end: 1rem;
+	font-weight: 600;
+	font-size: var(--sl-text-base);
+	line-height: 1.3;
+}
+
+/* small accent square marker before the name */
+.uses-card__name::before {
+	content: "";
+	width: 0.45rem;
+	height: 0.45rem;
+	border-radius: 2px;
+	background: var(--sl-color-accent);
+	flex-shrink: 0;
+}
+
+.uses-card__purpose {
+	font-size: var(--sl-text-sm);
+	color: var(--sl-color-gray-2);
+	line-height: 1.45;
 }

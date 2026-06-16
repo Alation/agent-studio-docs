@@ -1,0 +1,80 @@
+---
+title: Bulk Endorse or Deprecate Catalog Objects
+description: "Apply trust flags to many objects at once by criteria, like deprecating every order_dt field in a schema."
+titleIcon: check
+titleIconAccent: green
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+
+Stewards often need to flag objects in bulk: "endorse all fields stewarded by this person", "deprecate every `order_dt` column in the raw schema."
+Doing it one object at a time in the UI doesn't scale.
+This recipe builds an agent that finds the matching objects and applies trust flags through the Trust Check Flags API, with a human review step before anything is written.
+Deployed at two enterprises, with an approval-workflow variant in demand at several more.
+
+<div class="recipe-cost not-content">
+  <div class="recipe-cost__main">
+    <span class="recipe-cost__label">Estimated cost</span>
+    <span class="recipe-cost__figure">0.25<span class="recipe-cost__acu">ACU</span><span class="recipe-cost__per">per object</span></span>
+  </div>
+  <p class="recipe-cost__note">The catalog search is metered; the flag writes go through custom HTTP tools, which aren't. A 500-object run pays for the search, not the writes. <a href="/agent-studio-docs/security/observability/usage/#how-consumption-is-priced">At 0.25 ACU per metered action</a>; confirm actual spend on the <a href="/agent-studio-docs/security/observability/usage/">Usage page</a>.</p>
+</div>
+
+## What you'll use
+
+<div class="uses-grid not-content">
+  <a class="uses-card" href="/agent-studio-docs/build/tools/search-catalog-tool/">
+    <span class="uses-card__name">Search Catalog tool</span>
+    <span class="uses-card__purpose">Finds the objects matching your criteria</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/tools/creating-custom-tools/">
+    <span class="uses-card__name">Custom HTTP tools</span>
+    <span class="uses-card__purpose">Wrap the Trust Check Flags API</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/agents/overview/">
+    <span class="uses-card__name">Custom agent</span>
+    <span class="uses-card__purpose">Orchestrates find → review → flag</span>
+  </a>
+</div>
+
+## Build it
+
+<Steps>
+
+1. **Create HTTP tools for the flag API**
+
+   Create custom HTTP tools for creating (and removing) trust flags via `POST /integration/flag/`.
+   One tool per action keeps the agent's choices simple.
+
+2. **Build the agent**
+
+   Prompt pattern: find objects matching the user's criteria, **present the full list for confirmation, and only flag after the user approves**.
+   Add the search tool and your flag tools.
+
+3. **Run it with review**
+
+   Ask: "Deprecate all order_dt fields in the raw schema."
+   Confirm the list, then let the agent apply the flags.
+
+</Steps>
+
+<Aside type="caution" title="Always keep the approval step">
+In one early run, a bulk-update agent applied every change without review because the prompt didn't require confirmation.
+For any agent that writes to the catalog, make the explicit user approval step part of the prompt, not an afterthought.
+</Aside>
+
+## Gotchas
+
+- Custom HTTP tools send request bodies as JSON, but the M2M token endpoint requires a form-encoded body.
+  Configure the tool with authentication **None** and pass a 24-hour API access token in a header instead.
+- Endorsements don't accept comments, and flags can't carry approval documentation — track the approval trail outside the flag (for example, in a custom field).
+
+## Variations
+
+- Approval-workflow variant: a first agent proposes flags into a review queue (custom field), a second applies approved ones on a schedule.
+
+## Related
+
+- [Creating custom tools](/agent-studio-docs/build/tools/creating-custom-tools/)
+- [Machine-to-machine authentication](/agent-studio-docs/security/authentication/machine-to-machine/)
+- [Known limitations](/agent-studio-docs/get-started/recipes/known-limitations/)

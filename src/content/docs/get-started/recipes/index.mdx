@@ -1,0 +1,94 @@
+---
+title: Recipes
+description: "Map your use case to the right Agent Studio building blocks, then follow an Alation-curated walkthrough end to end."
+---
+
+import CalendarIcon from '../../../../assets/diagram-icons/calendar.svg';
+import ApiIcon from '../../../../assets/diagram-icons/api.svg';
+import SnowflakeIcon from '../../../../assets/diagram-icons/snowflake.svg';
+import CatalogIcon from '../../../../assets/diagram-icons/catalog.svg';
+import CheckIcon from '../../../../assets/diagram-icons/check.svg';
+import ChartIcon from '../../../../assets/diagram-icons/chart.svg';
+import FlowIcon from '../../../../assets/diagram-icons/flow.svg';
+import CopilotIcon from '@lobehub/icons-static-svg/icons/copilot-color.svg';
+import N8nIcon from '@lobehub/icons-static-svg/icons/n8n-color.svg';
+
+This page maps common use cases to what you build and where you deliver it, with curated end-to-end walkthroughs for the patterns we see working at real enterprises.
+[Build](/agent-studio-docs/build/overview/) covers the building blocks; [Integrations](/agent-studio-docs/integrations/overview/) covers the delivery channels.
+
+## Use case map
+
+| If you want to... | Build | Deliver via |
+|-------------------|-------|-------------|
+| Get alerted when a business condition fires | [Scheduled alert emails](/agent-studio-docs/get-started/recipes/scheduled-alert-emails/) | Email or Slack |
+| Ask questions of your data in natural language | A [Query-style agent](/agent-studio-docs/build/agents/query/) with [SQL tools](/agent-studio-docs/build/tools/sql-execution-tool/) | [Web UI or Slack](/agent-studio-docs/integrations/slack/setup/) |
+| Power your own app with chat-with-data | [Embedded chat via REST](/agent-studio-docs/get-started/recipes/embedded-chat-rest-api/) | [REST API](/agent-studio-docs/integrations/rest-api/auth/) |
+| Bring trusted catalog context into Claude, ChatGPT, Copilot, or Cursor | Nothing — use the built-in tools | [MCP client setup](/agent-studio-docs/integrations/mcp-clients/claude/) |
+| Clean up your catalog or BI estate in bulk | [Bulk trust flags](/agent-studio-docs/get-started/recipes/bulk-trust-flags/), [BI rationalization](/agent-studio-docs/get-started/recipes/bi-report-rationalization/) | Web UI, or [scheduled flows](/agent-studio-docs/build/schedules/scheduling-flows/) |
+| Work with Alation from your AI coding tool | Nothing — install the plugin | [Plugins (Agent Skills)](/agent-studio-docs/integrations/plugins/overview/) |
+
+## Alerts and notifications
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/scheduled-alert-emails/">
+    <span class="channel-card-head"><CalendarIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Send scheduled data alerts by email</span></span>
+    <span class="channel-card-desc">Monitor a data product for a business condition and email stakeholders on a schedule.</span>
+  </a>
+</div>
+
+## Chat with data
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/embedded-chat-rest-api/">
+    <span class="channel-card-head"><ApiIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Embed chat-with-data in your application</span></span>
+    <span class="channel-card-desc">Call agents from your own product over the streaming REST API. Powers 150k+ calls a month in production.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/snowflake-agent/">
+    <span class="channel-card-head"><SnowflakeIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Query Agent Studio from Snowflake</span></span>
+    <span class="channel-card-desc">Call agents directly from Snowflake using an HTTP request integration.</span>
+  </a>
+</div>
+
+## Catalog context everywhere
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/catalog-context-search/">
+    <span class="channel-card-head"><CatalogIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Catalog context search</span></span>
+    <span class="channel-card-desc">Retrieve trusted catalog context for any natural-language question, inside or outside Alation.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/copilot-scoped-catalog-context/">
+    <span class="channel-card-head"><CopilotIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Scoped context in Copilot and Teams</span></span>
+    <span class="channel-card-desc">Publish a domain-scoped context agent into M365, where tight scoping is what makes the accuracy.</span>
+  </a>
+</div>
+
+## Curation and governance
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/bulk-trust-flags/">
+    <span class="channel-card-head"><CheckIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Bulk endorse or deprecate objects</span></span>
+    <span class="channel-card-desc">Apply trust flags to many objects at once by criteria, with a human review step built in.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/bi-report-rationalization/">
+    <span class="channel-card-head"><ChartIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Find duplicate and stale BI reports</span></span>
+    <span class="channel-card-desc">Rationalize your BI estate. One enterprise cut its Tableau licenses in half.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/document-lineage/">
+    <span class="channel-card-head"><FlowIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Document lineage automatically</span></span>
+    <span class="channel-card-desc">Use the Lineage Agent to generate human-readable documentation from lineage graphs.</span>
+  </a>
+</div>
+
+## Workflow automation
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/n8n-workflow/">
+    <span class="channel-card-head"><N8nIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Call agents from n8n</span></span>
+    <span class="channel-card-desc">Trigger Agent Studio agents from an n8n workflow over the REST API.</span>
+  </a>
+</div>
+
+## Before you build
+
+Every recipe runs into the same platform constraints sooner or later.
+Read the [known limitations](/agent-studio-docs/get-started/recipes/known-limitations/) once before starting; each recipe links back to the ones it hits.

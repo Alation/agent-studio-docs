@@ -1,0 +1,39 @@
+---
+title: Get Data Product Spec Tool
+description: Retrieve a data product's specification as JSON.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Get Data Product Spec Tool
+
+This tool fetches the raw specification of a data product as JSON. Use it when an agent needs the structured definition of a data product rather than its data.
+
+## When to use it
+
+Add this tool to an agent that reasons about a data product's definition, for example when revising or documenting it.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `data_product_id` | Yes | string | User input | The data product to fetch. |
+| `data_product_version` | No | string | Fixed or User input | A specific version. If omitted, the current version is returned. |
+
+<Aside type="note">
+See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
+</Aside>
+
+## Example usage
+
+```jsonc
+{
+  "data_product_id": "my-data-product",
+  "data_product_version": "v1"
+}
+```
+
+## See also
+
+- https://developer.alation.com/dev/reference/get_data_product
+- https://developer.alation.com/dev/reference/get_data_product_version

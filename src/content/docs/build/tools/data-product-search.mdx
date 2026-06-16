@@ -1,0 +1,40 @@
+---
+title: Data Product Search Tool
+description: Find data products in a marketplace from a natural language query.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Data Product Search Tool
+
+This tool finds data products listed in a marketplace based on a natural language query. It returns the products most relevant to the request, and only those that are published to the marketplace. It backs the [Data Marketplace Query](/agent-studio-docs/build/agents/data-marketplace-query) agent.
+
+## When to use it
+
+Add this tool to an agent that needs to discover which data product to use before querying it.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `search_term` | Yes | string | Agent determined | The text to search for. The user's question can often be passed directly. |
+| `limit` | No | integer (default `5`) | Fixed | Maximum number of products to return. |
+| `marketplace_id` | No | string | Fixed or User input | The marketplace to search. If omitted, the default marketplace is used. |
+
+<Aside type="note">
+Pin `marketplace_id` as a **Fixed** value when every search should target the same marketplace. See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters).
+</Aside>
+
+## Example usage
+
+```jsonc
+{
+  "search_term": "Human Resources",
+  "limit": 5
+}
+```
+
+## See also
+
+- [Data Marketplace Query agent](/agent-studio-docs/build/agents/data-marketplace-query)
+- https://developer.alation.com/dev/reference/data_product_marketplace_search

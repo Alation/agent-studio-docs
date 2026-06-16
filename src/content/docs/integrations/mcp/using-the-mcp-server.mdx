@@ -1,0 +1,155 @@
+---
+title: Using the MCP Server
+description: "What the Alation MCP server exposes once you're connected: the default tool set, custom MCP servers with curated tools, and example prompts."
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import agentAccessToggle from '../../../../assets/img/guides/mcp-usage/01-agent-access-mcp-toggle.png';
+import createServerDialog from '../../../../assets/img/guides/mcp-usage/02-create-mcp-server-dialog.png';
+import selectServers from '../../../../assets/img/guides/mcp-usage/03-select-mcp-servers.png';
+
+You've [connected a client](/agent-studio-docs/integrations/mcp/quick-start/) — this page covers what you can do with it: which tools appear, how to curate them with custom MCP servers, and what to ask.
+
+## What the server exposes
+
+The default server at `https://<your-tenant>.alationcloud.com/ai/mcp/` exposes everything you're entitled to:
+
+| Source | What appears | Who sees it |
+|--------|--------------|-------------|
+| Built-in tools | Catalog search, context retrieval, SQL execution, chart generation, lineage, data quality, and more | Everyone connected to the tenant |
+| Built-in agents | Out-of-the-box agents surfaced as callable tools | Everyone |
+| Your published agents | Any agent with [MCP enabled on its Agent access tab](#publish-an-agent-to-mcp) | Everyone, if the agent is published; owner and admins only while it is a draft |
+
+Because every request carries your identity, two users connecting to the same server can see different tool lists and get different results from the same tool.
+See [identity and permissions](/agent-studio-docs/security/identity-and-permissions/) for why.
+
+The full catalog of built-in tools is in the [tools reference](/agent-studio-docs/build/tools/default-tools/), and the built-in agents in the [agents reference](/agent-studio-docs/build/agents/default-agents/).
+To see your live list, open your client's tool panel (most clients have one), or simply ask: *"What Alation tools do you have available?"*
+
+## Curate with custom MCP servers
+
+The default server exposes a lot, and agents work best with the smallest tool set their job needs.
+Instead of disabling tools client by client, create a **custom MCP server**: a named server that exposes only the tools you pick, at its own URL.
+
+<Steps>
+
+1. **Create the server**
+
+   From an agent's **Agent access** tab, click **Add to MCP servers** and then **New MCP server** — or open the MCP servers list in Agent Studio.
+   Give it a name and a description that tells the model what the server is for.
+
+2. **Pick the tools**
+
+   Click **Add tool** and select just the tools the use case needs — built-in tools, and agents published as tools.
+
+   <Image src={createServerDialog} alt="Create MCP server dialog with name, description, and a curated list of two tools" style="max-width: 70%; height: auto;" />
+
+3. **Configure tool parameters (optional)**
+
+   Each tool entry has its own parameter settings, with the same [Fixed / User input / Agent determined scopes](/agent-studio-docs/build/tools/configuring-tools/) used everywhere in Agent Studio.
+   Parameters you fix are hidden from the connecting model entirely and injected at execution, so a custom server can pin tools to a domain, a data product, or a filter.
+
+4. **Connect your client to the new server**
+
+   Each custom server has its own URL (`/ai/mcp/<server-id>/`), shown in the UI.
+   Point your [MCP client](/agent-studio-docs/integrations/mcp/quick-start/) at that URL instead of the default `/ai/mcp/`.
+
+</Steps>
+
+<Aside type="tip" title="Scope the context, not just the tools">
+For the biggest accuracy gain, constrain *what the tools can reach* with fixed parameter bindings or a domain-scoped `base_signature`.
+The [scoped catalog context recipe](/agent-studio-docs/get-started/recipes/copilot-scoped-catalog-context/) shows how a domain-scoped agent reached 100% on its eval set.
+</Aside>
+
+## Publish an agent to MCP
+
+To make a custom agent callable over MCP — by MCP clients or by other agents:
+
+<Steps>
+
+1. Open the agent and switch to its **Agent access** tab.
+
+2. Turn on the **MCP** toggle.
+
+   <Image src={agentAccessToggle} alt="Agent access tab with the MCP toggle enabled and an Add to MCP servers button" style="max-width: 85%; height: auto;" />
+
+3. Click **Add to MCP servers** and pick which custom servers should carry it (it is always available on the default server once published).
+
+   <Image src={selectServers} alt="Select MCP servers dialog listing a custom server with a tool count" style="max-width: 70%; height: auto;" />
+
+</Steps>
+
+The agent appears as a tool to everyone once it is [published](/agent-studio-docs/security/identity-and-permissions/#published-vs-draft); while it is a draft, only you and admin-tier roles see it.
+
+## Example prompts
+
+Discovery and context:
+
+- *"Find sales-related tables in the catalog."*
+- *"What does the `fct_orders` table contain, and who stewards it?"*
+- *"What's our approved definition of customer churn?"*
+
+Data questions (require a data product and warehouse credentials):
+
+- *"Using the Sales data product, what were the top 10 products by revenue last quarter?"*
+- *"Chart weekly signups from the marketing data product for the past 90 days."*
+
+Governance and lineage:
+
+- *"Which dashboards report on customer churn?"*
+- *"Trace the lineage of `dim_customer` and summarize the upstream sources."*
+- *"List tables in the raw schema with no description."*
+
+Calling a published agent:
+
+- *"Use the `inventory_checker` tool to check stock levels for the EMEA region"* — where `inventory_checker` is an agent you published to the server.
+
+## Hosted vs. local servers
+
+Agent Studio supports two ways to use MCP servers: **hosted MCP servers** and **local MCP servers**. Both expose Agent Studio capabilities over MCP, but they differ in where the server runs and what it can access.
+
+### Hosted MCP servers
+
+Most customers use **hosted MCP servers** by default. In this mode, the MCP servers are **hosted by Alation in our cloud**.
+
+Hosted MCP servers can expose:
+- **Base tools**
+- **Base (out-of-the-box) agents**
+- **Custom agents you build** in Agent Studio (including those created in the UI)
+
+This is the best option when you want the full Agent Studio experience and the ability to build, publish, and use custom agents outside of Alation.
+
+### Local MCP servers
+
+:::caution
+We do not recommend starting with a local MCP server as the hosted option is easier.
+:::
+
+If you are using the **Python SDK**, you can also run a **local MCP server**, meaning you host the MCP server on your own machine using the SDK.
+
+By default, local MCP servers provide access to:
+- **Base tools** (data products, data dictionary, custom fields, data sources)
+- **Base (out-of-the-box) agents** (catalog context search, query flow, SQL query)
+
+Custom agents you build in the Agent Studio UI always run in Alation, but a local MCP server can expose them too: enable the `custom_agent` tool (it is off by default) and the server proxies requests to your agent by its ID.
+
+Setup instructions for running a local MCP server are available [here](https://github.com/Alation/alation-ai-agent-sdk/tree/main/python/dist-mcp/).
+
+### At a glance
+
+| Dimension | Hosted MCP server | Local MCP server (SDK) |
+|-----------|-------------------|------------------------|
+| Where it runs | Managed by Alation in the cloud | Your machine or infrastructure |
+| Recommended for | Most customers (the default) | Development and SDK-based workflows |
+| Built-in tools | Yes | Yes (configurable subset) |
+| Out-of-the-box agents | Yes | Yes |
+| Custom agents (UI-built) | Yes, after publishing | Via the `custom_agent` tool (off by default); the agent still runs in Alation |
+| Custom MCP servers (curated tool sets) | Yes | Configure the tool set via flags instead |
+| Infrastructure required | None | Self-managed |
+
+## Good to know
+
+- **Tool approvals need the web UI.** Approval-gated tools can't be approved from an MCP client; complete the approval in Agent Studio.
+- **Tool calls are metered.** Each call to a built-in tool counts as an action for [usage](/agent-studio-docs/security/observability/usage/) purposes, whether it comes from MCP, Slack, or the web UI.
+- **Timeouts apply.** Tool calls time out at 30 seconds (configurable to 60 per tool), and some clients impose their own response limits — see [known limitations](/agent-studio-docs/get-started/recipes/known-limitations/).

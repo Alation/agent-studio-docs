@@ -1,0 +1,34 @@
+---
+title: Claude Code
+description: "Install the Alation plugin in Claude Code."
+titleIcon: claudecode
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Install the Alation plugin in Claude Code and work with your catalog in natural language.
+
+## Prerequisites
+
+- Python 3.10+ on the machine running the agent.
+- An [OAuth client registered on your Alation instance](/agent-studio-docs/integrations/plugins/overview/#connect-to-your-alation-instance) (a one-time, per-instance step).
+
+## Install
+
+Register the marketplace and install the plugin:
+
+```bash
+/plugin marketplace add Alation/alation-plugins
+/plugin install alation@alation-plugins
+```
+
+## Authenticate
+
+Ask your agent to set up the Alation plugin — this runs the `setup` skill.
+It prompts for your instance **base URL** and the **Client ID** from the OAuth client, then opens a browser to log in.
+
+You only [register the OAuth client](/agent-studio-docs/integrations/plugins/overview/#connect-to-your-alation-instance) once per instance.
+
+## Next
+
+See [the skills and what to ask](/agent-studio-docs/integrations/plugins/using-the-skills/) to start working with your catalog.

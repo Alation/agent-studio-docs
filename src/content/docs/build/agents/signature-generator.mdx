@@ -1,0 +1,31 @@
+---
+title: Signature Generator
+description: An agent that builds optimized signatures for catalog context retrieval.
+---
+
+The Signature Generator builds a *signature* — a specification that tells Alation's catalog context API which fields and objects to retrieve for a given question. A well-formed signature improves the relevance of context that other agents and tools pull from the catalog.
+
+This is an advanced, technical agent. Most users do not call it directly; it is useful when you are tuning how an agent retrieves catalog context.
+
+## How it works
+
+The agent takes a user question and produces a signature for the object types involved. It looks up the available fields and rules, resolves the relevant objects, and adds the search phrases needed to retrieve good context. If you pass an existing `base_signature`, the agent completes it rather than starting over.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The catalog question the signature should support.
+
+Optional:
+
+- `base_signature` (object): A partial signature to complete. When provided, the agent fills in missing fields and adds search phrases instead of generating a signature from scratch.
+
+## Available tools
+
+The agent uses internal tools to analyze the question, look up signature creation rules, resolve object IDs, and read custom field definitions. These are configured on the agent by default.
+
+## See also
+
+- [Catalog Context Search](/agent-studio-docs/build/agents/catalog-context-search)
+- [Using Catalog Context Search](/agent-studio-docs/get-started/recipes/catalog-context-search)

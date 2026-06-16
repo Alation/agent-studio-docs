@@ -1,0 +1,56 @@
+---
+title: SQL Eval Case Manager
+description: An agent for creating, generating, and auditing SQL evaluation cases for a data product.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The SQL Eval Case Manager agent helps you build and maintain high-quality SQL evaluation sets for your data products. It can create new question/SQL pairs, generate evaluation questions in bulk, and audit existing cases for quality and correctness.
+
+These evaluation sets are what you use to measure and improve a text-to-SQL agent's accuracy. See [SQL Evaluations](/agent-studio-docs/build/evals/sql-evaluations) for the broader workflow.
+
+<Aside type="note">
+This agent was previously named **Data Product Question Manager**. The capability is the same; only the name has changed.
+</Aside>
+
+## How it works
+
+The agent follows this workflow:
+
+1. Reviews existing evaluation cases to avoid duplicates and understand current terminology.
+2. Explores the data product's schema and sample values to ground questions in real business context.
+3. Generates diverse questions across complexity categories (filters, joins, column transformations, business jargon, complex operators).
+4. Validates each SQL query by running it through a SQL agent against the data product.
+5. Saves the evaluation cases and presents them for review.
+6. For auditing tasks, reviews existing cases for SQL correctness, clarity, coverage, and duplicates.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The request, e.g. "Generate 10 new evaluation questions" or "Audit existing cases".
+- `agent_config_id` (string): The ID of the SQL agent used to generate and validate SQL.
+- `data_product_id` (string): The data product the cases are created against.
+
+Optional:
+
+- `data_product_version` (string): A specific version of the data product.
+- `agent_input_payload` (object): A custom input payload when calling sub-agents.
+
+## Available tools
+
+- **Get Data Schema**: Reads the schema and sample values to ground questions.
+- **Get SQL Evaluation Set** and **Get SQL Evaluation Case**: Retrieve existing cases to avoid duplicates.
+- **Run SQL Agent** and **Run SQL Eval Case**: Generate and validate SQL for candidate questions.
+- **Create / Update / Delete SQL Evaluation Case**: Manage the evaluation set.
+
+## Behavior notes
+
+- Questions should read like realistic business inquiries, not trivial queries such as "how many rows are in my data".
+- The agent generates a bounded number of questions at a time and keeps them concise.
+- Edits and deletions are confirmed before they are applied.
+
+## See also
+
+- [SQL Evaluations](/agent-studio-docs/build/evals/sql-evaluations)
+- [Data Product Evaluations](/agent-studio-docs/build/evals/data-product-evaluations)

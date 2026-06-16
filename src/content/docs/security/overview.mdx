@@ -1,0 +1,60 @@
+---
+title: Security Overview
+description: How Agent Studio preserves user identity and enforces permissions across every layer, from the entry point to the data warehouse.
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import FlowIcon from '../../../assets/diagram-icons/flow.svg';
+import LockIcon from '../../../assets/diagram-icons/lock.svg';
+import PointerIcon from '../../../assets/diagram-icons/pointer.svg';
+import ShieldIcon from '../../../assets/diagram-icons/shield.svg';
+import SlackIcon from '../../../assets/diagram-icons/slack.svg';
+import PuzzleIcon from '../../../assets/diagram-icons/puzzle.svg';
+import ChartIcon from '../../../assets/diagram-icons/chart.svg';
+
+Every request to Agent Studio runs as the person who made it.
+Each service re-checks that person's permissions, so an agent can only reach the agents, tools, and data products its user could already open in Alation.
+
+The stored-credential swap at the warehouse is the only place identity changes hands.
+Trace it hop by hop in the [interactive authorization explorer](/agent-studio-docs/security/authorization-explorer/), or in prose in the [request lifecycle](/agent-studio-docs/security/request-lifecycle/).
+
+## In this section
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/security/request-lifecycle/">
+    <span class="channel-card-head"><FlowIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Request lifecycle</span></span>
+    <span class="channel-card-desc">What happens at each hop when a user asks a question, with the identity carried on the wire.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/security/identity-and-permissions/">
+    <span class="channel-card-head"><LockIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Identity and permissions</span></span>
+    <span class="channel-card-desc">Roles, credentials, per-object grants, and the full permission matrices.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/security/authorization-explorer/">
+    <span class="channel-card-head"><PointerIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Authorization explorer</span></span>
+    <span class="channel-card-desc">Click through the full authorization graph, hop by hop, in your browser.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/security/data-handling/">
+    <span class="channel-card-head"><ShieldIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Data handling and compliance</span></span>
+    <span class="channel-card-desc">What reaches the LLM, where chat data lives, retention, and the compliance posture.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/security/channels/slack/">
+    <span class="channel-card-head"><SlackIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Slack security</span></span>
+    <span class="channel-card-desc">The identity model applied to the Slack channel.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/security/channels/plugins/">
+    <span class="channel-card-head"><PuzzleIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Plugin security</span></span>
+    <span class="channel-card-desc">The local CLI architecture, OAuth + PKCE flow, and RBAC enforcement for plugins.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/security/observability/usage/">
+    <span class="channel-card-head"><ChartIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Audit and usage</span></span>
+    <span class="channel-card-desc">Interaction logs for every request, and how tool calls are metered against your quota.</span>
+  </a>
+</div>
+
+## Related pages
+
+- [Architecture overview](/agent-studio-docs/architecture/overview/) — the system layout these controls run on, including deployment models.
+- [Creating OAuth clients](/agent-studio-docs/security/authentication/user-initiated-auth/) — set up user-initiated or [machine-to-machine](/agent-studio-docs/security/authentication/machine-to-machine/) clients.
+- [Permission matrices](/agent-studio-docs/security/identity-and-permissions/#permission-matrices) — who can create, edit, delete, and publish agents, tools, and flows.

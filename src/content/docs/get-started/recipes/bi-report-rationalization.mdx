@@ -1,0 +1,70 @@
+---
+title: Find Duplicate and Stale BI Reports
+description: "Tune a catalog search agent to rationalize your BI estate and cut unused licenses and duplicated reports."
+titleIcon: chart
+titleIconAccent: rose
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+
+Most BI estates accumulate near-duplicate and abandoned reports for years.
+This recipe tunes a Catalog Context Search agent to find duplication and staleness across Tableau and Power BI metadata, so you can consolidate.
+One enterprise used it to cut its Tableau license count in half, with a target of cutting it by 80%.
+
+<div class="recipe-cost not-content">
+  <div class="recipe-cost__main">
+    <span class="recipe-cost__label">Estimated cost</span>
+    <span class="recipe-cost__figure">0.25–0.5<span class="recipe-cost__acu">ACU</span><span class="recipe-cost__per">per query</span></span>
+  </div>
+  <p class="recipe-cost__note">One to two metered actions. This is a periodic cleanup, not a per-user workload, so total spend stays small. <a href="/agent-studio-docs/security/observability/usage/#how-consumption-is-priced">At 0.25 ACU per metered action</a>; confirm actual spend on the <a href="/agent-studio-docs/security/observability/usage/">Usage page</a>.</p>
+</div>
+
+## What you'll use
+
+<div class="uses-grid not-content">
+  <a class="uses-card" href="/agent-studio-docs/build/agents/catalog-context-search/">
+    <span class="uses-card__name">Catalog Context Search agent</span>
+    <span class="uses-card__purpose">The base agent to clone and tune</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/tools/bi-report-search-tool/">
+    <span class="uses-card__name">BI Report Search tool</span>
+    <span class="uses-card__purpose">Searches BI report metadata</span>
+  </a>
+</div>
+
+## Build it
+
+<Steps>
+
+1. **Confirm BI metadata coverage**
+
+   Make sure your Tableau and Power BI sources are cataloged with usage metadata, owners, and last-modified dates populated.
+   The agent can only reason over what's indexed.
+
+2. **Clone and tune the agent**
+
+   Clone Catalog Context Search and rewrite the prompt for rationalization questions: "find reports with overlapping titles, data sources, and fields", "list reports not modified in 12 months, grouped by owner."
+
+3. **Work domain by domain**
+
+   Run the agent per business domain and have report owners confirm candidates before retiring anything.
+
+</Steps>
+
+## Gotchas
+
+Scope expectations around what BI search can filter on today:
+
+- The BI Report Search tool can't filter on custom fields, stewardship, or calculated-field expressions.
+- BI owner properties aren't indexed as a search facet, and neither is the source connection string.
+
+Where these matter, export candidates and finish the slicing in a spreadsheet or query.
+
+## Variations
+
+- A "BI knowledge search" agent for one department (such as Finance), published into [Microsoft Copilot or Teams](/agent-studio-docs/get-started/recipes/copilot-scoped-catalog-context/).
+
+## Related
+
+- [Catalog context search recipe](/agent-studio-docs/get-started/recipes/catalog-context-search/)
+- [Known limitations](/agent-studio-docs/get-started/recipes/known-limitations/)

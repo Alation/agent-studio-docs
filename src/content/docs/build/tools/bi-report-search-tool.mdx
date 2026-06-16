@@ -1,0 +1,40 @@
+---
+title: BI Report Search Tool
+description: Search the catalog for BI reports.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# BI Report Search Tool
+
+This tool searches the Alation Data Catalog specifically for BI reports. It powers the [Dashboard Search](/agent-studio-docs/build/agents/dashboard-search) agent.
+
+## When to use it
+
+Add this tool to an agent that answers questions about dashboards and BI reports, such as "find our analysis on customer churn".
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `search_term` | Yes | string | Agent determined | The text to search for. |
+| `filters` | No | list of objects | Fixed or Agent determined | Filter on custom fields. Use the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature. |
+| `limit` | No | integer (default `20`) | Fixed | Maximum number of results. |
+
+<Aside type="note">
+See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
+</Aside>
+
+## Example usage
+
+```jsonc
+{
+  "search_term": "Find our analysis on customer churn.",
+  "limit": 20
+}
+```
+
+## See also
+
+- [Dashboard Search agent](/agent-studio-docs/build/agents/dashboard-search)
+- [Search Catalog Tool](/agent-studio-docs/build/tools/search-catalog-tool)

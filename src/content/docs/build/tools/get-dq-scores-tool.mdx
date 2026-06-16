@@ -1,0 +1,42 @@
+---
+title: Get Data Quality Scores Tool
+description: Look up data quality scores for specific catalog objects.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Get Data Quality Scores Tool
+
+This tool looks up the data quality score for a set of catalog objects you already have references to. It is the lightweight companion to the [Get Data Quality Tool](/agent-studio-docs/build/tools/get-data-quality-tool): rather than running checks, it returns the scores Alation already holds.
+
+## When to use it
+
+Use it right after a catalog search, when the user asks about the trustworthiness or reliability of specific objects that turned up in results. The agent reads the object type and ID from each search result and passes them in.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `objects` | Yes | list of objects | Agent determined | The objects to score. Each entry has an `object_type` (e.g. `"table"`, `"report_object"`) and an `object_id`. |
+
+See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
+
+## Example usage
+
+```jsonc
+{
+  "objects": [
+    { "object_type": "table", "object_id": "123" },
+    { "object_type": "table", "object_id": "456" }
+  ]
+}
+```
+
+## Output
+
+A list of the requested objects with their data quality scores. A score is `null` when none is available for that object.
+
+## See also
+
+- [Get Data Quality Tool](/agent-studio-docs/build/tools/get-data-quality-tool)
+- [Search Catalog Tool](/agent-studio-docs/build/tools/search-catalog-tool)

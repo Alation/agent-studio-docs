@@ -1,0 +1,43 @@
+---
+title: Generate PDF Tool
+description: Generate a downloadable PDF report from chat content.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Generate PDF Tool
+
+This tool turns content from a conversation into a formatted, downloadable PDF report. It is what powers the out-of-the-box [Generate PDF from a Chat](/agent-studio-docs/build/agents/generate-pdf-from-a-chat) agent.
+
+The agent writes a short program that lays out the report (headings, paragraphs, tables, lists), and the tool renders it to a professional PDF and saves it as a downloadable asset. The rendering runs in a sandbox with resource limits (30-second timeout, capped memory), so it is safe to expose to an agent.
+
+## When to use it
+
+Add this tool to an agent that should produce a shareable document at the end of a task: a summary of an analysis, a report built from query results, or a written record of a conversation.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `code` | Yes | string | Agent determined | The layout program the agent generates. It builds the report sections; the tool renders them. You do not write this by hand. |
+| `title` | Yes | string | Agent determined | A short noun phrase (3–8 words) used as the in-PDF title and the download filename. Plain letters, numbers, and spaces only. |
+
+<Aside type="note">
+Both parameters are **Agent determined** in normal use: the agent generates the report layout and a fitting title from the conversation. You typically add this tool without changing its parameter scopes.
+</Aside>
+
+See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
+
+## Output
+
+The tool saves the rendered PDF as a downloadable asset and returns its asset ID. In a chat surface, the PDF appears as a downloadable attachment in the agent's response.
+
+## Limits
+
+- Maximum rendered PDF size: 20 MB.
+- Up to 200 sections per document.
+- Rendering times out after 30 seconds.
+
+## See also
+
+- [Generate PDF from a Chat](/agent-studio-docs/build/agents/generate-pdf-from-a-chat)

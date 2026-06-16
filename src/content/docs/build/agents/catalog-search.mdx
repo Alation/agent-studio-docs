@@ -1,0 +1,43 @@
+---
+title: Catalog Search
+description: A general-purpose agent for searching the Alation catalog.
+---
+
+The Catalog Search agent answers questions by searching the Alation Data Catalog. It finds tables, columns, schemas, and other objects, and can enrich results with data quality scores and lineage when the question calls for it.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Interprets the question and decides which object types to search for.
+2. Uses filter fields and values to narrow the search where helpful.
+3. Searches the catalog and retrieves details about the matching objects.
+4. Adds data quality or lineage information when the user asks about trustworthiness or dependencies.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The natural language search request.
+
+## Available tools
+
+- **[Search Catalog](/agent-studio-docs/build/tools/search-catalog-tool)**: Finds objects across the catalog.
+- **[Get Search Filter Fields](/agent-studio-docs/build/tools/get-search-filter-fields-tool)** and **[Get Search Filter Values](/agent-studio-docs/build/tools/get-search-filter-values-tool)**: Narrow results with filters.
+- **Get Object Fields**: Retrieves details about a found object.
+- **[Get Data Quality Scores](/agent-studio-docs/build/tools/get-dq-scores-tool)**: Adds quality scores to results.
+- **[Get Lineage](/agent-studio-docs/build/tools/get-lineage-tool)**: Adds upstream/downstream context.
+
+## Comparison with Catalog Context Search
+
+Both agents search the catalog, but they suit different needs:
+
+- **Catalog Search** (this agent) is a broader search assistant. It can layer in data quality scores and lineage, which makes it a good fit for general discovery and questions about whether an object is trustworthy.
+- **[Catalog Context Search](/agent-studio-docs/build/agents/catalog-context-search)** focuses on assembling rich context for a question using semantic and filter-based strategies.
+
+If you mainly need to find and vet objects, start with Catalog Search. If you need assembled context for a downstream task, use Catalog Context Search.
+
+## See also
+
+- [Catalog Context Search](/agent-studio-docs/build/agents/catalog-context-search)
+- [Using Catalog Context Search](/agent-studio-docs/get-started/recipes/catalog-context-search)

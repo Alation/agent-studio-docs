@@ -1,0 +1,43 @@
+---
+title: Generate Lineage Documentation Tool
+description: Analyze a table's lineage and write it up as a catalog document.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+# Generate Lineage Documentation Tool
+
+This tool analyzes the lineage of a table and produces a written summary of how its data is built and consumed. It traces upstream to find source tables and column transformations, and downstream to find the tables and BI objects that use the table. The result can be returned as data, or written directly into a catalog document.
+
+It backs the documentation capability of the out-of-the-box [Lineage Agent](/agent-studio-docs/build/agents/lineage-agent).
+
+## When to use it
+
+Add this tool to an agent that should not just answer lineage questions but record the answer as governed documentation: a "how is this table built" write-up attached to the catalog.
+
+## Parameters
+
+| Parameter | Required | Type | Suggested scope | What it does |
+| --- | --- | --- | --- | --- |
+| `table_id` | Yes | integer | User input | The table to document. |
+| `max_depth` | No | integer (default `10`) | Fixed | How far upstream to trace. |
+| `folder_id` | No | integer | Fixed or User input | Folder to create the document in. |
+| `document_hub_id` | No | integer | Fixed or User input | Document hub for the new document. |
+| `template_id` | No | integer | Fixed | Template the document should use. |
+| `field_mapping` | No | object | Fixed | Maps the analysis results (source tables, column transformations, downstream consumers, and so on) to template field IDs. |
+
+<Aside type="note">
+If you provide `folder_id`, `document_hub_id`, `template_id`, and `field_mapping` together, the tool **creates a document** with the results mapped onto the template's fields. If you leave them out, it returns the analysis as data instead.
+</Aside>
+
+See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
+
+## Output
+
+Either a JSON analysis of the table's lineage, or — when the document parameters are supplied — the ID of the catalog document it created. The analysis covers source tables, downstream tables and BI consumers, column transformations, pass-through columns, columns with unknown lineage, and data quality notes.
+
+## See also
+
+- [Get Lineage Tool](/agent-studio-docs/build/tools/get-lineage-tool)
+- [Lineage Agent](/agent-studio-docs/build/agents/lineage-agent)
+- [Using the Lineage Agent](/agent-studio-docs/get-started/recipes/document-lineage)

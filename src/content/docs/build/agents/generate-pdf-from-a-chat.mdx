@@ -1,0 +1,37 @@
+---
+title: Generate PDF from a Chat
+description: An agent that turns a conversation into a downloadable PDF report.
+---
+
+The Generate PDF from a Chat agent reads a conversation and produces a formatted, downloadable PDF summary of it. It decides the report's structure and content from the chat history, so you do not need to specify a layout.
+
+## How it works
+
+The agent reads the chat history, decides how to organize the report (headings, sections, tables), and renders it to a PDF using the [Generate PDF](/agent-studio-docs/build/tools/generate-pdf-tool) tool. The finished PDF is saved as a downloadable asset.
+
+It can run two ways:
+
+- **Standalone**, where you tell it which chat to summarize.
+- **As a sub-agent tool** of another agent, where it inherits the parent conversation automatically.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The user's request, passed through as-is. The agent decides the report structure itself, so there is no need to add instructions or an outline.
+
+Optional:
+
+- `source_chat_id` (UUID): The chat to summarize when calling the agent standalone. Leave this unset when the agent is used as a sub-agent; it inherits the parent chat.
+
+## Available tools
+
+- **[Generate PDF](/agent-studio-docs/build/tools/generate-pdf-tool)**: Renders the report and saves it as a downloadable asset.
+
+## Output format
+
+A downloadable PDF asset. In a chat surface it appears as an attachment in the agent's response.
+
+## See also
+
+- [Generate PDF Tool](/agent-studio-docs/build/tools/generate-pdf-tool)
