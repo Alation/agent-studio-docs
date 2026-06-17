@@ -1,0 +1,49 @@
+---
+title: 26.153.1
+description: Release notes for Agent Studio 26.153.1
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components'
+
+**Release Date:** 2026-06-17
+
+**Version Range:** v26.143.1 -> v26.153.1
+
+## Highlights
+
+- Introduced a suite of new features to enhance feed management, including feed builders, hydrators, and validators.
+- Improved self-improvement capabilities with features like automatic peer revisions and enhanced data point triage.
+- Resolved several bugs to improve chat functionality, task management, and error messaging.
+
+## What's New
+
+### Features
+
+- **Feed Management:** Introduced a range of new tools for feed management, including feed builders, hydrators, renderers, and validators. Users can now create and edit feeds more efficiently with the new feed-builder agents and sub-agents, as well as seed builders from saved feeds.
+- **Self-Improvement Enhancements:** Added features like automatic application of peer revisions, breadcrumbs for better navigation, and improved triage for data points. Users can now also benefit from a new watermark nudge selection feature.
+- **Agent Health Monitoring:** Agent health can now be surfaced directly in the troubleshooting interface, making it easier to identify and resolve issues.
+- **Expanded Agent Capabilities:** Increased the codemode agent request limit to 100, added agent fields to the `get_connector_info` endpoint, and enabled agent health checks in the connector troubleshooting process.
+- **New Skills and Tools:** Introduced the QLI-Insights skill and exposed context search tools for MCP users.
+- **Enhanced Analytics:** Analytics events in Coveo are now attributed to specific users for better tracking and insights.
+
+### Improvements
+
+- **Taxonomy Cleanup:** Improved the organization and structure of the PA taxonomy for better usability.
+
+### Bug Fixes
+
+- **Chat:** Resolved an issue where the chat list was not properly scoped to the owner across all roles. Additionally, oversized tool results in chat are now capped to prevent errors.
+- **Agents:** Fixed an issue where input fields were not being passed correctly to sub-agent models.
+- **Tasks:** Addressed issues with task management, including ensuring tasks are not marked as failed during shutdown and improving task reclaim processes.
+- **Error Messaging:** Enhanced error messages for actionable metrics and improved the handling of invalid document URL errors.
+- **Triggers:** Ensured `chat_id` is propagated correctly for all triggers.
+- **Search:** Improved the handling of verbatim catalog link paths in search results.
+- **API Improvements:** Sanitized signatures for the v1 context API and resolved authentication issues for ZD-redirect FC lookups.
+
+### Breaking Changes
+
+None in this release.
+
+## Customer Impact
+
+None in this release.
