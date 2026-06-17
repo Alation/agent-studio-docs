@@ -11,34 +11,34 @@ import { Aside, Badge } from '@astrojs/starlight/components'
 
 ## Highlights
 
-- Introduced a suite of new features to enhance feed management, including feed builders, hydrators, and validators.
-- Improved self-improvement capabilities with features like automatic peer revisions and enhanced data point triage.
-- Resolved several bugs to improve chat functionality, task management, and error messaging.
+- New tools make it faster to build, populate, and validate the feeds that power your agents.
+- Agents now improve themselves over time by applying reviewer suggestions and prioritizing the data points that need attention.
+- Chat, task handling, and error messages are more reliable across the board.
 
 ## What's New
 
 ### Features
 
-- **Feed Management:** Introduced a range of new tools for feed management, including feed builders, hydrators, renderers, and validators. Users can now create and edit feeds more efficiently with the new feed-builder agents and sub-agents, as well as seed builders from saved feeds.
-- **Self-Improvement Enhancements:** Added features like automatic application of peer revisions, breadcrumbs for better navigation, and improved triage for data points. Users can now also benefit from a new watermark nudge selection feature.
-- **Agent Health Monitoring:** Agent health can now be surfaced directly in the troubleshooting interface, making it easier to identify and resolve issues.
-- **Expanded Agent Capabilities:** Increased the codemode agent request limit to 100, added agent fields to the `get_connector_info` endpoint, and enabled agent health checks in the connector troubleshooting process.
-- **New Skills and Tools:** Introduced the QLI-Insights skill and exposed context search tools for MCP users.
-- **Enhanced Analytics:** Analytics events in Coveo are now attributed to specific users for better tracking and insights.
+- **Faster feed building:** A new set of guided tools helps you create, populate, and check feeds with less manual effort. You can build a new feed from scratch or start from one of your saved feeds.
+- **Agents that improve over time:** Agents can now automatically apply reviewer suggestions, keep better track of context as they work, and focus on the data points that most need attention.
+- **Agent health at a glance:** You can now see an agent's health directly in the troubleshooting view, making it easier to spot and resolve issues.
+- **Expanded agent capabilities:** Agents can handle more work per run, return richer connector details, and report their health during connector troubleshooting.
+- **New insights skill:** A new skill surfaces query and usage insights, and more context-search capabilities are now available to agents.
+- **Better usage analytics:** Activity is now attributed to individual users, giving you clearer visibility into how Agent Studio is used.
 
 ### Improvements
 
-- **Taxonomy Cleanup:** Improved the organization and structure of the PA taxonomy for better usability.
+- **Cleaner organization:** Refined the underlying category structure for a more intuitive experience.
 
 ### Bug Fixes
 
-- **Chat:** Resolved an issue where the chat list was not properly scoped to the owner across all roles. Additionally, oversized tool results in chat are now capped to prevent errors.
-- **Agents:** Fixed an issue where input fields were not being passed correctly to sub-agent models.
-- **Tasks:** Addressed issues with task management, including ensuring tasks are not marked as failed during shutdown and improving task reclaim processes.
-- **Error Messaging:** Enhanced error messages for actionable metrics and improved the handling of invalid document URL errors.
-- **Triggers:** Ensured `chat_id` is propagated correctly for all triggers.
-- **Search:** Improved the handling of verbatim catalog link paths in search results.
-- **API Improvements:** Sanitized signatures for the v1 context API and resolved authentication issues for ZD-redirect FC lookups.
+- **Chat:** Your chat list now shows only your own chats across every role, and very large tool results no longer cause errors.
+- **Agents:** Fixed an issue where some input values were not passed correctly to sub-agents.
+- **Tasks:** Tasks are no longer incorrectly marked as failed during a restart, and interrupted tasks are recovered more reliably.
+- **Error messaging:** Clearer messages for metric issues and for invalid document links.
+- **Triggers:** Conversation context is now carried through correctly for all triggers.
+- **Search:** Improved how catalog links are handled in search results.
+- **Reliability:** Hardened the context API and fixed an authentication issue affecting certain redirect-based lookups.
 
 ### Breaking Changes
 
