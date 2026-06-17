@@ -17,13 +17,13 @@ Only users with the **Server Admin** role can create machine-to-machine OAuth cl
 2. Scroll down until you find **OAuth Client Applications**
 3. Click on **Add**
 4. Give it a **Name**, set the **Access Token Duration** (in seconds, min 5 mins, max 72 hours)
-5. Select a **System User Role** - this will determine the permissions the OAuth client will have when accessing Alation resources. Always follow the principle of least privilege and only assign the minimum role necessary for the client to perform its tasks.
+5. Select a **System User Role** - this will determine the permissions the OAuth client will have when accessing Alation resources. Always follow the principle of least privilege and only assign the minimum role necessary for the client to perform its tasks. See [Roles and what they can reach](/agent-studio-docs/security/identity-and-permissions/#roles-and-what-they-can-reach) for a breakdown of each role.
 6. On clicking save, the **Client ID** and **Client Secret** will be generated. Make sure to copy and securely store the **Client Secret** as it will not be shown again.
 </Steps>
 <Image src={m2mOAuthImage} alt="OAuth Client Creation Screenshot" style="max-width: 80%; height: auto;" />
 
 :::caution[ Security Note ]
-The `client_secret` is a sensitive credential, they do not expire automatically and need to be rotated periodically based on your organization's security policies.
+The `client_secret` is a sensitive credential. It does not expire automatically and must be rotated periodically based on your organization's security policies.
 Ensure it is stored securely and not exposed in client-side code or public repositories.
 :::
 ## Generating JWT Access Tokens
@@ -75,7 +75,7 @@ Ensure that your application logic accounts for this to avoid using stale tokens
 
 ## Configuring Data Warehouse Credentials
 
-When using M2M authentication with agents or tools that execute SQL queries, you must configure data warehouse credentials for each data product you want to query. This is a one-time setup per data product.
+When using M2M authentication with agents or tools that execute SQL queries, you must configure data warehouse credentials for each data product you want to query. Credentials are stored per M2M OAuth client — each client must configure its own credentials, and the setup applies only to the client whose access token is used in the request.
 
 ### Create credentials
 
@@ -93,15 +93,15 @@ curl -X POST "https://your-alation-instance.alationcloud.com/api/v2/auth/credent
   }'
 ```
 
-| Parameter | Description |
-|-----------|-------------|
-| `state` | A unique identifier for this credential configuration |
-| `username` | Username for the data warehouse |
-| `password` | Password for the data warehouse |
-| `dp_id` | The Data Product ID to associate these credentials with |
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `state` | Yes | A unique identifier for this credential configuration |
+| `username` | Yes | Username for the data warehouse |
+| `dp_id` | Yes | The Data Product ID to associate these credentials with |
+| `password` | No | Password for the data warehouse (use for basic auth) |
+| `private_key` | No | Private key string for key-pair authentication (e.g. Snowflake) |
+| `passphrase` | No | Passphrase for an encrypted private key |
 
-Once configured, credentials are automatically used when calling SQL-executing agents (Query, Data Product Query, Analytics, Chart Generation) or tools (SQL Execution, Get Data Schema).
+Provide either `password` (basic auth) or `private_key` (key-pair auth), but not both.
 
-:::note[Other authentication modes]
-If you need a different authentication mode apart from username and password, please reach out to us directly.
-:::
+Once configured, those credentials are automatically used for that M2M client when calling SQL-executing agents (Query, Data Product Query, Analytics, Chart Generation) or tools (SQL Execution, Get Data Schema).
