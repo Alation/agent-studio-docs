@@ -284,7 +284,7 @@ Content-Type: application/json
 }
 ```
 
-For Bedrock, use `"provider": "bedrock"`. The region is resolved automatically from the credentials.
+For Bedrock, use `"provider": "bedrock"` when validating credentials. When creating an LLM config (Step 3), use a region-qualified value such as `"provider": "bedrock_us-west-2"` — the stored config reflects the specific region.
 
 ### Step 3: Create LLM Config
 

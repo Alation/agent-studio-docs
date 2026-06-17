@@ -31,7 +31,7 @@ The web app already has the signed-in Alation session.
 
 The channel attaches the user's personal Alation access token to the request and sends it to the Agent Studio runtime. This token was issued when the user linked their Alation account through a browser OAuth 2.0 (PKCE) flow.
 
-There is no shared service identity on this path; each request carries the token of the person who made it. If the token has expired, the channel refreshes it and retries once. A real permission denial (`403`) reaches the user as an error — the channel never retries around it.
+For user-initiated OAuth, there is no shared service identity on this path — each request carries the token of the person who made it. For machine-to-machine OAuth (client-credentials flow), this token belongs to the OAuth application's assigned role rather than a real user; see [Identity and permissions](/agent-studio-docs/security/identity-and-permissions/#how-you-authenticate-changes-what-you-see) for how that role is set. If the token has expired, the channel refreshes it and retries once. A real permission denial (`403`) reaches the user as an error — the channel never retries around it.
 
 ### 3. Identity validation and catalog context
 

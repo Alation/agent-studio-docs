@@ -19,7 +19,7 @@ Add this tool to an agent that needs to find catalog objects from a natural lang
 | --- | --- | --- | --- | --- |
 | `search_term` | Yes | string | Agent determined | The text to search for. |
 | `object_types` | No | list of strings | Agent determined | Restrict results to types such as `table`, `column`, `schema`, `article`, `bi_field`, `glossary_term`. |
-| `filters` | No | list of objects | Fixed or Agent determined | Filter on custom fields. Use the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature. |
+| `filters` | No | object | Fixed or Agent determined | Filter on custom fields. Use the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature `search_filters.fields` structure. |
 | `limit` | No | integer (default `20`) | Fixed | Maximum number of results. |
 | `ranges` | No | list of date ranges | Agent determined | Limit results to a date range. |
 | `starred` | No | boolean | User input | Only objects the user has starred. |
