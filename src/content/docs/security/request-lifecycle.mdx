@@ -75,7 +75,7 @@ Hops 1–5 preserve identity end to end. Hop 6 is the single identity-translatio
 
 Authorization is enforced around the language model, not inside it. Agent visibility, data-product permission checks, and warehouse credentials decide what a request can reach, and the model cannot widen that scope: tools are fixed per agent by the author, and every data access is re-checked against the user's permissions downstream.
 
-There are no model-side controls today — no prompt-injection filtering, output moderation, or model policy engine. If your security review requires them in addition to access control, raise this with your Alation account team to confirm current capabilities for your deployment.
+The default Alation-hosted models run on Amazon Bedrock, pinned to your deployment's region for data residency. Bedrock does not store or log prompts or responses, customer data is never used to train foundation models, and Bedrock's automated abuse detection screens for prompt injection and jailbreaking with no human review. For what reaches the model, where conversation data is stored and for how long, and the full no-training and compliance commitments, see [Data handling and compliance](/agent-studio-docs/security/data-handling/).
 
 ## Related pages
 
