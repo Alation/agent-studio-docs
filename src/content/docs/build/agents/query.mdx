@@ -23,6 +23,10 @@ Required:
 - `message` (string): The natural language question or request to send to the agent
 - `data_product_id` (string): The ID of the data product to query
 
+Optional:
+
+- `data_product_version` (string): The data product version to query. Defaults to the active version when omitted.
+
 ## Output format
 
 The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.

@@ -21,7 +21,10 @@ The agent follows this workflow:
 Required:
 
 - `message` (string): The natural language question or request to send to the agent
-- `marketplace_id` (string): The ID of the marketplace to search for data products
+
+Optional:
+
+- `marketplace_id` (string): The ID of the marketplace to search for data products. If omitted, the agent uses the default marketplace.
 
 ## Output format
 
@@ -38,7 +41,7 @@ The agent is configured with 4 tools:
 Searches for data products in the specified marketplace relevant to the user's question.
 
 **Key parameters:**
-- `marketplace_id`: The marketplace to search, which is passed to the tool based from the input parameters.
+- `marketplace_id` (optional): The marketplace to search. When supplied as an agent input it is forwarded to the tool; otherwise the tool falls back to the default marketplace.
 
 ### Get data schema
 

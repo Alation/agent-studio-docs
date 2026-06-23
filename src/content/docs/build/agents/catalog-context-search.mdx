@@ -25,10 +25,6 @@ Required:
 
 - `message` (string): The natural language question or request to send to the agent
 
-Optional:
-
-- `base_signature` (object): Pre-configured signature to restrict object types or apply filters
-
 ## Output format
 
 The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
@@ -49,7 +45,6 @@ Searches for catalog objects using semantic search (by name, keyword, or busines
 
 **Key parameters:**
 - `question`: The user's natural language question
-- `base_signature`: Optional pre-configured signature
 
 **Internal behavior:**
 - Orchestrates the Signature Generator agent to build the search signature
@@ -68,7 +63,6 @@ Enumerates catalog objects using filter-based retrieval (no keyword search).
 
 **Key parameters:**
 - `question`: The user's natural language question
-- `base_signature`: Optional pre-configured signature
 - `ids_by_object_type`: Optional direct ID fetch (e.g., `{"table": [1, 2, 3]}`)
 
 **Internal behavior:**

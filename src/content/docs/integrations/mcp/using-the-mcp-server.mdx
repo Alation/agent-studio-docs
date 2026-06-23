@@ -150,6 +150,6 @@ Setup instructions for running a local MCP server are available [here](https://g
 
 ## Good to know
 
-- **Tool approvals need the web UI.** Approval-gated tools can't be approved from an MCP client; complete the approval in Agent Studio.
+- **Tool approvals are not enforced over MCP.** Each MCP client is responsible for setting and enforcing tool restrictions client-side. Be careful when using tools that can modify Alation objects.
 - **Tool calls are metered.** Each call to a built-in tool counts as an action for [usage](/agent-studio-docs/security/observability/usage/) purposes, whether it comes from MCP, Slack, or the web UI.
-- **Timeouts apply.** Tool calls time out at 30 seconds (configurable to 60 per tool), and some clients impose their own response limits — see [known limitations](/agent-studio-docs/get-started/recipes/known-limitations/).
+- **Timeouts apply.** Calls to custom HTTP tools time out after 30 seconds by default (configurable up to 60 per tool); calls to external MCP servers time out after 60 seconds by default (configurable up to 120). Some clients impose their own response limits — see [known limitations](/agent-studio-docs/get-started/recipes/known-limitations/).

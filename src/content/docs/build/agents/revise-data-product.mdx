@@ -12,9 +12,9 @@ The agent follows this workflow:
 
 1. Runs SQL evaluation on the data product's evaluation set and analyzes results
 2. Provides a summary of evaluation results, identifying patterns in failed cases
-3. Fetches the current data product specification (critical step to preserve all fields)
-4. Modifies only the specific fields that need changes while preserving all other fields
-5. Updates the data product with the complete modified specification
+3. Fetches the current data product specification to understand its structure
+4. Generates [JSON Patch (RFC 6902)](https://datatracker.ietf.org/doc/html/rfc6902) operations targeting only the fields that need to change
+5. Applies the patch to the data product's unlisted draft version in place
 6. Re-runs evaluation to verify improvements and compares with previous results
 7. Iterates the process if needed based on user feedback
 
@@ -59,22 +59,23 @@ This differs from the schema tool by providing the raw JSON specification withou
 - `x-derivedColumns`: Computed column definitions
 - `relationships`: Join relationship definitions
 
-### Update an existing data product
+### Update data product spec
 
-Updates the data product specification with modifications.
-Requires the complete specification with all fields preserved.
+Applies a list of [JSON Patch (RFC 6902)](https://datatracker.ietf.org/doc/html/rfc6902) operations to the data product's unlisted draft version. Patches use JSON Pointer paths (`/product/recordSets/<table_name>/...`) and support `add`, `replace`, `copy`, and `remove`.
 
-**Critical requirements:**
+**Protected paths** (cannot be modified):
 
-- Must include the complete specification (missing fields will be removed)
-- Must preserve exact field names and structure from the original spec
-- Never construct specifications from scratch
+- `/product/productId`
+- `/product/version`
+- `/product/deliverySystems`
+
+If the target version is already listed in the Data Product Marketplace, the call fails — listed versions are immutable, and a new draft must be created before further edits.
 
 ## Behavior notes
 
-- **Always fetch before update**: The agent must call Get Data Product Raw Specification before calling Update Data Product
-- **Complete specifications required**: Updates must include the complete specification; missing fields will be removed
-- **Preserve structure**: Field names and structure from the original spec must be maintained exactly
+- **Always fetch before update**: The agent must call Get Data Product Raw Specification before generating a patch, so its operations target the actual current structure
+- **Patch-based, not replacement**: Updates are JSON Patch operations targeting only the fields that change. Other fields are left untouched
+- **Drafts only**: Patches apply to the unlisted draft version in place; listed versions are immutable
 - **Verify improvements**: Changes are only kept if they improve evaluation scores
 - **Iterative approach**: The agent can make multiple rounds of refinements based on evaluation feedback
 - **Cached results**: If the data product hasn't changed, evaluation returns cached results for efficiency

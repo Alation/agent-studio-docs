@@ -18,8 +18,8 @@ Add this tool to an agent that answers questions about dashboards and BI reports
 | Parameter | Required | Type | Suggested scope | What it does |
 | --- | --- | --- | --- | --- |
 | `search_term` | Yes | string | Agent determined | The text to search for. |
-| `filters` | No | object | Fixed or Agent determined | Filter on custom fields. Use the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature `search_filters.fields` structure. |
-| `limit` | No | integer (default `20`) | Fixed | Maximum number of results. |
+| `filters` | No | list of objects | Fixed or Agent determined | Filter on custom fields. Use the same [format](https://developer.alation.com/dev/docs/customize-the-aggregated-context-api-calls-with-a-signature#fields) as the aggregated context signature `search_filters.fields` structure. |
+| `limit` | No | integer (default `20`, max `100`) | Fixed | Maximum number of results. |
 
 <Aside type="note">
 See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
