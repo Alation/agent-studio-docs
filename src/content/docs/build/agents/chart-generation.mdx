@@ -20,6 +20,10 @@ Required:
 - `message` (string): The natural language question or request to send to the agent
 - `data_product_id` (string): The data product to query
 
+Optional:
+
+- `data_product_version` (string): The data product version to query. Defaults to the active version when omitted.
+
 ## Output format
 
 The agent produces a series of thinking, tool call, tool return, and text blocks as it works through the user request.
@@ -54,15 +58,15 @@ The tool automatically handles result serialization and may limit rows/columns f
 
 ### Chart generation from asset
 
-Generates visualizations using Altair and Python.
-Takes an asset ID from a generated CSV to create interactive charts.
+Generates visualizations from an asset (a CSV produced by a prior SQL execution).
+The agent uses **ChartGrammar** — a structured chart configuration — by default; if the requested chart can't be expressed in ChartGrammar, the agent falls back to providing custom Altair Python code via `chart_code_snippet`.
 
 **Key parameters:**
 
-- `data_product_id`: The data product to query
-- `sql`: SQL query to generate data for the chart
-- `chart_code_snippet`: Python function using Altair to create the chart
-- `image_title`: Title for the chart
+- `asset_id` (required): ID of the CSV asset containing the data
+- `chart_grammar`: Structured chart configuration (preferred path)
+- `chart_code_snippet`: Python function using Altair (fallback when ChartGrammar can't express the chart; required with `image_title`)
+- `image_title`: Title for the chart (required with `chart_code_snippet`)
 
 
 ## Behavior notes

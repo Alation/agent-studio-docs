@@ -30,6 +30,10 @@ Add this tool to an agent that should not just answer lineage questions but reco
 If you provide `folder_id`, `document_hub_id`, `template_id`, and `field_mapping` together, the tool **creates a document** with the results mapped onto the template's fields. If you leave them out, it returns the analysis as data instead.
 </Aside>
 
+<Aside type="caution">
+This tool can create catalog documents. In the Agent Studio web UI, calls are approval-gated and surfaced for user confirmation before they run. Approvals are not enforced over MCP — each MCP client is responsible for any client-side tool restrictions.
+</Aside>
+
 See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
 
 ## Output
