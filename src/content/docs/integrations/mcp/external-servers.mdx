@@ -31,6 +31,41 @@ Once created, you assign the MCP server config to an agent. At runtime, the agen
 | `CLIENT_CREDENTIALS` | OAuth 2.0 Client Credentials (2-legged) | Server-to-server, no user interaction |
 | `AUTHORIZATION_CODE` | OAuth 2.0 Authorization Code (3-legged, with optional PKCE) | User-delegated access, e.g. connecting to another Alation instance |
 
+## Connecting with basic authentication
+
+:::note
+Only HTTP `BASIC` (username/password) authentication is currently supported by the UI.
+If you need to use a different authentication method, you will need to use [the API](#connecting-with-oauth-authorization-code-flow).
+:::
+
+You can use the UI to connect to an external MCP server that uses HTTP `BASIC` (username/password) authentication.
+
+<Steps>
+1. Go to the **Imported servers** tab on the **MCP servers** page
+
+   ![Imported servers tab](../../../../assets/img/guides/mcp-external-servers/01-imported-servers-tab.png)
+
+2. Click the **Add new server** button.
+
+   ![Add new server button](../../../../assets/img/guides/mcp-external-servers/02-add-new-server-button.png)
+
+3. Populate the form.
+
+   - **Server URL** -- The publicly accessible URL of the external MCP server you want to connect to.
+   - **Name** -- This is a user friendly display name used to identify your MCP server within Alation's software.
+   - **Description (Optional)** -- Any arbitrary description you'd like to save to identify your MCP server within Alation's software.
+   - **Username** -- The username to use for HTTP `BASIC` authentication when connecting to the external MCP server.
+   - **Password** -- The password to use for HTTP `BASIC` authentication when connecting to the external MCP server.
+
+   ![Populate the form](../../../../assets/img/guides/mcp-external-servers/03-populate-the-form.png)
+
+4. Click the **Test and save** button.
+   This will attempt to connect to the specified MCP server URL using the specified username and password.
+   If the connection test succeeds, the dialog will close and your new MCP server will appear in the **Imported servers** list.
+   If the connection test fails, the dialog will remain open and you will be prompted to re-verify your configuration.
+
+</Steps>
+
 ## Connecting with OAuth Authorization Code flow
 
 This is the most common flow when connecting to another Alation instance or any OAuth-protected MCP server.
