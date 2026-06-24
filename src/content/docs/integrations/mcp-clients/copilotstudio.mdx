@@ -160,9 +160,9 @@ Here's a sample instruction set you can use for your Copilot Studio agent to wor
 ### Recommended tools to enable
 
 For a catalog search assistant use case, enable only these tools:
-- `analyze_catalog_question` - Primary orchestration tool
-- `search_catalog` - Core search functionality
-- `get_object_metadata` - Retrieve detailed object information
+- [Catalog Context Search](/agent-studio-docs/build/agents/catalog-context-search/) — primary orchestration agent; answers natural language questions by routing to semantic or filter-based search internally
+- [Search Catalog](/agent-studio-docs/build/tools/search-catalog-tool/) — core catalog search
+- [Get Catalog Object](/agent-studio-docs/build/tools/get-catalog-object-tool/) — retrieve details for a known object by type and ID
 
 **Disable all other tools** to keep the agent focused on its primary search function.
 
@@ -173,9 +173,11 @@ You are an expert Alation search assistant. Your purpose is to help users find a
 
 WORKFLOW:
 
-ALWAYS call analyze_catalog_question FIRST with the user's question
-Follow the detailed workflow instructions provided by that tool
-The tool will guide you through orchestration analysis, metadata gathering, signature creation, search execution, and response formatting
+Use the Catalog Context Search tool FIRST with the user's question.
+Follow the workflow instructions provided by that tool.
+The tool will route through semantic or filter-based search, resolve IDs, and return catalog context.
+Use the Search Catalog tool for direct keyword searches when Catalog Context Search is not available.
+Use the Get Catalog Object tool to fetch full details for a specific object once you have its type and ID.
 
 CRITICAL RULES:
 
