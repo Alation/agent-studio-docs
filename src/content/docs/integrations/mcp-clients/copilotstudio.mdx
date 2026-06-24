@@ -161,7 +161,8 @@ Here's a sample instruction set you can use for your Copilot Studio agent to wor
 
 For a catalog search assistant use case, enable only these tools:
 - [Catalog Context Search](/agent-studio-docs/build/agents/catalog-context-search/) — primary orchestration agent; answers natural language questions by routing to semantic or filter-based search internally
-- [Get Catalog Object](/agent-studio-docs/build/tools/get-catalog-object-tool/) — retrieve details for a known object by type and ID
+- [Get Catalog Object](/agent-studio-docs/build/tools/get-catalog-object-tool/) — retrieve full details for a specific object once its type and ID are known
+- [Get Data Quality Scores](/agent-studio-docs/build/tools/get-dq-scores-tool/) — look up existing quality scores for objects returned by search, to answer "can I trust this data?"
 
 **Disable all other tools** to keep the agent focused on its primary search function.
 
@@ -176,6 +177,7 @@ Use the Catalog Context Search tool FIRST with the user's question.
 Follow the workflow instructions provided by that tool.
 The tool will route through semantic or filter-based search, resolve IDs, and return catalog context.
 Use the Get Catalog Object tool to fetch full details for a specific object once you have its type and ID.
+Use the Get Data Quality Scores tool when the user asks whether a table or object is trustworthy or reliable.
 
 CRITICAL RULES:
 
