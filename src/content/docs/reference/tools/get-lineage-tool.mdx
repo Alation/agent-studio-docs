@@ -1,0 +1,110 @@
+---
+title: Get Lineage Tool
+description: "Retrieve upstream or downstream data lineage for tables and columns in your Alation catalog."
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components'
+
+The Get Lineage tool lets your agent trace how data flows through your pipelines.
+Use it to answer questions like "what feeds into this table?", "what uses this column?", or "what would break if we changed this dataset?"
+
+## When to use this tool
+
+This tool is the right choice when users ask about:
+
+- **Data dependencies** — what sources does this table come from?
+- **Downstream impact** — what reports or tables would be affected if this data changed?
+- **Column-level lineage** — exactly how is this column calculated or transformed?
+
+## Understanding Fixed vs Agent-determined inputs
+
+When you configure this tool in Agent Studio, each parameter has a **scope** setting:
+
+- **Fixed input** — you lock the value at configuration time.
+The agent always uses exactly what you specify.
+Use this when the value should never change, such as restricting lineage to a specific direction.
+- **Agent determined** — the agent decides the value at runtime based on the user's question.
+Use this for parameters that should vary, like which table or column to query.
+- **User input** — the end user provides the value when they invoke the agent.
+Use this when you want the agent to ask the user directly for a specific ID or setting.
+
+<Aside type="tip" title="When in doubt, use Agent determined">
+For most parameters on this tool, "Agent determined" is the safest default.
+The agent understands the semantics of lineage queries and will pick the right values from the user's question.
+</Aside>
+
+## Example configuration
+
+This is a minimal configuration that lets the agent answer any lineage question:
+
+```jsonc
+{
+  "direction": "upstream",       // Agent determined — let the agent pick based on the question
+  "otype": "table",              // Agent determined — table or attribute depending on question
+  "root_node_ids": [123],        // Agent determined — IDs resolved from catalog search
+  "allowed_otypes": ["table"],   // Optional: restrict results to tables only
+  "max_depth": 5                 // Optional: limit traversal depth
+}
+```
+
+## Column-level lineage
+
+To retrieve lineage at the column level, you must use `otype="attribute"` with **column IDs**, not the table ID.
+
+```jsonc
+{
+  "direction": "upstream",
+  "otype": "attribute",              // Must be "attribute" for column lineage
+  "root_node_ids": [1024, 1089],     // Use column/attribute IDs, not the table ID
+  "allowed_otypes": ["attribute"]    // Optional: return only columns in the graph
+}
+```
+
+<Aside type="caution" title="Common mistake">
+Do not use `otype="table"` with `allowed_otypes=["attribute"]` to get column lineage.
+That starts traversal from the table node and filters the result, which returns empty or incorrect results.
+Always start with `otype="attribute"` for column-level queries.
+</Aside>
+
+## Parameter reference
+
+| Parameter | Type | Default | Scope | Description |
+|-----------|------|---------|-------|-------------|
+| `direction` | `"upstream"` \| `"downstream"` | — | Agent determined | Required. `"upstream"` finds sources; `"downstream"` finds consumers. |
+| `otype` | string | — | Agent determined | Required. Object type of the root nodes: `"table"` or `"attribute"` (column). |
+| `root_node_ids` | list of IDs | — | Agent determined | Required. IDs of the objects to query lineage for. All must be the same `otype`. |
+| `allowed_otypes` | list of strings | All types | Agent determined | Filter which object types appear in the returned graph. Does not change the starting point. |
+| `direction` | string | `"upstream"` | Fixed or Agent | Which direction to traverse the lineage graph. |
+| `max_depth` | integer | `10` | Fixed | How many levels deep to traverse. Lower values improve performance on large graphs. |
+| `limit` | integer | `1000` | Fixed | Maximum nodes to return. The maximum value is 1000. |
+| `design_time` | `1` \| `2` \| `3` | `3` | Fixed | Filter by lineage type: `1` = design-time only, `2` = runtime only, `3` = both (default). |
+| `show_temporal_objects` | boolean | `false` | Fixed | Include temporary or transient objects in results. |
+| `excluded_schema_ids` | list of integers | `[]` | Fixed | Schema IDs to exclude from results, useful for filtering out staging or test schemas. |
+| `time_from` | string (ISO 8601) | — | Fixed | Start of a time range filter, e.g. `"2024-01-01T00:00:00"`. |
+| `time_to` | string (ISO 8601) | — | Fixed | End of a time range filter, e.g. `"2024-12-31T23:59:59"`. |
+| `processing_mode` | `"complete"` \| `"chunked"` | `"complete"` | Fixed | `"complete"` returns all results at once; `"chunked"` returns results in batches for large graphs. |
+
+## Working with large graphs
+
+If your lineage graph has more than 1000 nodes, the tool returns a truncated result with `has_more: true` in the pagination field.
+When this happens:
+
+- Query each root node individually to get complete results for that node.
+- Use `excluded_schema_ids` to filter out schemas you don't care about (e.g. staging, dev).
+- Reduce `max_depth` to limit traversal scope.
+
+## Special object types
+
+For file system and external objects, use fully-qualified names as IDs instead of numeric IDs:
+
+```jsonc
+{
+  "direction": "upstream",
+  "otype": "file",
+  "root_node_ids": ["filesystem_id.path/to/file"]
+}
+```
+
+## Related resources
+
+See the [Lineage Agent Guide](../../guides/lineage/using-lineage-agent/) for a complete walkthrough of lineage queries, column transformation analysis, and saving lineage documentation to the catalog.
