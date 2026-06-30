@@ -1,0 +1,47 @@
+---
+title: Lineage Builder Agent
+description: An agent for data stewards and catalog administrators to manage data lineage — view, create, delete, and debug.
+---
+
+The Lineage Builder Agent helps data stewards and catalog administrators manage data lineage end-to-end. It can view upstream/downstream lineage, create manual lineage paths between tables and BI objects, delete incorrect lineage, and diagnose why lineage is missing.
+
+## How it works
+
+The agent follows this workflow:
+
+1. Identifies what the user wants to do (view, create, delete, or debug).
+2. Resolves object names to IDs by searching the catalog.
+3. Routes to the appropriate skill based on the request:
+   - For "what feeds / what depends on this?" questions, it fetches the lineage graph.
+   - For "create lineage between X and Y" requests, it walks through discovery, confirmation, and creation.
+   - For "delete lineage" requests, it identifies the path and confirms before removing.
+   - For "why is lineage missing?" questions, it runs a staged diagnostic.
+4. For create and delete operations, shows exactly what will change and waits for user approval before executing.
+
+## Input parameters
+
+Required:
+
+- `message` (string): The lineage request or question.
+
+## Available skills
+
+- **lineage-read**: Fetches upstream or downstream lineage graphs, views SQL for edges, and traces column-level transformations.
+- **lineage-create**: Creates or deletes manual lineage between tables, columns, or BI objects. Supports warehouse auto-discovery for Snowflake.
+- **lineage-debug**: Runs a multi-stage diagnostic to identify why lineage is missing — checks QLI jobs, probes the warehouse, and inspects parser behavior.
+- **explore**: Searches the catalog to find tables, columns, or BI objects by name.
+
+## Behavior notes
+
+- Create and delete operations require Server Admin, Catalog Admin, or Source Admin permissions. The agent returns a clear error on 403 Forbidden.
+- Before any create or delete, the agent shows exactly what will change and waits for explicit user approval.
+- When lineage is missing, the agent suggests debugging first — automatic lineage via QLI configuration changes may be possible without manual creation.
+- Before creating lineage, the agent optionally checks if lineage already exists to avoid duplicates.
+- Uses mermaid flowcharts for lineage visualization.
+- Object IDs are shown alongside names for unambiguous reference.
+
+## See also
+
+- [Using the Lineage Builder Agent](/agent-studio-docs/get-started/recipes/data-lineage-agents)
+- [Data Lineage Agents Guide](/agent-studio-docs/get-started/recipes/data-lineage-agents)
+- [Get Lineage Tool](/agent-studio-docs/build/tools/get-lineage-tool)

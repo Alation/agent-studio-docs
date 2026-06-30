@@ -1,0 +1,211 @@
+---
+title: Data Lineage Agents Guide
+description: Learn how to use the Lineage Agent and Lineage Builder Agent in Alation AI to explore, create, and debug data lineage.
+---
+
+This guide covers both lineage agents in Alation AI: the **Lineage Agent** for exploring lineage and generating documentation, and the **Lineage Builder Agent** for creating, deleting, and debugging lineage.
+
+---
+
+## Choosing the Right Agent
+
+| What you want to do | Who can do it | Agent |
+|---|---|---|
+| View upstream/downstream lineage | Any user | Lineage Agent |
+| Trace column transformations | Any user | Lineage Agent |
+| Generate lineage documentation | Any user | Lineage Agent |
+| Create manual lineage | Server/Catalog/Source Admin | Lineage Builder Agent |
+| Delete lineage | Server/Catalog/Source Admin | Lineage Builder Agent |
+| Debug missing lineage | Server/Catalog/Source Admin | Lineage Builder Agent |
+
+---
+
+## Lineage Agent
+
+The Lineage Agent helps you understand how data flows through your pipelines. It can find dependencies, trace column transformations, and save analysis as catalog documentation.
+
+### Input
+
+- `message` (string, required): Your lineage question or documentation request.
+
+### What You Can Ask
+
+**Find dependencies:**
+"What tables feed into the orders table?"
+"Show me upstream dependencies for table ID 1234"
+"What uses this table downstream?"
+
+**Trace transformations:**
+"How is the revenue_total column calculated?"
+"What transformations happen to this table's data?"
+
+**Create documentation:**
+"Create lineage documentation for table ID 1234"
+"Generate a lineage document for the orders table"
+
+### Tools
+
+| Tool | What It Does |
+|------|--------------|
+| `get_search_context` | Find tables or columns by name in the catalog |
+| `get_filter_context` | Retrieve the content of an existing lineage document by ID |
+| `get_lineage` | Fetch upstream or downstream lineage graph |
+| `generate_lineage_documentation` | Analyze SQL transformations for a table's columns |
+| `get_document_templates` | List available templates for creating documents |
+| `update_catalog_object` | Link a document to a table's custom field |
+
+### How It Works
+
+1. Finds the object you're asking about by searching the catalog.
+2. Checks whether lineage documentation already exists and answers from it before regenerating.
+3. Chooses the right approach:
+   - For "what feeds / what depends on this?" questions, it fetches the lineage graph.
+   - For "how is this column calculated?" questions, it analyzes upstream SQL to trace column-level transformations.
+4. When explicitly asked to save documentation, it creates a catalog document and links it back to the table.
+
+### get_lineage
+
+Retrieves the lineage graph showing what objects are connected upstream (sources) or downstream (consumers).
+
+**Supports:**
+- Table-level lineage (`otype="table"`)
+- Column-level lineage (`otype="attribute"` with column IDs)
+- Filtering by direction (upstream or downstream)
+
+### generate_lineage_documentation
+
+Analyzes SQL dataflows to trace how each column in a table is derived from source columns.
+
+**Important:** This tool only works for **tables**.
+
+**What it returns:**
+- Executive summary of what the table represents
+- Column transformations (calculations, aggregations, renames)
+- Passthrough columns (unchanged from source)
+- Untraced columns (where SQL couldn't be analyzed)
+- Data quality notes (filters, joins, conditions)
+- Source tables and downstream consumers
+
+You can optionally save the analysis as a document by providing `folder_id`, `document_hub_id`, and `template_id`.
+
+### Template Setup
+
+To save lineage documentation, you need a document template with these custom fields:
+
+| Field Name | Field Type | Description |
+|------------|------------|-------------|
+| Source Tables | OBJECT_SET | Leaf tables where data originates |
+| Downstream Tables | OBJECT_SET | Tables that consume this table's data |
+| Upstream Layers | RICH_TEXT | Visual representation of the data pipeline layers |
+| Downstream Tables Detail | RICH_TEXT | Downstream tables with links |
+| Downstream BI Objects | RICH_TEXT | BI reports and dashboards using this table |
+| Column Transformations | RICH_TEXT | How each column is calculated |
+| Passthrough Columns | RICH_TEXT | Columns that pass through unchanged from source |
+| Untraced Columns | RICH_TEXT | Columns where lineage couldn't be determined from SQL |
+| Data Quality Notes | RICH_TEXT | Filters, joins, and conditions that affect data quality |
+
+---
+
+## Lineage Builder Agent
+
+The Lineage Builder Agent helps data stewards and catalog administrators manage lineage end-to-end. It can view existing lineage, create manual lineage paths, delete incorrect lineage, and diagnose why lineage is missing.
+
+### Input
+
+- `message` (string, required): Your lineage request or question.
+
+### What You Can Ask
+
+**Create lineage:**
+"Create lineage from staging.orders to analytics.orders"
+"Link the customers table as upstream of customer_metrics"
+"Add lineage between this BI report and its source table"
+
+**Delete lineage:**
+"Remove the lineage between staging.orders and analytics.orders"
+"Delete the manual lineage I created for this table"
+
+**Debug missing lineage:**
+"Why is there no lineage for the orders table?"
+"Lineage is missing for analytics.revenue — help me figure out why"
+"The lineage for this table looks incomplete"
+
+**View lineage:**
+"What feeds the orders table?"
+"Show downstream for table ID 1234"
+"What columns feed into revenue_total?"
+
+### Skills
+
+| Skill | What It Does |
+|-------|--------------|
+| `lineage-read` | Fetch upstream/downstream lineage graphs, view SQL for edges, trace column transformations |
+| `lineage-create` | Create or delete manual lineage between tables, columns, or BI objects |
+| `lineage-debug` | Staged diagnostic: QLI status, warehouse probes, parser checks |
+| `explore` | Search the catalog to resolve object names to IDs |
+
+### How It Works
+
+1. Identifies what you want to do (view, create, delete, or debug).
+2. Resolves object names to IDs via catalog search when needed.
+3. Routes to the appropriate skill.
+4. For create/delete operations, shows exactly what will change and waits for your approval before executing.
+
+### Creating Lineage
+
+When you ask to create lineage, the agent asks two questions:
+
+**Discovery method:**
+- **Warehouse auto-discovery** (Snowflake only) — Queries your warehouse to find actual data flows automatically
+- **Manual** — You specify the source and target objects directly
+
+**Scope:**
+- **One level** — Immediate parents/children only
+- **Full upstream** — Trace back to root source tables
+- **Full end-to-end** — Complete upstream and downstream
+
+The agent then finds the objects, shows you the proposed lineage as a diagram, and waits for confirmation before creating it.
+
+**Supported object types:** tables, columns, BI reports, BI report columns, BI datasources, BI datasource columns.
+
+### Deleting Lineage
+
+The agent finds the lineage path, shows you what will be removed, and confirms before deleting. You can delete a specific edge or all lineage between two objects.
+
+### Debugging Missing Lineage
+
+The agent runs a staged diagnostic, reporting findings at each step:
+
+| Stage | What It Checks |
+|-------|----------------|
+| Find table | Confirms the table exists in the catalog |
+| Lineage existence | Checks if any lineage exists, including through temp objects |
+| QLI job status | Checks if QLI has run successfully and when |
+| Warehouse probes | Queries the warehouse for write operations to the table |
+| QLI window | Verifies writes fall within the QLI ingestion window |
+| Parser issues | Checks for SQL patterns that the parser can't handle |
+
+The agent stops when it identifies the root cause and recommends a fix.
+
+**Supported warehouses for debug:** Snowflake, BigQuery, Databricks, Redshift, Oracle.
+
+---
+
+## Limitations
+
+| Limitation | Agent | Notes |
+|------------|-------|-------|
+| Tables only for transformation analysis | Lineage Agent | `generate_lineage_documentation` only works for tables |
+| Max 1000 nodes per lineage query | Both | Lineage graph queries cap at 1000 nodes |
+| Max depth of 20 levels | Both | Lineage traversal stops at 20 hops |
+| Admin permissions for mutations | Lineage Builder | Create/delete require Server, Catalog, or Source Admin |
+| Warehouse support for debug | Lineage Builder | Debug probes only support Snowflake, BigQuery, Databricks, Redshift, Oracle |
+| BI lineage requires registered datasource | Lineage Builder | BI objects must already exist in the catalog |
+| One table at a time for debug | Lineage Builder | Diagnostic flow runs per table |
+
+---
+
+## See Also
+
+- [Get Lineage Tool](/agent-studio-docs/build/tools/get-lineage-tool)
+- [Generate Lineage Documentation Tool](/agent-studio-docs/build/tools/generate-lineage-documentation-tool)
