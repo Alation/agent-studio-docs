@@ -420,3 +420,8 @@ a.uses-card:hover::after {
 	color: var(--sl-color-gray-2);
 	line-height: 1.45;
 }
+
+/* Hide prev/next navigation on release notes pages (confusing with newest-first ordering) */
+[data-slug^="releases/26-"] .pagination-links {
+	display: none;
+}
