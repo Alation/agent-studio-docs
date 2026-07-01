@@ -1,0 +1,54 @@
+---
+title: 26.192.2
+description: Release notes for Agent Studio 26.192.2
+sidebar:
+  order: -26192
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components'
+
+**Release Date:** 2026-07-01
+
+**Version Range:** v26.178.1 -> v26.192.2
+
+## Highlights
+
+- A new Lineage Builder Agent helps you document and manage data lineage relationships.
+- Agents now learn from your feedback to improve their performance over time.
+- Expanded data quality capabilities let you generate and manage quality rules more easily.
+
+## What's New
+
+### Features
+
+- **Lineage Builder Agent:** A new agent helps you create and document lineage relationships between your data assets, making it easier to understand how data flows through your organization.
+- **Feedback-driven improvements:** Agents can now aggregate feedback from your chat sessions and use it to improve their responses over time.
+- **Data quality rule generation:** New tools help you generate data quality rules and monitor data quality across your data products.
+- **Permission seeding:** Default agents now come with pre-configured permissions, and permissions are automatically cleaned up when agents are deleted.
+- **BI report data sources:** Search results now include information about the data sources behind BI reports, helping you trace data origins.
+- **Deeper health monitoring:** New health check endpoints provide more detailed diagnostics for troubleshooting connection and configuration issues.
+- **Chat keep-alive:** Streaming chat sessions now maintain their connection more reliably with periodic keep-alive signals.
+
+### Improvements
+
+- **Faster search:** Catalog search now uses prompt caching for faster responses in multi-turn conversations.
+- **User group lookups:** You can now look up which groups a user belongs to, simplifying permission management workflows.
+- **Data product relationships:** A new endpoint helps generate relationships between data products automatically.
+- **Clearer error handling:** Better error messages when access is denied versus when resources are not found.
+
+### Bug Fixes
+
+- **Feed:** Fixed several chart rendering issues including duplicate titles, layout problems on load, and date parameter handling.
+- **Chat:** Improved session boundary handling to prevent messages from appearing in the wrong conversation.
+- **Data products:** Fixed error handling during data enrichment to provide clearer feedback.
+- **Search:** Improved search result formatting and exploration guidance.
+- **Authentication:** Fixed an issue where user email was not correctly resolved in certain authentication flows.
+
+### Breaking Changes
+
+None in this release.
+
+## Customer Impact
+
+None in this release.
+
