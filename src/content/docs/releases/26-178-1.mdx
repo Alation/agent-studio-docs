@@ -1,0 +1,54 @@
+---
+title: 26.178.1
+description: Release notes for Agent Studio 26.178.1
+sidebar:
+  order: -26178
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components'
+
+**Release Date:** 2026-06-25
+
+**Version Range:** v26.153.1 -> v26.178.1
+
+## Highlights
+
+- Export your chats to PDF, making it easy to share conversations with stakeholders.
+- New permission controls give you finer control over who can view and edit your agents.
+- Enhanced charting with support for geographic visualizations and richer data insights.
+
+## What's New
+
+### Features
+
+- **Chat PDF export:** You can now export any chat to PDF format, with safeguards to ensure only complete and up-to-date conversations are exported.
+- **Permission management:** New role-based permission controls let you define who can view, edit, or manage your agents. Permission hierarchies ensure consistent access across your organization.
+- **Geographic visualizations:** Charts now support choropleth maps with state-level data, enabling geographic data visualization.
+- **Agent import and export:** Custom tools are now preserved when you import or export agents, making it easier to share agent configurations across environments.
+- **Data product generator:** A new agent helps you create data product specifications from your existing data sources.
+- **Feed insights:** Metric cards now display compact, easy-to-read numbers and improved chart tooltips for better data comprehension.
+- **Batch column descriptions:** You can now update descriptions for multiple columns at once in your data products.
+- **Authentication improvements:** Credential identity resolution is now more reliable, ensuring consistent authentication across sessions.
+
+### Improvements
+
+- **Upgraded AI models:** All agents have been migrated to the latest AI model versions for improved response quality.
+- **Better search enrichment:** Search results now include richer context from BI reports and queries.
+- **Metrics and telemetry:** Enhanced tracking for data source usage and agent performance helps you understand how your agents are being used.
+- **Evaluation improvements:** New structured evaluation fields and retry logic make agent testing more reliable.
+
+### Bug Fixes
+
+- **Chat:** Fixed issues with PDF export validation and caching to ensure exported conversations are always current.
+- **Permissions:** Resolved a potential issue when removing editors that could cause delays in permission updates.
+- **Data products:** Fixed handling of invalid specifications to provide clearer error messages.
+- **Search:** Improved how search results link to catalog items, especially for BI reports.
+- **Feed:** Fixed chart tooltip rendering for arrays and improved initial chart generation.
+
+### Breaking Changes
+
+None in this release.
+
+## Customer Impact
+
+None in this release.
