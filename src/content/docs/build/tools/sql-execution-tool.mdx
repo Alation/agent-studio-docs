@@ -15,6 +15,28 @@ Queries are read-only. Mutating statements (`UPDATE`, `DELETE`, `INSERT`, and so
 
 Add this tool to any agent that needs to answer questions from data by running queries. Pair it with [Get Data Schema](/agent-studio-docs/build/tools/get-data-schema-tool) so the agent can learn the available tables and columns first.
 
+## Supported databases
+
+Agent Studio recognizes the data source's SQL dialect and parses, validates, and normalizes every query to it — a query written in generic SQL is rewritten into syntax the target database accepts. Supported dialects are:
+
+- Amazon Redshift
+- Databricks
+- Google BigQuery
+- IBM DB2
+- Microsoft SQL Server
+- Oracle
+- PostgreSQL
+- SAP HANA
+- Snowflake
+- Teradata
+- Trino (formerly PrestoSQL)
+
+<Aside type="note">
+Dialect handling is automatic. Agent Studio derives the dialect from the data product's data source, so pointing a data product at one of these databases is all that is needed — there is nothing to configure.
+</Aside>
+
+If you need a dialect that is not listed, contact Alation to inquire about support.
+
 ## Parameters
 
 | Parameter | Required | Type | Suggested scope | What it does |
