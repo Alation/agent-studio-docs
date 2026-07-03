@@ -169,6 +169,7 @@ export default defineConfig({
                                 items: [
                                     "build/tools/overview",
                                     "build/tools/configuring-tools",
+                                    "build/tools/credentials-for-data-product-queries",
                                     "build/tools/creating-custom-tools",
                                     {
                                         label: "Built-in tools",
