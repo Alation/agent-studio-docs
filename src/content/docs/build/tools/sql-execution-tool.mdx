@@ -25,9 +25,15 @@ Add this tool to any agent that needs to answer questions from data by running q
 | `data_product_version` | No | string | Fixed or User input | A specific version of the data product. |
 | `pre_exec_sql` | No | string | Fixed | SQL to run before the main query, e.g. to set session context. |
 | `auth_id` | No | string | Fixed or User input | The authentication credentials to use for the query. |
+| `auth_mode` | No | string | Fixed | Set to `datasource_service_account` to let the query use an admin-configured shared service account when the user has no credentials of their own. Requires the service account feature. |
+| `allow_fallback_auth` | No | boolean | Fixed | When `true`, falls back to the data source's default credentials if the user has none. |
 
 <Aside type="note">
 `data_product_id` is a good fit for **User input** so callers choose what to query, while `sql` and `result_table_name` are normally **Agent determined** — the agent writes the query from the question. See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters).
+</Aside>
+
+<Aside type="tip">
+To let end users query without each authenticating to the data source, use a shared service account (`auth_mode`) or fallback auth (`allow_fallback_auth`), depending on whether your instance has the service account feature. See [Credentials for data product queries](/agent-studio-docs/build/tools/credentials-for-data-product-queries/).
 </Aside>
 
 ## Example usage
@@ -46,5 +52,6 @@ The query result as a table. Very large results may have rows or columns trimmed
 
 ## See also
 
+- [Credentials for data product queries](/agent-studio-docs/build/tools/credentials-for-data-product-queries)
 - [Get Data Schema Tool](/agent-studio-docs/build/tools/get-data-schema-tool)
 - [Query agent](/agent-studio-docs/build/agents/query)

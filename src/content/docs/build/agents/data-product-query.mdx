@@ -71,6 +71,11 @@ Takes a SQL query and Python code snippet to create interactive charts.
 - `chart_code_snippet`: Python function using Altair to create the chart
 - `image_title`: Title for the chart
 
+## Credentials
+
+Queries run as the user's own credentials when they have them. When a user has none, the query falls back to an admin-configured shared service account (which requires the service account feature to be enabled) — and fails if neither is available. This agent does not use the data source's default credentials.
+To let end users query without each authenticating to the underlying data source, see [Credentials for data product queries](/agent-studio-docs/build/tools/credentials-for-data-product-queries/).
+
 ## Behavior notes
 
 - The agent always uses result tables from executed queries to answer questions (never synthesizes data)
