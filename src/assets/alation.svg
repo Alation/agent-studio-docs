@@ -1,9 +1,25 @@
-<svg width="184" height="89" viewBox="0 0 184 89" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M6.37793 88.3605C4.64702 88.3605 2.9483 87.656 1.7156 86.3355C-0.133827 84.3551 -0.528878 81.4215 0.730164 79.0219L38.8211 6.41958C39.6793 4.78304 41.2053 3.60009 43.0043 3.17577C44.8025 2.75146 46.6965 3.12895 48.1955 4.20949L93.3484 36.7544L174.227 1.16979C176.7 0.0819378 179.589 0.670125 181.44 2.63806C183.29 4.606 183.699 7.52645 182.462 9.92748L145.722 81.1991C144.872 82.8488 143.345 84.0456 141.54 84.478C139.735 84.9103 137.832 84.535 136.326 83.4501L91.8077 51.3632L8.94357 87.8205C8.11688 88.1841 7.24338 88.3605 6.37793 88.3605ZM46.6995 18.8505L20.4886 68.8098L79.8055 42.7123L46.6995 18.8505ZM105.351 45.4045L137.778 68.7776L162.873 20.0971L105.351 45.4053V45.4045Z" fill="url(#paint0_linear_8076_4237)"/>
-<defs>
-<linearGradient id="paint0_linear_8076_4237" x1="3.63406e-06" y1="88.497" x2="89.557" y2="-70.4767" gradientUnits="userSpaceOnUse">
-<stop stop-color="#F47C20"/>
-<stop offset="1" stop-color="#FDA600"/>
-</linearGradient>
-</defs>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 176.3 179.8">
+  <!-- Generator: Adobe Illustrator 30.5.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 3)  -->
+  <defs>
+    <clipPath id="clippath">
+      <rect width="176.3" height="179.8" fill="none"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <rect width="176.3" height="179.8" fill="none"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="154.5" y1="60" x2="44.5" y2="60" gradientTransform="translate(0 182) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff9901"/>
+      <stop offset="1" stop-color="#ea5458"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#clippath)">
+    <g clip-path="url(#clippath-1)">
+      <g>
+        <path d="M52.5,108.9l-8,26.1h110l-9.2-26.1" fill="url(#linear-gradient)"/>
+        <path d="M169.6,168.6c-3.6-3.4-5.5-7.5-7.4-12l-4.8-13.4-2.9-8.1h-44.7l5,15.7c1,3,1.9,5.8,2.3,8.9.7,4.3-.4,8.2-4.9,9.7l-10.1,3.5c-1.5.5-2.9.9-4.4,1.6v5.4h78.5v-7c-2.6-.7-4.8-2.5-6.7-4.3Z" fill="#14141a"/>
+        <path d="M51.3,170c-2.7-.9-6-2.8-7.6-5.3-2.2-3.6-3.2-7.7-2.9-12.1.4-6,1.9-11.8,3.7-17.6l8.1-26.1,23.9-78,25,78h43.9L106.9,0h-33.3c-2.6,10.1-5.9,19.8-9.3,29.5l-38.8,105.6c-3.7,9.5-9.1,24.5-15.8,31.8-.8.8-1.4,1.6-2.3,2.4-1.5,1.2-2.8,2.4-4.6,3.2-1,.5-1.9,1.2-2.9,1.6v5.2c0,.2,0,.4.1.4.2,0,.2,0,.5,0h63.1v-5.5s-12.5-4.3-12.5-4.3h0Z" fill="#14141a"/>
+      </g>
+    </g>
+  </g>
 </svg>
