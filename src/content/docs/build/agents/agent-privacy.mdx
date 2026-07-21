@@ -1,0 +1,49 @@
+---
+title: Agent Privacy
+description: "Grant access to an agent for everyone or for specific users and groups."
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components'
+import { Image } from 'astro:assets';
+import agentPrivacy from '../../../../assets/img/guides/access-controls/agent-privacy.png';
+import browseAgents from '../../../../assets/img/guides/access-controls/browse-agents.png';
+
+A new agent starts **private**: visible only to you.
+You can grant access to it — for everyone, or for specific users and groups — from the agent's **Agent Access** tab.
+For the full model, see [Agent access settings](/agent-studio-docs/security/identity-and-permissions/#agents).
+
+## Manage access in the UI
+
+<Steps>
+1. **Open your agent** in Agent Studio and go to the **Agent Access** tab.
+
+2. **Choose Public or Private** in the **Agent privacy** section.
+   - **Public** — everyone in the tenant gets the role you pick (viewer or user).
+   - **Private (Restricted)** — only you and anyone granted a role below can reach the agent.
+
+3. **Grant specific users or groups a role**, independent of the public/private setting, in the **Agent roles** section — viewer, user, or editor.
+</Steps>
+
+<Image src={agentPrivacy} alt="Agent Access tab with the Agent privacy and Agent roles sections" style="max-width: 85%; height: auto;" />
+
+**Who can manage an agent's access:** its owner, anyone granted `editor`, and Server Admin. Default agents (built-in system agents) are always public and can't be restricted.
+
+<Aside type="caution">
+If you switch an agent to Private, or remove someone's access, they lose it immediately — mid-chat, on the next request.
+</Aside>
+
+## Finding agents by privacy
+
+When browsing agents, filter by **Public** or **Private** to see which agents fall into each bucket.
+
+<Image src={browseAgents} alt="Browse agents view with All, Native, Public, and Private filter tabs, search, and creator filter" style="max-width: 70%; height: auto;" />
+
+## Listing in the marketplace (separate from access)
+
+The **List in marketplace** / **Unlist from marketplace** button controls *discoverability*, not access.
+Listing an agent doesn't grant anyone a role on it, and unlisting doesn't revoke one.
+
+## Related
+
+- [Agent access settings](/agent-studio-docs/security/identity-and-permissions/#agents) — the full role model.
+- [Publish an agent to MCP](/agent-studio-docs/integrations/mcp/using-the-mcp-server/#publish-an-agent-to-mcp) — expose the agent as a tool for MCP clients and other agents.

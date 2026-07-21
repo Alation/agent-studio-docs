@@ -1,19 +1,20 @@
 ---
 title: Identity and permissions
-description: "How roles, credentials, and per-object grants decide what a user can see and do in Agent Studio, including the full permission matrices for agents, tools, and flows."
+description: "How roles, credentials, per-agent permissions, and per-object grants decide what a user can see and do in Agent Studio, including the full permission matrices for agents, tools, and flows."
 sidebar:
   order: 3
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-What a user can reach through an agent comes down to three variables:
+What a user can reach through an agent comes down to four variables:
 
 1. **How the request authenticated** — as a real user, or as a machine-to-machine OAuth client.
-2. **The user's role and grants in Alation** — the role drives catalog metadata visibility; per-object grants drive data-product access.
-3. **Which warehouse credential runs the query** — the warehouse enforces that credential's native permissions.
+2. **Whether they have access to that specific agent** — every agent has its own access settings, independent of Alation role.
+3. **The user's role and grants in Alation** — the role drives catalog metadata visibility; per-object grants drive data-product access.
+4. **Which warehouse credential runs the query** — the warehouse enforces that credential's native permissions.
 
-Published agents and their tools are visible to every role, so it is these three variables — not agent visibility — that change what different users get back from the same agent.
+The second variable decides whether a user can reach an agent at all; the rest decide what they can do or see once they're in. See [Agents](#agents) for how per-agent access works.
 
 ## How you authenticate changes what you see
 
@@ -33,32 +34,31 @@ A machine-to-machine OAuth application acts with the role you assign it at creat
 
 ### Does a user OAuth token inherit catalog permissions?
 
-Yes. With user-initiated OAuth, the request carries the user's own identity to every Alation service, so it inherits exactly the catalog visibility, data-product access, and agent publish/draft visibility that user has in the Agent Studio web app. Two users with different roles or different data-product grants get different results from the same agent.
+Yes. With user-initiated OAuth, the request carries the user's own identity to every Alation service, so it inherits exactly the catalog visibility, data-product access, and per-agent permissions that user has in the Agent Studio web app. Two users with different roles, different agent grants, or different data-product grants get different results from the same agent.
 
 With machine-to-machine OAuth, the request instead inherits the permissions of the **role assigned to the OAuth application** — not those of any individual user.
 
 ## Roles and what they can reach
 
-Agent Studio uses your existing Alation roles. The table below shows what each role can reach; the [permission matrices](#permission-matrices) further down cover what each role can create, edit, and delete.
+Agent Studio uses your existing Alation roles. The table below shows what each role can *view and run* by default, with no explicit grant — not what it can create, edit, or delete (see [Permission matrices](#permission-matrices) for that). See [Agents](#agents) below for how agent access can extend beyond this baseline, and [Data-product visibility](#data-product-visibility) for how a grant changes the data-products column.
 
-| Global role | Published agents | Catalog metadata | Data products (no grant) | Data products (with grant) | Create/publish agents? |
-|-------------|:---------------:|------------------|:------------------------:|:--------------------------:|:----------------------:|
-| Server Admin | All | All | **All (admin bypass)** | All | Yes |
-| Catalog Admin | All | Broad | **None — needs a grant** | Per grant | Yes |
-| Source Admin | All | Source-scoped | None — needs a grant | Per grant | Yes |
-| Composer | All | Composer-scoped | None — needs a grant | Per grant | Yes |
-| Steward | All | Steward-scoped | None — needs a grant | Per grant | Yes |
-| Viewer | All | Read-only | None — needs a grant | Per grant (view) | No |
-| Explorer | All | Cloud discovery | None — needs a grant | Per grant (view) | No |
+| Global role | Agents | Data products | Catalog metadata |
+|-------------|:------:|:--------------:|------------------|
+| Server Admin | All (admin bypass) | All (admin bypass) | All |
+| Catalog Admin | All (admin bypass) | Needs a grant | Broad |
+| Source Admin | Needs a grant | Needs a grant | Source-scoped |
+| Composer | Needs a grant | Needs a grant | Composer-scoped |
+| Steward | Needs a grant | Needs a grant | Steward-scoped |
+| Explorer | Needs a grant | Needs a grant | Cloud discovery |
+| Viewer | Needs a grant | Needs a grant | Read-only |
 
 <Aside type="caution" title="Catalog Admin is not a data-products admin">
 Only **Server Admin** bypasses data-product permissions. A Catalog Admin with no explicit grant on a restricted data product cannot see it — the same as any other role. This surprises teams who assume "catalog admin sees everything," and it often leads to over-granting. Grant access to specific data products explicitly rather than relying on an admin bypass that does not exist for that role.
 </Aside>
 
-
 ## Permission matrices
 
-You always have full control over resources you create; restrictions apply to actions on other people's resources.
+By default you have full control over resources you create; restrictions apply to actions on other people's resources.
 The same rules are enforced in the UI, the REST API, and over MCP — the acting role comes from [how the caller authenticated](#how-you-authenticate-changes-what-you-see).
 
 For Agent Studio permissions, Alation roles group into four tiers:
@@ -68,39 +68,32 @@ For Agent Studio permissions, Alation roles group into four tiers:
 | Global | Server Admin | Full control over all resources, including other users' |
 | Admin | Catalog Admin | Can see all Agent Studio resources (agents, tools, flows), edit others' flows |
 | Standard | Composer, Steward, Source Admin | Full control over own resources, can publish agents as tools |
-| Restricted | Viewer, Explorer | Can view and use published agents; cannot create, edit, delete, or clone agents or flows (can create and manage their own custom tools) |
-
-### Published vs draft
-
-Every agent has a published status that controls who can see it.
-Published agents are visible to all roles; draft agents only to the owner and admin-tier roles.
-A new agent starts as a draft.
-To change an agent's status, see [publishing agents](/agent-studio-docs/build/agents/publishing-agents/).
+| Restricted | Viewer, Explorer | Can view and use agents they have access to; cannot create, edit, delete, or clone agents or flows (can create and manage their own custom tools) |
 
 ### Agents
 
-| Action | Server Admin | Catalog Admin | Standard roles | Viewer / Explorer |
-|--------|:---:|:---:|:---:|:---:|
-| Create agent | Yes | Yes | Yes | No |
-| Edit own agent | Yes | Yes | Yes | No |
-| Edit others' agent | Yes | No | No | No |
-| Delete own agent | Yes | Yes | Yes | No |
-| Delete others' agent | Yes | No | No | No |
-| Set own agent published / draft | Yes | Yes | Yes | No |
-| Set others' agent published / draft | Yes | No | No | No |
-| Publish / unpublish own agent as tool | Yes | Yes | Yes | No |
-| Publish / unpublish others' agent as tool | Yes | No | No | No |
-| Clone others' agent | Yes | Yes | Yes | No |
-| See others' draft agents | Yes | Yes | No | No |
-| See published agents | Yes | Yes | Yes | Yes |
-| Use published agents | Yes | Yes | Yes | Yes |
+Every custom agent has its own access settings, managed from its **Agent Access** tab. A new agent starts with only its creator as **Agent editor**; anyone who is already an editor (including Server Admin) can then add other people, groups, or "everyone" at one of three agent roles:
 
-When a non-admin user lists agents, they see published agents plus their own drafts.
+- **Agent viewer** — see the agent's configuration
+- **Agent user** — also run it: chat, API, MCP tool calls
+- **Agent editor** — also edit, delete, manage its access, and publish/unpublish or list it
 
-### Agent-as-tool visibility
+What that agent role actually grants you depends on your Alation tier:
 
-When an agent is published as a tool (for MCP clients or as a sub-agent), the tool inherits the parent agent's visibility: published parents appear for everyone, draft parents only for the owner and admin-tier roles.
-Published status and publish-as-tool are independent: the first controls who can *see* the agent, the second creates an MCP tool entry so other agents and clients can *invoke* it.
+| Agent role | Server Admin | Catalog Admin | Standard roles | Viewer / Explorer |
+|------------|:---:|:---:|:---:|:---:|
+| Agent editor | Can view<br />Can run<br />Can edit | Can view<br />Can run<br />Can edit | Can view<br />Can run<br />Can edit | Can view<br />Can run |
+| Agent user | Can view<br />Can run<br />Can edit | Can view<br />Can run | Can view<br />Can run | Can view<br />Can run |
+| Agent viewer | Can view<br />Can run<br />Can edit | Can view<br />Can run | Can view | Can view |
+| Not added | Can view<br />Can run<br />Can edit | Can view<br />Can run | — | — |
+
+In the **Agent Access** tab's **Agent privacy** section, choose **Public** to grant "everyone" a role at once (the modern equivalent of publishing), or add specific users and groups while keeping the agent private overall. Default agents (SQL Agent, Deep Research, etc.) are always public to everyone and can't be restricted.
+
+<Aside type="caution">
+Publishing an agent as an MCP tool and granting access to it are separate actions: publishing creates the tool entry, but whether anyone can actually see or call that tool still follows the agent's own access settings. Listing an agent in the marketplace is likewise separate from access — listing doesn't grant it, and unlisting doesn't revoke it.
+
+Access is also only checked at the outermost entry point: if you can run an agent or trigger a workflow, everything it composes internally — sub-agents, tools — runs too, without a separate check on each one.
+</Aside>
 
 ### Custom tools (SMTP / HTTP)
 
@@ -133,14 +126,14 @@ Two behaviors differ from agents: Catalog Admin can edit others' flows, and View
 ### Ownership and role changes
 
 Ownership is set by who created the resource and does not change when a user's role changes.
-A Composer who creates an agent and is later downgraded to Viewer loses the ability to edit or delete it, though they can still see and use it while it is published.
+A Composer who creates an agent and is later downgraded to Viewer keeps their Agent editor role on that specific agent, but loses the ability to act on it above what Viewer allows — they can still see and run it, but not edit or delete it. For flows, which don't have per-agent access settings, the same downgrade fully loses edit/delete on owned flows.
 Role changes take effect immediately on the next request.
 
 ### Error responses
 
 | Status code | Meaning |
 |-------------|---------|
-| `404 Not Found` | The resource is invisible to you (for example, another user's draft agent). The existence of the resource is not revealed. |
+| `404 Not Found` | The resource is invisible to you (for example, another user's private agent you have no grant on). The existence of the resource is not revealed. |
 | `403 Forbidden` | You can see the resource but lack permission for the requested action. |
 
 ## Data-product visibility
@@ -173,11 +166,13 @@ On the default (user-own-credential) path, the warehouse sees the user's own pri
 
 ## Worked examples
 
-**Viewer · user OAuth · own warehouse credential · public product.** Sees all published agents and their tools. Reads catalog metadata read-only. Sees the public data product. The warehouse query runs as the user's own warehouse identity, so results respect their column and row grants. A clean least-privilege path.
+**Viewer · user OAuth · own warehouse credential · public product.** Sees all public agents and their tools, plus any agent they've been explicitly granted access to. Reads catalog metadata read-only. Sees the public data product. The warehouse query runs as the user's own warehouse identity, so results respect their column and row grants. A clean least-privilege path.
 
 **Viewer · user OAuth · restricted product, no grant.** Same agents and tools. The restricted product returns `404` — indistinguishable from not existing. The user must request a grant through the access-request flow.
 
-**Composer · user OAuth · shared service account · public product.** Sees published agents and tools, and can compose. The warehouse query runs as the shared service account, so the user sees whatever that account can see — *not* their own warehouse grants — and warehouse audit attributes the query to the service account. Alation still records that this user initiated the query.
+**Viewer · granted access to a private agent.** Can't see other users' private agents, but can chat with and run the one agent they were explicitly granted access to — the same as if it were public — without being able to edit it or see who else has access.
+
+**Composer · user OAuth · shared service account · public product.** Sees public agents and tools plus agents they've been granted access to, and can compose. The warehouse query runs as the shared service account, so the user sees whatever that account can see — *not* their own warehouse grants — and warehouse audit attributes the query to the service account. Alation still records that this user initiated the query.
 
 ## Related pages
 

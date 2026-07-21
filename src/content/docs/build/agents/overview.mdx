@@ -115,14 +115,10 @@ You can either:
 7. **Configure tool inputs**
    - Define how each tool receives its input parameters (see next section)
 
-8. **Publish the agent**
-   - New agents start in **draft** status and are only visible to you and admin roles
-   - When ready, click **Publish** in the top-right corner to make the agent visible to all users
-   - See [Publishing and unpublishing agents](/agent-studio-docs/security/identity-and-permissions/#publishing-and-unpublishing-agents-in-the-ui) for details
-
-<Aside type="tip" title="Existing custom agents">
-Custom agents created before the publish/draft feature are now in **draft** status. Check the **Draft** tab and publish them to make them visible to other users again.
-</Aside>
+8. **Set the agent's privacy**
+   - New agents start **private**, visible only to you
+   - In the agent's **Agent Access** tab, use **Agent privacy** to set it to **Public** (everyone gets a role you choose), or grant specific users/groups a role while keeping it private
+   - See [Agent Privacy](/agent-studio-docs/build/agents/agent-privacy/) for details
 
 ## Tool input configuration
 
@@ -190,7 +186,7 @@ This traceability is critical for debugging, optimization, and trust.
 Once an agent meets your quality and performance expectations, it can be deployed in multiple ways.
 
 <Aside type="tip">
-Before deploying, make sure your agent is **published**. Draft agents are only visible to you and admin roles. See [Publishing and unpublishing agents](/agent-studio-docs/security/identity-and-permissions/#publishing-and-unpublishing-agents-in-the-ui).
+Before deploying, make sure the agent's **Agent privacy** setting gives the people who need it access. A new agent is private to you by default. See [Agent Privacy](/agent-studio-docs/build/agents/agent-privacy/).
 </Aside>
 
 **API**
