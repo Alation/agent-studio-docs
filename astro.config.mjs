@@ -200,7 +200,7 @@ export default defineConfig({
                                 label: "Agents",
                                 items: [
                                     "build/agents/overview",
-                                    "build/agents/publishing-agents",
+                                    "build/agents/agent-privacy",
                                     {
                                         label: "Built-in agents",
                                         collapsed: true,
