@@ -1,0 +1,170 @@
+---
+title: Gemini Enterprise
+description: "Connect the Alation MCP server to Gemini Enterprise as a custom MCP data store, so agents and chats can use trusted catalog context."
+titleIcon: geminicli
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import authSettings from '../../../../assets/img/guides/mcp-client-setup/gemini/01-authentication-settings-oauth.png';
+import verifyAuth from '../../../../assets/img/guides/mcp-client-setup/gemini/02-verify-auth-prompt.png';
+import dataStoreActive from '../../../../assets/img/guides/mcp-client-setup/gemini/03-data-store-active.png';
+import enableActions from '../../../../assets/img/guides/mcp-client-setup/gemini/04-enable-actions.png';
+import connectedDataStores from '../../../../assets/img/guides/mcp-client-setup/gemini/05-connected-data-stores.png';
+import authorizeInChat from '../../../../assets/img/guides/mcp-client-setup/gemini/06-authorize-connector-in-chat.png';
+
+Connect the Alation-hosted MCP server to Gemini Enterprise as a custom MCP data store, then attach it to an app so agents and chats can ground their answers in your catalog.
+
+<Aside type="note">
+In Gemini Enterprise, MCP servers are represented as **data stores**.
+Every resource is created under a Google Cloud **project**, which sits beneath an organization or folder that inherits policies downward, and all costs are billed at the project level.
+</Aside>
+
+## Prerequisites
+
+- A Google Cloud project to hold the MCP server.
+  Work with your GCP admin to create a dedicated project, or reuse an existing one.
+- The **Disable custom MCP server connector for Gemini Enterprise** organization policy set to **Not Enforced**.
+  See the [Google Cloud documentation](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/custom-mcp-server/override-constraint-for-custom-mcp-data-stores#override_the_constraint) for how to override the constraint.
+- The **Owner** role on the project.
+- The **Discovery Engine Editor** role granted to the user who adds the MCP server.
+- **Server Admin** access to your Alation instance to create the OAuth client.
+
+## Creating the OAuth client
+
+The connector authenticates with [user-initiated OAuth](/agent-studio-docs/security/authentication/user-initiated-auth/).
+
+Create the OAuth client in the Alation UI following the [user-initiated OAuth guide](/agent-studio-docs/security/authentication/user-initiated-auth/#creating-an-oauth-client-in-alation), then note the following.
+
+1. Set the **Redirect URI** to `https://vertexaisearch.cloud.google.com/oauth-redirect`.
+2. Enable **Require PKCE**.
+3. Copy the **Client ID** and **Client Secret** — you will need them when configuring the data store.
+
+## Creating the MCP server in Gemini Enterprise
+
+<Steps>
+
+1. **Open Gemini Enterprise**
+
+   Go to the [Gemini Enterprise](https://console.cloud.google.com/gemini-enterprise/) page and select the project where the MCP connector should be configured.
+
+2. **Add a custom MCP server**
+
+   Follow the [Set up a custom MCP server](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/custom-mcp-server/set-up-custom-mcp-server) steps to begin adding the data store.
+
+3. **Choose OAuth authentication**
+
+   In the **Authentication Settings** section, set **Authentication Method** to **OAuth 2.0**.
+
+4. **Fill in the configuration**
+
+   | Field | Value |
+   |-------|-------|
+   | MCP Server URL | `https://your-alation-instance.alationcloud.com/ai/mcp/` — the trailing slash is required |
+   | Authorization URL | `https://your-alation-instance.alationcloud.com/oauth/v1/authorize/` |
+   | Token URL | `https://your-alation-instance.alationcloud.com/oauth/v1/token/` |
+   | Client ID | From the OAuth client you created |
+   | Client Secret | From the OAuth client you created |
+   | Scopes | `openid` |
+   | Enable PKCE Support | Checked |
+
+   <Image src={authSettings} alt="Gemini Enterprise Authentication Settings with OAuth 2.0 selected and the MCP server URL, authorization and token URLs, client credentials, scopes, and PKCE fields filled in" style="max-width: 100%; height: auto;" />
+
+5. **Verify authentication**
+
+   Click **Verify Auth**.
+   You are prompted to sign in to your Alation instance; with single sign-on, you continue to your identity provider to complete authentication.
+
+   <Image src={verifyAuth} alt="Alation sign-in prompt shown after clicking Verify Auth" style="max-width: 70%; height: auto;" />
+
+6. **Complete the advanced options**
+
+   Continue with the **Advanced** configuration options.
+   Choose the region the connector should be available in — the default is **Global**.
+
+7. **Wait for the data store to activate**
+
+   Check the state of the data store after adding the MCP server.
+   Once it changes from **Creating** to **Active**, the custom MCP server data store is ready to use.
+
+   <Image src={dataStoreActive} alt="Data store detail showing the state changed from Creating to Active" style="max-width: 100%; height: auto;" />
+
+</Steps>
+
+## Enabling actions
+
+Actions in Gemini Enterprise are synonymous with MCP **tools**, and they start out disabled.
+
+<Steps>
+
+1. **Load the actions**
+
+   Follow [Enable actions](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/custom-mcp-server/set-up-custom-mcp-server#enable-actions) to load the available actions.
+
+2. **Enable the actions you need**
+
+   Once the actions load, they appear in the **Disabled** state.
+   Select the actions to enable and click **Enable Actions**.
+
+   <Image src={enableActions} alt="Custom MCP server actions list with disabled actions selected and the Enable Actions button" style="max-width: 100%; height: auto;" />
+
+</Steps>
+
+<Aside type="caution">
+You may occasionally see a **Failed to load/reload action** error caused by a [known Gemini Enterprise UI bug](https://discuss.google.dev/t/gemini-enterprise-custom-mcp-reload-custom-actions-always-fails-with-401-ui-uses-api-key-instead-of-oauth-token/371907/5) where the UI uses an API key instead of the OAuth token.
+Retry the action if you hit it.
+</Aside>
+
+## Adding the connector to an app
+
+The MCP server is used inside an agent or chat by associating its data store with an **app** in Gemini Enterprise.
+
+<Steps>
+
+1. **Create an app**
+
+   Create an app in Gemini Enterprise.
+
+2. **Open the connected data stores**
+
+   Open the app to configure it and select the **Connected data stores** tab.
+
+3. **Attach the data store**
+
+   Click **Add existing data stores** and choose the Alation MCP server from the list.
+
+   <Image src={connectedDataStores} alt="App Connected data stores tab with the Add existing data stores dialog listing the Alation MCP server" style="max-width: 100%; height: auto;" />
+
+</Steps>
+
+## Using the connector
+
+<Steps>
+
+1. **Open the web app**
+
+   On the app's **Overview** page, copy the URL from the **Your Gemini Enterprise webapp is ready** section and open it in a new tab.
+
+2. **Start a chat**
+
+   Click **New Chat**, then click the **Connectors** icon in the chat window.
+   The Alation MCP server appears in the list.
+
+3. **Authorize as yourself**
+
+   Click **Authorize** next to the Alation MCP server and sign in to your Alation instance.
+   With single sign-on, you continue to your identity provider to complete authentication.
+   Because each user connects individually, every request to Alation runs with [that user's own permissions](/agent-studio-docs/security/identity-and-permissions/).
+
+   <Image src={authorizeInChat} alt="Gemini Enterprise chat Connectors panel showing the Alation MCP server with an Authorize button" style="max-width: 70%; height: auto;" />
+
+4. **Verify**
+
+   Ask for a list of the data products available in your Alation instance to confirm the connector is working.
+
+</Steps>
+
+## Related
+
+- [Using the MCP server](/agent-studio-docs/integrations/mcp/using-the-mcp-server/) — what the connector exposes, example prompts, and custom MCP servers with curated tool sets.
+- [Creating an OAuth client in Alation](/agent-studio-docs/security/authentication/user-initiated-auth/#creating-an-oauth-client-in-alation) — the user-initiated OAuth flow this connector relies on.

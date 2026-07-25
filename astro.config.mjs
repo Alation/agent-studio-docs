@@ -298,6 +298,7 @@ export default defineConfig({
                                             "integrations/mcp-clients/claude",
                                             "integrations/mcp-clients/copilotstudio",
                                             "integrations/mcp-clients/cursor",
+                                            "integrations/mcp-clients/gemini",
                                             "integrations/mcp-clients/librechat",
                                             "integrations/mcp-clients/n8n",
                                             "integrations/mcp-clients/snowflake",
