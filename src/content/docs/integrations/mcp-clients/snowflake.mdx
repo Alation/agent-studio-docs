@@ -31,7 +31,7 @@ The connector authenticates with [user-initiated OAuth](/agent-studio-docs/secur
 Snowflake needs two redirect URIs registered on the client:
 
 1. The static URI: `https://identity.snowflake.com/oauth2/callback`
-2. Your deployment's Snowsight URI: run `SELECT SYSTEM$ALLOWLIST();` in Snowflake and find the `SNOWSIGHT_DEPLOYMENT` entry that starts with `apps-api`. Prefix it with `https://`.
+2. Your deployment's `Snowsight` URI: run `SELECT SYSTEM$ALLOWLIST();` in Snowflake and find the `SNOWSIGHT_DEPLOYMENT` entry that starts with `apps-api`. Prefix it with `https://` and suffix it with `/oauth/complete-secret` . Final value would look like `https://<snowsight-deployment-uri>/oauth/complete-secret`.
 
 Create the OAuth client in the Alation UI following the [user-initiated OAuth guide](/agent-studio-docs/security/authentication/user-initiated-auth/), add both redirect URIs, and copy the **Client ID** and **Client Secret**.
 
