@@ -6,12 +6,21 @@ titleIcon: geminicli
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
-import authSettings from '../../../../assets/img/guides/mcp-client-setup/gemini/01-authentication-settings-oauth.png';
-import verifyAuth from '../../../../assets/img/guides/mcp-client-setup/gemini/02-verify-auth-prompt.png';
+import addMCPServer from '../../../../assets/img/guides/mcp-client-setup/gemini/01-gcp-add-mcp-server.png';
+import authSettings from '../../../../assets/img/guides/mcp-client-setup/gemini/02-authentication-settings-oauth.png';
+import dataStoreCreating from '../../../../assets/img/guides/mcp-client-setup/gemini/02-data-store-creating.png';
 import dataStoreActive from '../../../../assets/img/guides/mcp-client-setup/gemini/03-data-store-active.png';
-import enableActions from '../../../../assets/img/guides/mcp-client-setup/gemini/04-enable-actions.png';
-import connectedDataStores from '../../../../assets/img/guides/mcp-client-setup/gemini/05-connected-data-stores.png';
-import authorizeInChat from '../../../../assets/img/guides/mcp-client-setup/gemini/06-authorize-connector-in-chat.png';
+import loadActions from '../../../../assets/img/guides/mcp-client-setup/gemini/04-load-actions.png';
+import enableActions from '../../../../assets/img/guides/mcp-client-setup/gemini/05-enable-actions.png';
+import enabledActions from '../../../../assets/img/guides/mcp-client-setup/gemini/06-enabled-actions.png';
+import createApp from '../../../../assets/img/guides/mcp-client-setup/gemini/07-create-app.png';
+import addDataStoreToApp from '../../../../assets/img/guides/mcp-client-setup/gemini/08-add-data-store-app.png';
+import connectedDataStores from '../../../../assets/img/guides/mcp-client-setup/gemini/09-connected-data-store.png';
+import addConnectorInChat from '../../../../assets/img/guides/mcp-client-setup/gemini/10-add-connector-chat.png';
+import authorizeInChat from '../../../../assets/img/guides/mcp-client-setup/gemini/11-authorize-connector-chat.png';
+import authenticateToAlationInChat from '../../../../assets/img/guides/mcp-client-setup/gemini/12-authenticate-alation.png';
+import chatResultsMCPServer from '../../../../assets/img/guides/mcp-client-setup/gemini/13-chat-alation-mcp-server.png';
+
 
 Connect the Alation-hosted MCP server to Gemini Enterprise as a custom MCP data store, then attach it to an app so agents and chats can ground their answers in your catalog.
 
@@ -52,6 +61,8 @@ Create the OAuth client in the Alation UI following the [user-initiated OAuth gu
 
    Follow the [Set up a custom MCP server](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/custom-mcp-server/set-up-custom-mcp-server) steps to begin adding the data store.
 
+   <Image src={addMCPServer} alt="Option to add MCP server as a data store" style="max-width: 70%; height: auto;" />
+
 3. **Choose OAuth authentication**
 
    In the **Authentication Settings** section, set **Authentication Method** to **OAuth 2.0**.
@@ -75,8 +86,6 @@ Create the OAuth client in the Alation UI following the [user-initiated OAuth gu
    Click **Verify Auth**.
    You are prompted to sign in to your Alation instance; with single sign-on, you continue to your identity provider to complete authentication.
 
-   <Image src={verifyAuth} alt="Alation sign-in prompt shown after clicking Verify Auth" style="max-width: 70%; height: auto;" />
-
 6. **Complete the advanced options**
 
    Continue with the **Advanced** configuration options.
@@ -87,6 +96,8 @@ Create the OAuth client in the Alation UI following the [user-initiated OAuth gu
    Check the state of the data store after adding the MCP server.
    Once it changes from **Creating** to **Active**, the custom MCP server data store is ready to use.
 
+   <Image src={dataStoreCreating} alt="Data store detail showing the state as Creating" style="max-width: 100%; height: auto;" />
+   
    <Image src={dataStoreActive} alt="Data store detail showing the state changed from Creating to Active" style="max-width: 100%; height: auto;" />
 
 </Steps>
@@ -101,12 +112,16 @@ Actions in Gemini Enterprise are synonymous with MCP **tools**, and they start o
 
    Follow [Enable actions](https://docs.cloud.google.com/gemini/enterprise/docs/connectors/custom-mcp-server/set-up-custom-mcp-server#enable-actions) to load the available actions.
 
+   <Image src={loadActions} alt="Custom MCP server actions list with actions loaded and in Disabled state" style="max-width: 100%; height: auto;" />
+
 2. **Enable the actions you need**
 
    Once the actions load, they appear in the **Disabled** state.
    Select the actions to enable and click **Enable Actions**.
 
    <Image src={enableActions} alt="Custom MCP server actions list with disabled actions selected and the Enable Actions button" style="max-width: 100%; height: auto;" />
+
+   <Image src={enabledActions} alt="Custom MCP server with actions enabled" style="max-width: 100%; height: auto;" />
 
 </Steps>
 
@@ -125,6 +140,8 @@ The MCP server is used inside an agent or chat by associating its data store wit
 
    Create an app in Gemini Enterprise.
 
+   <Image src={createApp} alt="Create an App in project" style="max-width: 100%; height: auto;" />
+
 2. **Open the connected data stores**
 
    Open the app to configure it and select the **Connected data stores** tab.
@@ -133,7 +150,9 @@ The MCP server is used inside an agent or chat by associating its data store wit
 
    Click **Add existing data stores** and choose the Alation MCP server from the list.
 
-   <Image src={connectedDataStores} alt="App Connected data stores tab with the Add existing data stores dialog listing the Alation MCP server" style="max-width: 100%; height: auto;" />
+   <Image src={addDataStoreToApp} alt="App Connected data stores tab with the Add existing data stores dialog listing the Alation MCP server" style="max-width: 100%; height: auto;" />
+
+   <Image src={connectedDataStores} alt="App Connected data stores tab with the added MCP server shown Active" style="max-width: 100%; height: auto;" />
 
 </Steps>
 
@@ -150,17 +169,24 @@ The MCP server is used inside an agent or chat by associating its data store wit
    Click **New Chat**, then click the **Connectors** icon in the chat window.
    The Alation MCP server appears in the list.
 
+   <Image src={addConnectorInChat} alt="Add Connectors to chat" style="max-width: 100%; height: auto;" />
+
+   <Image src={authorizeInChat} alt="Gemini Enterprise chat Connectors panel showing the Alation MCP server with an Authorize button" style="max-width: 70%; height: auto;" />
+
+
 3. **Authorize as yourself**
 
    Click **Authorize** next to the Alation MCP server and sign in to your Alation instance.
    With single sign-on, you continue to your identity provider to complete authentication.
    Because each user connects individually, every request to Alation runs with [that user's own permissions](/agent-studio-docs/security/identity-and-permissions/).
 
-   <Image src={authorizeInChat} alt="Gemini Enterprise chat Connectors panel showing the Alation MCP server with an Authorize button" style="max-width: 70%; height: auto;" />
+   <Image src={authenticateToAlationInChat} alt="User level authentication to Alation to authorize Alation MCP server in Gemini Enterprise chat" style="max-width: 70%; height: auto;" />
 
 4. **Verify**
 
    Ask for a list of the data products available in your Alation instance to confirm the connector is working.
+
+   <Image src={chatResultsMCPServer} alt="Response from Alation MCP server with list of available data products" style="max-width: 100%; height: auto;" />
 
 </Steps>
 
