@@ -76,7 +76,7 @@ The pattern runs in production inside a customer-facing analytics product handli
 
 ## Gotchas
 
-- Cloning an agent copies tool parameter bindings as they were; re-check bindings such as `allow_fallback_auth` before pointing production traffic at a clone.
+- Cloning an agent copies tool parameter bindings as they were; re-check auth mode bindings before pointing production traffic at a clone.
 - The JWT's role claims decide API access — a token with the wrong role gets `403`, not a helpful error.
 - Chart-generating agents respond slowly enough to hit client timeouts (Microsoft Teams cuts off around 45 seconds); prefer text answers in latency-sensitive surfaces.
 

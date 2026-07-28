@@ -22,15 +22,14 @@ Add this tool to a querying agent so it can discover the data product's structur
 | `data_product_version` | No | string | Fixed or User input | A specific version of the data product. |
 | `pre_exec_sql` | No | string | Fixed | SQL to run before sampling tables, e.g. to set session context. |
 | `auth_id` | No | string | Fixed or User input | The authentication credentials to use. |
-| `auth_mode` | No | string | Fixed | Set to `datasource_service_account` to let schema lookups use an admin-configured shared service account when the user has no credentials of their own. Requires the service account feature. |
-| `allow_fallback_auth` | No | boolean | Fixed | When `true`, falls back to the data source's default credentials if the user has none. |
+| `auth_mode` | No | string | Fixed | Controls credential resolution. Leave unset (Default) to resolve the user's credential first then fall back to a shared service account. Set to `mde_credentials` to force the datasource's MDE service account. Admin-only. |
 
 <Aside type="note">
 See [Configuring tool parameters](/agent-studio-docs/build/tools/configuring-tools/#configuring-tool-parameters) for what the scope column means.
 </Aside>
 
 <Aside type="tip">
-Configure `auth_mode` the same way on this tool and the SQL Execution tool so schema lookups and queries resolve credentials consistently. See [Credentials for data product queries](/agent-studio-docs/build/tools/credentials-for-data-product-queries/).
+Configure the auth mode the same way on this tool and the SQL Execution tool so schema lookups and queries resolve credentials consistently. See [Credentials for data product queries](/agent-studio-docs/build/tools/credentials-for-data-product-queries/).
 </Aside>
 
 ## Example usage
