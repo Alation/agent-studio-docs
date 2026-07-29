@@ -1,0 +1,50 @@
+---
+title: 27.33.1
+description: Release notes for Agent Studio 27.33.1
+sidebar:
+  order: -27033001
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components'
+
+**Release Date:** 2026-07-30
+
+**Version Range:** v27.16.1 -> v27.33.1
+
+## Highlights
+
+- Migrated Help skill to Coveo Search API v2 for improved documentation retrieval.
+- Enhanced authentication with consolidated autonomous-dq endpoints and mde_credentials support.
+- Improved SQL query handling for TSQL set operations and agent verification.
+
+## What's New
+
+### Features
+
+- **Help Skill Upgrade:** Migrated Coveo Passage Retrieval from v3 to Search API v2, improving documentation search accuracy and performance.
+- **Chat Naming:** You can now specify a chat name when sending messages, making it easier to organize and identify conversations.
+- **Agent Batch Operations:** Added internal `agent:batchGet` endpoint for retrieving multiple agent configurations at once.
+- **Authentication Consolidation:** Consolidated autonomous-dq endpoints to external authorization for improved security posture.
+- **Header Validation:** Added middleware to validate user and tenant headers on requests.
+
+### Improvements
+
+- **Self-Improvement:** Widened per-turn user-text cap to 4000 characters for better context handling.
+- **Workflow Scheduling:** Scheduled runs now correctly skip disabled workflows.
+- **SQL Verification:** Enhanced run_sql_agent with end-to-end verification capabilities.
+
+### Bug Fixes
+
+- Fixed `mde_credentials` auth_mode restoration issue that could affect authentication.
+- Fixed UUID parsing in `agent_config_id` to handle malformed values gracefully.
+- Fixed ORDER BY clause positioning on TSQL set operations (UNION, INTERSECT, EXCEPT).
+- Fixed SQL-retry text that was confusing the self-improvement classifier.
+- Fixed truncated SQL-retry-error cap to handle longer error messages.
+
+### Breaking Changes
+
+None in this release.
+
+## Customer Impact
+
+None in this release.
