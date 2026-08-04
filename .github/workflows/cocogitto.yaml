@@ -1,4 +1,9 @@
-on: [push]
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches:
+      - main
 name: Cocogitto
 
 jobs:
@@ -6,11 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     name: check conventional commit compliance
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
 
       - name: Conventional commits check
-        uses: cocogitto/cocogitto-action@v4
+        uses: cocogitto/cocogitto-action@390bda87a19bf627e03ad075c67a11e9ddbb7547 # v4
         with:
           command: check
+          args: >-
+            ${{
+              github.event_name == 'pull_request' && format('{0}..{1}', github.event.pull_request.base.sha, github.event.pull_request.head.sha) ||
+              github.event_name == 'merge_group' && format('{0}..{1}', github.event.merge_group.base_sha, github.event.merge_group.head_sha) ||
+              ''
+            }}
