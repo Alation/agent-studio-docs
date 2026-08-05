@@ -1,0 +1,90 @@
+---
+title: Populate the Data Product Opportunities Inbox
+description: "Run the Data Product Recommender on a schedule to surface high-value table clusters as recommendation cards, so stewards can review and claim them without a live agent session."
+titleIcon: sparkles
+titleIconAccent: teal
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+
+The Alation Opportunities Inbox lets data stewards discover and claim data product candidates without running an agent themselves.
+This recipe uses the Data Product Recommender to fill that inbox automatically: it scans active datasources for high-value table clusters, validates them against BI usage and catalog metadata, and writes recommendation cards in a single unattended run.
+Stewards then review at their own pace and claim the ones they want to build.
+
+<div class="recipe-cost not-content">
+  <div class="recipe-cost__main">
+    <span class="recipe-cost__label">Estimated cost</span>
+    <span class="recipe-cost__figure">&lt;1<span class="recipe-cost__acu">ACU</span><span class="recipe-cost__per">per run</span></span>
+  </div>
+  <p class="recipe-cost__note">This agent runs via a codemode skill pipeline. Inbox checks, datasource scans, lineage traces, evidence fetches, cluster synthesis, and recommendation writes all execute as internal skill functions — they are not individually metered as tool calls. Actual metered action consumption is near zero regardless of datasource scope or cluster count. <a href="/agent-studio-docs/security/observability/usage/#how-consumption-is-priced">At 0.25 ACU per metered action</a>; confirm actual spend on the <a href="/agent-studio-docs/security/observability/usage/">Usage page</a>.</p>
+</div>
+
+## What you'll use
+
+<div class="uses-grid not-content">
+  <a class="uses-card" href="/agent-studio-docs/build/agents/data-product-recommender/">
+    <span class="uses-card__name">Data Product Recommender agent</span>
+    <span class="uses-card__purpose">Identifies clusters and writes recommendation cards to the Opportunities Inbox</span>
+  </a>
+  <a class="uses-card" href="/agent-studio-docs/build/schedules/scheduling-flows/">
+    <span class="uses-card__name">Scheduled flow (optional)</span>
+    <span class="uses-card__purpose">Run the recommender on a recurring schedule</span>
+  </a>
+</div>
+
+## Build it
+
+<Steps>
+
+1. **Confirm usage data and BI metadata are populated**
+
+   The recommender grounds every card in evidence it fetches — it never invents usage.
+   Verify that relational database query logs have been ingested for your target datasources and that at least one BI source has been cataloged.
+
+2. **Run the agent**
+
+   Open the Data Product Recommender agent and describe the scope.
+   Examples: "scan all active datasources for data product candidates" or "recommend data products for the SALES schema."
+   The agent runs the full pipeline without stopping to ask for input.
+
+   <Aside type="note">
+   The agent reads the Opportunities Inbox before writing and skips any candidate that substantially overlaps an existing active card.
+   Running it repeatedly on the same datasource is safe — duplicates are filtered automatically.
+   </Aside>
+
+3. **Review the results**
+
+   The agent reports how many cards were inserted, how many already existed, and how many were skipped.
+   Navigate to the Alation Opportunities Inbox to see the new cards with their confidence labels, evidence summaries, and suggested example questions.
+
+4. **Have stewards claim and generate**
+
+   Stewards review the inbox, dismiss irrelevant candidates, and claim the ones they want.
+   Claiming a card hands it to the [Data Product Generator](/agent-studio-docs/get-started/recipes/generate-data-products/) for supervised creation and enrichment.
+   The recommendation card pre-populates the member tables and evidence — so the generation session starts with a richer proposal than starting from scratch.
+
+5. **(Optional) Schedule it**
+
+   Wrap the agent in a [scheduled flow](/agent-studio-docs/build/schedules/scheduling-flows/) to keep the inbox fresh automatically — weekly is a reasonable cadence for most data platforms.
+
+</Steps>
+
+## Gotchas
+
+- The recommender never creates data products. If you want products created in the same session, use the [Data Product Generator](/agent-studio-docs/get-started/recipes/generate-data-products/) instead.
+- Cards from datasources with no query history produce bare skeleton products when claimed and need manual enrichment.
+- Candidates below the confidence threshold are silently skipped — the reported skipped count is the signal to check datasource metadata quality.
+- Gaps in BI coverage are noted in the evidence on each card — a steward can add the missing context when they claim it.
+
+## Variations
+
+- **Scoped inbox fill** — provide a specific datasource to restrict the scan to one source.
+- **Read-only audit** — run the agent with the message "read the current recommendations inbox and summarize what's there" to audit inbox state without adding new cards.
+- **Recommender + generator in sequence** — run the recommender first to identify the most impactful clusters, then run the generator targeting the top-ranked candidates.
+
+## Related
+
+- [Data Product Recommender agent reference](/agent-studio-docs/build/agents/data-product-recommender/)
+- [Generate data products recipe](/agent-studio-docs/get-started/recipes/generate-data-products/)
+- [Scheduling flows](/agent-studio-docs/build/schedules/scheduling-flows/)
+- [Known limitations](/agent-studio-docs/get-started/recipes/known-limitations/)
