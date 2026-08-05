@@ -1,0 +1,57 @@
+---
+title: 28.1.3
+description: Release notes for Agent Studio 28.1.3
+sidebar:
+  order: -28001003
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components'
+
+**Release Date:** 2026-07-30
+
+**Version Range:** v27.33.1 -> v28.1.3
+
+## Highlights
+
+- Major version bump (28.0.0) with waitable data product sampling and admin endpoint cleanup.
+- New eval generation feature with data sampling and quality scoring.
+- Enhanced Alation One with configure/automate skills and experimental agent support.
+- MCP permissions now require RUN action for list_tools and call_tool.
+
+## What's New
+
+### Features
+
+- **Eval Generation:** Added SQL evaluation case generation with data sampling, quality scoring, and dialect-aware parsing. Includes auth_id support and improved error handling.
+- **Waitable Data Product Sampling:** You can now await data product sampling operations, improving workflow control.
+- **Alation One Enhancements:** Enabled configure and automate skills, added page context, and introduced a dedicated Terraform guardrail.
+- **Experimental Agent:** Renamed internal agent to experimental agent with Agent Studio skills hosted on it.
+- **MCP Permissions:** `list_tools` and `call_tool` now require RUN permission for better access control.
+- **Surface Attribution:** Added MCP client name capture and surface attribution dimension for better analytics.
+- **Eager Search Preload:** Alation One searchbar now preloads search results eagerly when gated on keyword.
+
+### Improvements
+
+- **Agent Configs Limit:** Increased default agent configs limit from 100 to 1000.
+- **Autonomous DQ Batch Limit:** Increased batch limit from 200 to 500 tables.
+- **Permissions Performance:** Skip user-lookup on default VIEW/RUN permissions for faster responses.
+- **Routing:** Namespace overrides are now persisted correctly.
+- **Lineage Debug:** Added attribute branch for CLL, sharpened root-cause claims in BI diagnostic.
+
+### Bug Fixes
+
+- Fixed MCP tool registration for filtered tools and validated filter tool availability.
+- Fixed duplicate `tool_config_ids` rejection on agent config.
+- Fixed feed issues: time series chronological order, duplicate ID rejection, invalid chart scale keys.
+- Fixed sampling to run under real product_id and await enqueue in enrichment flow.
+- Fixed search to scope DP links to their marketplace and strip trailing slashes from tenant URLs.
+- Fixed eval generation guards for null product/recordSets/metadata and empty evals handling.
+- Fixed session cookie leak prevention on internal QLI API calls.
+
+### Breaking Changes
+
+- **Removed admin sampling endpoint** (`fix(api)!: remove admin sampling endpoint`) - Use the new waitable data product sampling feature instead.
+
+## Customer Impact
+
+The removal of the admin sampling endpoint may require updates if you were using it directly. Migrate to the new waitable data product sampling API.
