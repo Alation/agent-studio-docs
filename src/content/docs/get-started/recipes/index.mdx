@@ -10,6 +10,7 @@ import CatalogIcon from '../../../../assets/diagram-icons/catalog.svg';
 import CheckIcon from '../../../../assets/diagram-icons/check.svg';
 import ChartIcon from '../../../../assets/diagram-icons/chart.svg';
 import FlowIcon from '../../../../assets/diagram-icons/flow.svg';
+import SparklesIcon from '../../../../assets/diagram-icons/sparkles.svg';
 import CopilotIcon from '@lobehub/icons-static-svg/icons/copilot-color.svg';
 import N8nIcon from '@lobehub/icons-static-svg/icons/n8n-color.svg';
 
@@ -25,6 +26,8 @@ This page maps common use cases to what you build and where you deliver it, with
 | Power your own app with chat-with-data | [Embedded chat via REST](/agent-studio-docs/get-started/recipes/embedded-chat-rest-api/) | [REST API](/agent-studio-docs/integrations/rest-api/auth/) |
 | Bring trusted catalog context into Claude, ChatGPT, Copilot, or Cursor | Nothing — use the built-in tools | [MCP client setup](/agent-studio-docs/integrations/mcp-clients/claude/) |
 | Clean up your catalog or BI estate in bulk | [Bulk trust flags](/agent-studio-docs/get-started/recipes/bulk-trust-flags/), [BI rationalization](/agent-studio-docs/get-started/recipes/bi-report-rationalization/) | Web UI, or [scheduled flows](/agent-studio-docs/build/schedules/scheduling-flows/) |
+| Create data products from usage evidence | [Generate data products](/agent-studio-docs/get-started/recipes/generate-data-products/) | Web UI |
+| Fill the Opportunities Inbox automatically | [Recommend data products](/agent-studio-docs/get-started/recipes/recommend-data-products/) | [Scheduled flow](/agent-studio-docs/build/schedules/scheduling-flows/) |
 | Work with Alation from your AI coding tool | Nothing — install the plugin | [Plugins (Agent Skills)](/agent-studio-docs/integrations/plugins/overview/) |
 
 ## Alerts and notifications
@@ -76,6 +79,19 @@ This page maps common use cases to what you build and where you deliver it, with
   <a class="channel-card" href="/agent-studio-docs/get-started/recipes/data-lineage-agents/">
     <span class="channel-card-head"><FlowIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Document lineage automatically</span></span>
     <span class="channel-card-desc">Use the Lineage Agent to generate human-readable documentation from lineage graphs.</span>
+  </a>
+</div>
+
+## Data product management
+
+<div class="channel-grid not-content">
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/generate-data-products/">
+    <span class="channel-card-head"><SparklesIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Generate data products from usage evidence</span></span>
+    <span class="channel-card-desc">Turn QLI usage signals and BI lineage into fully enriched, chat-ready data products with a supervised approval gate.</span>
+  </a>
+  <a class="channel-card" href="/agent-studio-docs/get-started/recipes/recommend-data-products/">
+    <span class="channel-card-head"><SparklesIcon width={22} height={22} aria-hidden="true" /><span class="channel-card-name">Populate the Opportunities Inbox</span></span>
+    <span class="channel-card-desc">Run the recommender on a schedule to surface high-value clusters as inbox cards that stewards claim at their own pace.</span>
   </a>
 </div>
 
