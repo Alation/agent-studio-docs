@@ -1,0 +1,60 @@
+---
+title: Data Product Recommender
+description: An unattended agent that identifies high-value table clusters from relational database query usage, BI usage, and catalog metadata, then surfaces them as recommendation cards in the Alation Opportunities Inbox.
+---
+
+The Data Product Recommender is an unattended agent that runs the same evidence pipeline as the [Data Product Generator](/agent-studio-docs/build/agents/data-product-generator/) — identify, reconfirm, synthesize, prioritize — but never creates a product.
+Instead, it writes recommendation cards to the Alation Opportunities Inbox so data stewards can review and claim them at their own pace.
+
+This agent is designed to run without a human in the loop.
+It does not stop to ask for approval; it runs the full pipeline and writes the results.
+
+## How it works
+
+1. Reads the current Opportunities Inbox to avoid re-proposing already-active clusters
+2. Identifies candidate table clusters from relational database query usage and catalog metadata
+3. Reconfirms each cluster against BI usage data and per-table usage detail
+4. Groups tables into coherent clusters and ranks them by impact
+5. Writes all candidates to the Opportunities Inbox in a single batch
+
+## Input parameters
+
+Required:
+
+- `message` (string): Describes the scope — "scan all active datasources" or "recommend data products for the SALES schema"
+
+Optional:
+
+- `datasource_id` (integer): Scope the evidence pipeline to a single datasource
+
+## Output format
+
+The agent produces thinking, tool call, tool return, and text blocks as it runs.
+It does not pause for input.
+The final message reports the outcome: how many cards were inserted, how many already existed, and how many were skipped.
+
+## Recommendation card fields
+
+Each card written to the Opportunities Inbox contains:
+
+| Field | Description |
+|-------|-------------|
+| `title` | Business-outcome name (e.g. "Sales Orders"), not a schema or table name |
+| `short_description` | One line leading with business value and the BI reports it supports |
+| `source` | The primary signal: `query_history` (default) \| `bi_usage` \| `strategic_insights` |
+| `confidence` | `high` \| `medium` \| `low` based on usage strength and BI coverage |
+| `member_tables` | Non-empty list of fully-qualified table names |
+| `evidence` | Usage context, BI consumers, confidence rationale, and suggested example questions |
+
+## Behavior notes
+
+- Checks the inbox first — skips any candidate that substantially overlaps an existing active card
+- Writes all candidates in a single batch; skipped candidates are not retried
+- Individual query details and user identities from usage data are never exposed
+- Gaps in BI usage data are noted in the evidence rather than being treated as confirmation that no consumers exist
+
+## Related
+
+- [Data Product Generator](/agent-studio-docs/build/agents/data-product-generator/) — the interactive companion that creates and enriches products in a supervised session
+- [Recommend data products recipe](/agent-studio-docs/get-started/recipes/recommend-data-products/)
+- [All built-in agents](/agent-studio-docs/build/agents/default-agents/)
