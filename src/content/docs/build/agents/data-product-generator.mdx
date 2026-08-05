@@ -1,0 +1,67 @@
+---
+title: Data Product Generator
+description: An interactive agent that identifies high-value table clusters from relational database query usage, BI usage, and catalog metadata, then creates and fully enriches chat-ready Alation data products.
+---
+
+The Data Product Generator is an interactive agent that turns relational database query usage, BI usage, and catalog metadata into well-scoped, fully enriched, chat-ready data product proposals — and, when you approve, creates them.
+It opens with a short clarifying exchange, runs an evidence pipeline, presents a ranked shortlist for your approval, then loops through each approved cluster to create and enrich a complete draft.
+
+## How it works
+
+1. Asks how you want to work: default pipeline across a datasource/schema, specific tables, a single product, or enrichment of an existing product
+2. Identifies candidate table clusters from relational database query usage and catalog metadata
+3. Reconfirms each cluster against BI usage data and per-table usage detail
+4. Synthesizes tables into coherent clusters — tables queried together or feeding the same BI reports become one cluster; disjoint-usage tables become separate ones
+5. Ranks clusters by impact and presents the shortlist for your approval
+6. Creates a draft data product for each approved cluster, then enriches it completely before moving on
+
+The agent never creates anything until you have approved the shortlist.
+
+## Input parameters
+
+Required:
+
+- `message` (string): Your natural-language request. Examples:
+  - "Generate data products for the SALES schema"
+  - "Enrich the existing Orders product"
+  - "Create a data product from the upstream tables behind the Revenue dashboard"
+  - "Generate eval cases for the Orders product from its query logs and upstream BI reports"
+
+Optional:
+
+- `datasource_id` (integer): Scope the evidence pipeline to a single datasource instead of scanning all active sources
+
+## Output format
+
+The agent produces thinking, tool call, tool return, and text blocks as it works.
+At each gate (shortlist approval, metric approval, eval-case approval, promotion to ready) it stops and waits for your response before proceeding.
+The final message is a per-product status summary: `created / enriched / ready / failed`.
+
+## Enrichment checklist
+
+Every created product is enriched to the following before the agent marks it chat-ready:
+
+- **Columns** — all columns with name, type, and description; never an empty schema
+- **Documentation links** — each record set links back to its catalog page
+- **Delivery system** — database connection URI copied exactly from the catalog configuration
+- **Relationships** — observed joins between member tables
+- **Metrics** — proposed KPIs derived from recurring query patterns, added only after your explicit approval
+- **Descriptions** — product and per-column descriptions grounded in real usage, not boilerplate
+- **Example questions** — 5–10 natural-language starter prompts derived from observed query intent and BI report measures
+- **Eval cases** — question/SQL pairs, created and run only after your approval; failures are used to fix the spec before promotion
+- **Chat-ready status** — set only after the spec is complete, evals have passed, and you have approved promotion
+
+## Behavior notes
+
+- One pipeline whether you want one product or many — the cluster count is an output of the evidence pipeline, not an upfront assumption
+- Checks for existing products before creating; prefers updating a draft over creating a duplicate
+- Each product in a batch is built independently — a failure on one does not abort the rest
+- Gaps in BI usage data prompt a question rather than being treated as confirmation that no consumers exist
+- Individual query details and user identities from usage data are never exposed
+
+## Related
+
+- [Data Product Recommender](/agent-studio-docs/build/agents/data-product-recommender/) — the unattended companion that populates the Opportunities Inbox without creating products
+- [Revise Data Product](/agent-studio-docs/build/agents/revise-data-product/) — iteratively improves an existing product's spec using eval results
+- [Generate data products recipe](/agent-studio-docs/get-started/recipes/generate-data-products/)
+- [All built-in agents](/agent-studio-docs/build/agents/default-agents/)

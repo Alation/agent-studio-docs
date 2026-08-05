@@ -1,0 +1,92 @@
+---
+title: Generate Data Products from Usage Evidence
+description: "Use the Data Product Generator to turn relational database query usage, BI usage, and catalog metadata into fully enriched, chat-ready data products with a human approval gate at every key step."
+titleIcon: sparkles
+titleIconAccent: violet
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components'
+
+Most data teams have high-value table clusters that analysts query every day — but they've never been formally defined as data products, so they can't be queried in chat or surfaced in the Data Marketplace.
+The Data Product Generator finds those clusters automatically from relational database query usage, BI usage, and catalog metadata, proposes a ranked shortlist, and — after you approve — creates and fully enriches each product so it's chat-ready on day one.
+
+<div class="recipe-cost not-content">
+  <div class="recipe-cost__main">
+    <span class="recipe-cost__label">Estimated cost</span>
+    <span class="recipe-cost__figure">&lt;1<span class="recipe-cost__acu">ACU</span><span class="recipe-cost__per">per run</span></span>
+  </div>
+  <p class="recipe-cost__note">This agent runs via a codemode skill pipeline. Catalog lookups, lineage traces, column profiling, product creation, eval case generation, and promotion all execute as internal skill functions — they are not individually metered as tool calls. Actual metered action consumption is near zero regardless of cluster count or table depth. <a href="/agent-studio-docs/security/observability/usage/#how-consumption-is-priced">At 0.25 ACU per metered action</a>; confirm actual spend on the <a href="/agent-studio-docs/security/observability/usage/">Usage page</a>.</p>
+</div>
+
+## What you'll use
+
+<div class="uses-grid not-content">
+  <a class="uses-card" href="/agent-studio-docs/build/agents/data-product-generator/">
+    <span class="uses-card__name">Data Product Generator agent</span>
+    <span class="uses-card__purpose">Identifies clusters, proposes products, creates and enriches drafts</span>
+  </a>
+</div>
+
+## Build it
+
+<Steps>
+
+1. **Confirm usage data and BI metadata are populated**
+
+   The generator grounds every proposal in evidence it fetches — it never invents usage.
+   Before running, verify that relational database query logs have been ingested for your target datasource and that at least one BI source has been cataloged.
+   Datasources with no query history will produce proposals based only on catalog metadata.
+
+2. **Start the agent and agree on scope**
+
+   Open the Data Product Generator agent and describe your target.
+   The agent will propose its default pipeline and ask for the datasource or schema if you haven't named one.
+   Accept the default or steer it toward a specific table set, a BI dashboard's upstream tables, or enrichment of an existing product.
+
+3. **Review the ranked shortlist**
+
+   The agent presents a ranked shortlist: each cluster with its name, member tables, supporting evidence, and the BI reports that consume it.
+   Approve the full batch, select a subset, or ask to work through them one at a time.
+
+   <Aside type="tip">
+   If BI coverage is missing where you'd expect it, the agent will ask which reports depend on these tables rather than assuming the gap is accurate.
+   Fill in what you know — it gets folded into the evidence and the product description.
+   </Aside>
+
+4. **Review and approve metrics**
+
+   For each cluster, the agent proposes KPI metrics inferred from recurring query patterns.
+   Metrics are not added until you explicitly approve them — review each proposed expression and accept or adjust.
+
+5. **Review and approve eval cases**
+
+   After creating a draft product, the agent proposes a set of question/SQL eval pairs that test whether the product can answer its example questions.
+   These are created and run only after your approval.
+   Failures surface spec problems before you promote to ready.
+
+6. **Promote to ready**
+
+   Once all enrichment items are populated and the eval suite has passed, the agent asks you to promote the version to `ready`.
+   Only then does it become queryable in chat.
+   If anything is incomplete it stays DRAFT — the agent never auto-promotes.
+
+</Steps>
+
+## Gotchas
+
+- The generator uses the database connection URI from the catalog configuration. A mislabeled or stale URI breaks chat querying — confirm it in the catalog before promoting to ready.
+- The agent checks for existing products before creating. If a similar product already exists, it will ask whether to create a new one or augment the existing draft.
+- Metrics and eval cases require explicit approval — the agent waits at each gate.
+
+## Variations
+
+- **Read-only advisor** — clone the agent and remove the write capability to get proposals and enrichment previews without any writes to the catalog.
+- **Single product** — name a specific table set at the start; the pipeline scopes to those tables and produces exactly one cluster proposal.
+- **Bulk unattended** — use the [Data Product Recommender](/agent-studio-docs/get-started/recipes/recommend-data-products/) to populate the Opportunities Inbox automatically, then claim and generate from there.
+
+## Related
+
+- [Data Product Generator agent reference](/agent-studio-docs/build/agents/data-product-generator/)
+- [Recommend data products recipe](/agent-studio-docs/get-started/recipes/recommend-data-products/)
+- [Revise Data Product agent](/agent-studio-docs/build/agents/revise-data-product/)
+- [Known limitations](/agent-studio-docs/get-started/recipes/known-limitations/)
