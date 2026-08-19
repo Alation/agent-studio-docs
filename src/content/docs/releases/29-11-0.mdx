@@ -1,0 +1,63 @@
+---
+title: 29.11.0
+description: Release notes for Agent Studio 29.11.0
+sidebar:
+  order: -29011000
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components'
+
+**Release Date:** 2026-08-19
+
+**Version Range:** v28.8.0 -> v29.11.0
+
+## Highlights
+
+- Major version 29.0.0 drops Deno sandbox for vega_lite_spec chart rendering.
+- Lineage Builder now includes curate skill for updating dataflow metadata.
+- Agent Studio writes are now gated on user approval for safer operations.
+- Alamigo provides role-aware responses tailored to the caller's IAM role.
+- Local eval runs are now fully documented with environment templates.
+
+## What's New
+
+### Features
+
+- **Lineage Builder Curate Skill:** Added curate skill to Lineage Builder agent, allowing updates to existing dataflow metadata and content on manual dataflow objects.
+- **Agent Studio Write Gates:** Agent Studio write operations now require explicit user approval before execution, preventing accidental modifications.
+- **Role-Aware Alamigo Responses:** Alamigo now tailors responses based on the caller's IAM role, providing more contextual assistance.
+- **Page Context for Agents:** Agents can now access page context by declaration, with caller role information available throughout the request lifecycle.
+- **Local Eval Support:** Added comprehensive documentation and environment templates for running evaluations locally, including Coveo requirements.
+- **Metrics Capture:** New metrics infrastructure captures corrected-chat metrics, query sources, and exposes candidate inspection.
+- **Merged Agent Studio Skills:** Configure and automate skills merged into unified agent_studio skill for simpler routing.
+- **Feed Attribution:** Feeds now validate and request attribution, with insight query schema for capturing query outcomes.
+- **QLI Job Completion Endpoint:** New endpoint for tracking QLI job completion status.
+- **Search Improvements:** Filter-context object limit raised from 100 to 1000 for broader search capabilities.
+- **Cost Attribution:** Enabled cost attribution via STS session tags in seprod and staging environments.
+- **UNSTRUCTURED_DATA Product Area:** New product area for unstructured data processing with quota support.
+- **Catalog Search Reuse:** Catalog search results now reused across Alation One for improved performance.
+
+### Improvements
+
+- **Escalation Diagnostics Gate:** Escalation flow now enforces auto-fetch diagnostics before case creation with turn-scoped loop guard.
+- **PowerBI AI Parser:** Registered powerbi_ai_parser product area with quota exemption.
+- **Health Logging:** Deep health checks now log details on non-pass results for better debugging.
+- **Observability:** Allowlisted alation_one for content observability.
+
+### Bug Fixes
+
+- Fixed DQ pilot Databricks OCF connector mapping to use spark via DQMS.
+- Fixed schedule auth issues: restore auth on enable, detach disabled schedule auth, return conflict for scheduled auth.
+- Fixed usage metrics: persist chat_id and count individual tool calls correctly.
+- Fixed escalation gate behavior with symmetric fail-open and proper call matching.
+- Fixed page context to never emit raw and snapshot caller role correctly.
+- Fixed search to tolerate unknown otypes and stop retrying fatal CF errors.
+- Ungated Alation One guardrail mount for prod.
+
+### Breaking Changes
+
+- **Dropped Deno sandbox for vega_lite_spec** (29.0.0) - Chart rendering no longer uses Deno sandbox. If you have custom vega_lite_spec configurations, verify they work with the new rendering approach.
+
+## Customer Impact
+
+The removal of the Deno sandbox for vega_lite_spec may affect custom chart configurations. Test any custom chart specs after upgrading.
