@@ -167,6 +167,12 @@ export default defineConfig({
                             "build/overview",
                             "build/best-practices",
                             {
+                                label: "Data products",
+                                items: [
+                                    "build/data-products/best-practices",
+                                ],
+                            },
+                            {
                                 label: "Tools",
                                 items: [
                                     "build/tools/overview",
