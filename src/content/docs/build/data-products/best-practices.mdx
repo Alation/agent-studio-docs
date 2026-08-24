@@ -1,0 +1,116 @@
+---
+title: Data product best practices
+description: "How to scope, evaluate, optimize, and continuously improve data products for accurate, reliable agent responses."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import evaluationCreationImg from '../../../../assets/img/build/data-products/evaluation-creation.png';
+import evaluationCasesImg from '../../../../assets/img/build/data-products/evaluation-cases.png';
+
+Data products package the data and business context that people and agents need for a specific use case.
+A well-designed data product is narrowly scoped, self-contained, and testable, which helps agents reason over its data accurately and consistently.
+
+This guide follows the data product lifecycle from initial creation through ongoing improvement.
+For product concepts and administration, see the [Data Products documentation](https://documentation.alation.com/en/latest/DataProductsandMarketplace/ManageDataProductsApp/index).
+
+## Scope the data product
+
+Build each data product around a clear use case.
+Include only the schemas, tables, and columns required to answer the questions in that use case.
+A smaller scope reduces ambiguity, limits irrelevant context, and helps agents respond faster.
+
+<Aside type="tip" title="Include only what the use case needs">
+Extra columns and tables increase the amount of context an agent must process and can introduce competing interpretations.
+Start with the smallest useful scope and expand it only when evaluation results or user questions reveal a gap.
+</Aside>
+
+Data products can also use catalog documentation as context.
+This is useful for business definitions, metrics, policies, and standard operating procedures, but searching more documentation can increase latency and tool usage.
+
+Apply least-privilege scoping to documentation:
+
+1. Attach individual documents when possible.
+2. Attach a specific folder when several related documents are required.
+3. Use catalog-wide documentation only when the use case cannot be served by a narrower scope.
+
+## Establish an evaluation baseline
+
+When a data product is created, it draws on the context already available in the catalog.
+If that context is incomplete, Alation can suggest enrichments such as descriptions, metric definitions, relationships, and clearer column names.
+
+Treat the initial product as a starting point.
+Before publishing it broadly, create evaluation cases that represent the questions users will ask and the SQL that should answer them.
+Evaluation cases expose ambiguous terms, missing synonyms, incomplete relationships, and inconsistent behavior.
+
+You can create evaluation cases in several ways:
+
+- Add question-and-SQL pairs manually.
+- Upload a CSV file.
+- Generate cases from published queries and query-log history.
+- Use the [SQL Eval Case Manager](/agent-studio-docs/build/agents/sql-eval-case-manager/) to generate or audit cases interactively.
+
+<Image
+  src={evaluationCreationImg}
+  alt="The Evaluations tab for a data product with controls to generate evaluations, import a CSV, open evaluation chat, or add a question"
+  style="max-width: 100%; height: auto;"
+/>
+
+Good evaluation cases are specific, non-empty, temporally stable, consistent, and reproducible.
+Use the SQL Eval Case Manager to audit existing cases or help create new ones.
+
+<Image
+  src={evaluationCasesImg}
+  alt="The Questions view for a data product evaluation set, showing evaluation questions and the expected SQL for the selected question"
+  style="max-width: 100%; height: auto;"
+/>
+
+For detailed guidance, see [SQL evaluations for data products](/agent-studio-docs/build/evals/data-product-evaluations/).
+
+## Optimize before publishing
+
+Run the evaluation set and review individual failures, not only the overall score.
+Use each failure to identify a concrete gap in the data product, such as:
+
+- A business term or synonym that is not defined.
+- An ambiguous metric or time period.
+- A missing relationship between tables.
+- An unnecessary table or column that creates ambiguity.
+- An expected query that does not match the wording of its evaluation question.
+
+Use **Suggest Improvements** to analyze failures from the latest evaluation run and propose changes to the data product.
+If no evaluation result exists, Alation runs the evaluation first.
+The proposed changes are validated by rerunning the evaluation set, then made available for you to review, modify, and accept.
+See [Suggest Improvements](https://documentation.alation.com/en/latest/DataProductsandMarketplace/ManageDataProducts/SuggestImprovementsToDataProduct) for instructions.
+
+Repeat this cycle until the product answers its representative questions consistently:
+
+1. Run evaluations.
+2. Inspect failures.
+3. Improve the product's metadata and scope.
+4. Rerun evaluations and check for regressions.
+
+## Improve the data product over time
+
+Enable **Automatic Improvements** to monitor a data product after publication.
+Automatic Improvements uses two feedback loops:
+
+- **Catalog changes:** Detects schema drift and metadata changes, then surfaces proposed updates for review.
+- **User feedback:** Analyzes data product chats and thumbs-up or thumbs-down feedback, then proposes improvements based on how people use the product.
+
+When appropriate, Alation creates an evaluation case from user feedback to validate that a proposed change improves the new scenario without regressing existing cases.
+Review these suggestions regularly and keep evaluation cases that represent important production questions.
+
+Continued use does not improve a data product by itself.
+The improvement comes from reviewing feedback, accepting appropriate changes, and maintaining an evaluation set that protects expected behavior.
+
+## Lifecycle checklist
+
+- Define one clear use case.
+- Include only the required data and documentation.
+- Add representative evaluation cases.
+- Resolve ambiguity and missing context revealed by failures.
+- Rerun the full evaluation set after every material change.
+- Publish only after representative cases pass consistently.
+- Enable Automatic Improvements and review its suggestions.
+- Add useful production questions to the evaluation set.
