@@ -1,0 +1,73 @@
+---
+title: 29.31.4
+description: Release notes for Agent Studio 29.31.4
+sidebar:
+  order: -29031004
+---
+
+import { Aside, Badge } from '@astrojs/starlight/components'
+
+**Release Date:** 2026-08-31
+
+**Version Range:** v29.11.0 -> v29.31.4
+
+## Highlights
+
+- Feed chat now has full data product context and grounded insights.
+- Curation Hub Automation skill enables CHS-backed curation workflows.
+- Help skill prevents URL fabrication with source headers.
+- SQL evaluations can now suggest fixes from eval results.
+- Auth config endpoints are now properly scoped to callers.
+
+## What's New
+
+### Features
+
+- **Feed Chat Grounding:** Feed chat is now grounded in insights and charts, with preloaded data products and frozen component IDs for consistent behavior.
+- **Curation Hub Automation:** New CHS-backed curation_automation skill with dedicated Curation Hub Automation product area.
+- **SQL Eval Fixes:** SQL evaluations can now suggest fixes from eval results, improving the feedback loop.
+- **Help URL Safety:** Help skill now prepends source headers to prevent URL fabrication and carries source URLs on the search path.
+- **Current User Injection:** Agents now have access to the current user context via prompt injection.
+- **Feed Page Attribution:** Feed hydrate requests now include page_id for better log attribution.
+- **System User:** Added alation-ai as a system user with ability to delete.
+- **Navigation Fields:** Skills now support navigation and enablement fields for better routing.
+- **Sonnet 4.6 Regions:** Enabled Sonnet 4.6 in ap-southeast-1 and ap-south-1 regions.
+- **Feed Signal Mining:** Feed chat conversations are now mined as a signal source for self-improvement.
+- **Chat Source Tags:** Added feed_builder and feed_editor chat-source tags for attribution.
+
+### Improvements
+
+- **Auth Scoping:** Auth config list and by-id endpoints are now properly scoped to the caller.
+- **Tool Retries:** Increased tool call retries from 2 to 3 for better reliability.
+- **Bedrock Throttle Handling:** Mid-stream Bedrock 429 throttles are now retried automatically.
+- **Feed Grain Guidance:** Feed preserves series dimensions in grain guidance for more accurate charts.
+- **Completions Error Handling:** Narrowed BYOM exception handling with proper region-config error distinction.
+- **CI/CD:** Migrated workflows off Vault KV to GitHub OIDC for AWS credentials.
+- **Test Stability:** Split test_chat.py into domain-scoped files and stabilized agent-sharing tests.
+
+### Bug Fixes
+
+- Fixed default product area for native DQ advisor agent.
+- Fixed help skill to carry source URLs and prevent URL fabrication.
+- Fixed peer-revisions to populate evaluation and provenance metadata.
+- Fixed DQ monitor to stop enumerating high-cardinality value sets.
+- Fixed Alamigo to ban skill-narration in user-facing text.
+- Fixed feed hydration idempotency key on save-back.
+- Fixed data-products builder creation grounding.
+- Fixed DP version preservation in SQL evals.
+- Fixed feed to guard chart str fields against off-spec values.
+- Fixed feed to drop insights without resolved titles.
+- Fixed feed dialect lookup bounds and empty schema handling.
+- Fixed feed SQL aliasing for date-probe aggregates.
+- Fixed auth config owner filtering to be opt-in.
+- Fixed sampling table access validation.
+- Fixed completions to move usage reads outside try blocks.
+- Fixed codemode to stop re-prompting approved writes.
+
+### Breaking Changes
+
+None in this release.
+
+## Customer Impact
+
+None in this release.
