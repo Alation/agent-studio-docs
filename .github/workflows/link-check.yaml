@@ -22,7 +22,7 @@ jobs:
                   for attempt in $(seq 1 "$max_attempts"); do
                     echo "Attempt $attempt of $max_attempts: Installing d2..."
 
-                    if curl -fsSL https://d2lang.com/install.sh | sh -s --; then
+                    if curl -fsSL https://d2lang.com/install.sh | sh -s -- --version v0.7.1; then
                       echo "✅ d2 installed successfully."
                       exit 0
                     fi
