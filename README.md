@@ -1,6 +1,12 @@
 # Agent Studio Documentation
 
-This repository serves as documentation for Agent Studio.
+> [!IMPORTANT]
+> **This repository is read-only and no longer maintained.**
+> All Agent Studio documentation now lives at **[documentation.alation.com](https://documentation.alation.com/en/latest/agentstudio/get-started/what-is-agent-studio)**. Please go there for current docs.
+>
+> Links to the old site at `alation.github.io/agent-studio-docs` redirect to the matching page on the new site.
+
+This repository served as documentation for Agent Studio.
 
 ## Development
 
