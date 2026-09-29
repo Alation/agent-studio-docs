@@ -100,6 +100,7 @@ export default defineConfig({
     integrations: [
         starlight({
             title: "Alation Agent Studio Documentation",
+            routeMiddleware: "./src/routeData.ts",
             logo: {
                 light: "./src/assets/logo-light.svg",
                 dark: "./src/assets/logo-dark.svg",
